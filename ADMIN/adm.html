@@ -1,25 +1,101 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel do Administrador</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: #eef2f7; margin: 0; padding: 20px; }
-    .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    h1 { color: #333; }
-    .btn { display: inline-block; padding: 10px 20px; background: #28a745; color: white; text-decoration: none; border-radius: 4px; margin-top: 20px; }
-    .btn:hover { background: #218838; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Administrador - Gerenciamento</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background-color: #0b0713;
+            color: #ffffff;
+            padding: 20px;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .logo-area h1 {
+            color: #ff2a85;
+            font-size: 22px;
+        }
+        .logo-area p {
+            color: #a0a0a0;
+            font-size: 13px;
+        }
+        .btn-sair {
+            background-color: #ff2a85;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .panel-box {
+            background: #140d24;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .panel-box h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #e0e0e0;
+        }
+        .admin-card {
+            background: #1f1235;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #7c3aed;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>Bem-vindo ao Painel do Administrador</h1>
-    <p>Aqui você gerencia as rádios, usuários e configurações do sistema.</p>
-    
-    <a href="../index.html" class="btn">Sair / Voltar ao Login</a>
-  </div>
+    <header>
+        <div class="logo-area">
+            <h1>Painel do Administrador</h1>
+            <p>Gerencie rádios, usuários e mensagens do sistema</p>
+        </div>
+        <div>
+            <a href="../OUVINTES/ouvinte_cards_radio.html" class="btn-sair">Sair / Voltar ao Painel</a>
+        </div>
+    </header>
+
+    <div class="admin-grid">
+        <!-- Coluna de Gerenciamento de Rádios -->
+        <div class="panel-box">
+            <h3>📻 Gerenciar Rádios do Sistema</h3>
+            <div class="admin-card">Maringá FM - Status: Ativa</div>
+            <div class="admin-card">Jovem Pam Cascavel - Status: Ativa</div>
+            <div class="admin-card">Antena 1 - Status: Ativa</div>
+        </div>
+
+        <!-- Coluna de Mensagens Recebidas -->
+        <div class="panel-box">
+            <h3>💬 Mensagens e Pedidos dos Ouvintes</h3>
+            <div class="admin-card">"Adicionar rádio Mix FM por favor!"</div>
+            <div class="admin-card">"Parabéns pela programação da rádio."</div>
+        </div>
+    </div>
 
 </body>
 </html>
