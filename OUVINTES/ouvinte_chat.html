@@ -3,226 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel do Ouvinte - Chat estilo WhatsApp</title>
-    <!-- Scripts do Firebase (Compat) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <title>Painel do Ouvinte - Chat com ADM</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f3f0f7;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .card {
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 6px 15px rgba(88, 28, 135, 0.1);
-            width: 100%;
-            max-width: 450px;
-            height: 85vh;
-            display: flex;
-            flex-direction: column;
-            border-top: 5px solid #6b21a8;
-        }
-        h2 {
-            text-align: center;
-            color: #4c1d95;
-            margin-top: 0;
-            margin-bottom: 15px;
-            font-size: 20px;
-        }
-        .identificacao-box {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #5b21b6;
-            font-size: 13px;
-            font-weight: 600;
-        }
-        input {
-            width: 100%;
-            padding: 9px;
-            border: 1px solid #d8b4fe;
-            border-radius: 6px;
+        * {
             box-sizing: border-box;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
         }
-        input:focus {
-            border-color: #7c3aed;
-            box-shadow: 0 0 5px rgba(124, 58, 237, 0.3);
+        body {
+            background-color: #0b0713;
+            color: #ffffff;
+            padding: 20px;
         }
-        /* Estilo do Chat (Estilo WhatsApp) */
-        .chat-container {
-            flex: 1;
-            border: 1px solid #d8b4fe;
-            border-radius: 8px;
-            background-color: #efe7f5;
-            padding: 10px;
-            overflow-y: auto;
+        header {
             display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 10px;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
         }
-        .mensagem {
-            max-width: 75%;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            word-wrap: break-word;
-            position: relative;
+        .logo-area h1 {
+            color: #ff2a85;
+            font-size: 22px;
         }
-        .mensagem.recebida {
-            background-color: #ffffff;
-            align-self: flex-start;
-            border-left: 4px solid #7c3aed;
+        .logo-area p {
+            color: #a0a0a0;
+            font-size: 13px;
         }
-        .mensagem.enviada {
-            background-color: #e9d5ff;
-            align-self: flex-end;
-            border-right: 4px solid #6b21a8;
-        }
-        .msg-autor {
-            font-size: 11px;
-            font-weight: bold;
-            color: #4c1d95;
-            margin-bottom: 3px;
-        }
-        .msg-texto {
-            color: #333333;
-        }
-        .chat-input-area {
-            display: flex;
-            gap: 8px;
-        }
-        .chat-input-area input {
-            flex: 1;
-        }
-        button {
-            padding: 10px 15px;
+        .btn-voltar {
             background-color: #7c3aed;
             color: white;
             border: none;
+            padding: 8px 16px;
             border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .chat-container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #140d24;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .chat-messages {
+            height: 350px;
+            overflow-y: auto;
+            background: #0b0713;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .message-bubble {
+            background: #1f1235;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            max-width: 80%;
+            border: 1px solid #7c3aed;
+        }
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+        }
+        .chat-input {
+            flex: 1;
+            background: #1f1235;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            color: white;
             font-size: 14px;
+        }
+        .btn-enviar {
+            background: #ff2a85;
+            color: white;
+            border: none;
+            padding: 0 24px;
+            border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.2s;
         }
-        button:hover {
-            background-color: #6d28d9;
+        .btn-enviar:hover {
+            opacity: 0.9;
         }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h2>Chat da Rádio</h2>
+    <header>
+        <div class="logo-area">
+            <h1>Chat com o Administrador</h1>
+            <p>Envie sua mensagem ou pedido de rádio em tempo real</p>
+        </div>
+        <div>
+            <a href="ouvinte_cards_radio.html" class="btn-voltar">Voltar ao Painel</a>
+        </div>
+    </header>
+
+    <div class="chat-container">
+        <h3 style="margin-bottom: 15px; font-size: 15px; color: #e0e0e0;">💬 Suas Mensagens e Respostas</h3>
         
-        <div class="identificacao-box">
-            <label>Seu Apelido / Nome no Chat</label>
-            <input type="text" id="chat-usuario" placeholder="Digite seu nome ou apelido">
+        <!-- Caixa onde as mensagens do Firebase vão aparecer dinamicamente -->
+        <div id="boxMensagens" class="chat-messages">
+            <div class="message-bubble">Carregando mensagens da nuvem...</div>
         </div>
 
-        <!-- Caixa de Mensagens -->
-        <div id="chat-mensagens" class="chat-container">
-            <!-- As mensagens aparecem aqui em tempo real -->
-        </div>
-
-        <!-- Área de Envio -->
         <div class="chat-input-area">
-            <input type="text" id="chat-mensagem-texto" placeholder="Digite sua mensagem..." onkeypress="verificarEnterChat(event)">
-            <button onclick="enviarMensagem()">Enviar</button>
+            <input type="text" id="inputMensagem" class="chat-input" placeholder="Escreva seu recado ou pedido de rádio aqui...">
+            <button id="btnEnviar" class="btn-enviar">Enviar</button>
         </div>
     </div>
 
-    <script>
-        // Configuração do Firebase utilizando o seu projeto
-        const firebaseConfig = {
-            databaseURL: "https://novo-jeito-de-ouvir-radio-default-rtdb.firebaseio.com"
-        };
+    <!-- Importação da Conexão Centralizada do Firebase -->
+    <script type="module">
+        import { db } from '../firebase-config.js';
+        import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Inicializar Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const db = firebase.database();
+        const boxMensagens = document.getElementById('boxMensagens');
+        const inputMensagem = document.getElementById('inputMensagem');
+        const btnEnviar = document.getElementById('btnEnviar');
 
-        // Referência para o chat no Realtime Database
-        const chatRef = db.ref('chat_ouvintes');
-
-        // Escutar mensagens em tempo real (aparece igual WhatsApp para qualquer dispositivo conectado)
-        chatRef.on('child_added', (snapshot) => {
-            const dados = snapshot.val();
-            adicionarMensagemNaTela(dados.usuario, dados.mensagem);
+        // Função para escutar as mensagens em tempo real do Firebase
+        const q = query(collection(db, "mensagens_chat"), orderBy("timestamp", "asc"));
+        
+        onSnapshot(q, (snapshot) => {
+            boxMensagens.innerHTML = "";
+            if (snapshot.empty) {
+                boxMensagens.innerHTML = '<div class="message-bubble">Nenhuma mensagem enviada ainda. Digite algo abaixo!</div>';
+                return;
+            }
+            snapshot.forEach((doc) => {
+                const dados = doc.data();
+                const div = document.createElement('div');
+                div.className = 'message-bubble';
+                div.textContent = dados.texto || "Mensagem vazia";
+                boxMensagens.appendChild(div);
+            });
+            boxMensagens.scrollTop = boxMensagens.scrollHeight;
         });
 
-        function enviarMensagem() {
-            const usuario = document.getElementById('chat-usuario').value.trim();
-            const mensagemInput = document.getElementById('chat-mensagem-texto');
-            const mensagem = mensagemInput.value.trim();
+        // Evento de clique para enviar mensagem ao Firebase
+        btnEnviar.addEventListener('click', async () => {
+            const textoMensagem = inputMensagem.value.trim();
+            if (textoMensagem === "") return;
 
-            if (!usuario) {
-                alert('Por favor, digite seu apelido/nome antes de enviar mensagens!');
-                document.getElementById('chat-usuario').focus();
-                return;
+            try {
+                await addDoc(collection(db, "mensagens_chat"), {
+                    texto: textoMensagem,
+                    timestamp: serverTimestamp()
+                });
+                inputMensagem.value = "";
+            } catch (erro) {
+                console.error("Erro ao enviar mensagem: ", erro);
+                alert("Erro ao enviar mensagem. Verifique a conexão.");
             }
+        });
 
-            if (!mensagem) {
-                return;
+        // Enviar também ao apertar a tecla Enter
+        inputMensagem.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                btnEnviar.click();
             }
-
-            // Envia a nova mensagem para o Firebase
-            const novaMensagemRef = chatRef.push();
-            novaMensagemRef.set({
-                usuario: usuario,
-                mensagem: mensagem,
-                timestamp: Date.now()
-            });
-
-            // Limpa o campo de texto da mensagem
-            mensagemInput.value = '';
-        }
-
-        function verificarEnterChat(event) {
-            if (event.key === 'Enter') {
-                enviarMensagem();
-            }
-        }
-
-        function adicionarMensagemNaTela(autor, texto) {
-            const container = document.getElementById('chat-mensagens');
-            const usuarioAtual = document.getElementById('chat-usuario').value.trim();
-
-            const divMsg = document.createElement('div');
-            divMsg.classList.add('mensagem');
-
-            // Diferencia visualmente as mensagens enviadas por quem está digitando vs outros
-            if (autor === usuarioAtual && usuarioAtual !== "") {
-                divMsg.classList.add('enviada');
-            } else {
-                divMsg.classList.add('recebida');
-            }
-
-            divMsg.innerHTML = `
-                <div class="msg-autor">${autor}</div>
-                <div class="msg-texto">${texto}</div>
-            `;
-
-            container.appendChild(divMsg);
-            
-            // Auto scroll para a mensagem mais recente
-            container.scrollTop = container.scrollHeight;
-        }
+        });
     </script>
+
 </body>
 </html>
