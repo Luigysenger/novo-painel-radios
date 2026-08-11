@@ -3,136 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel do Ouvinte - Quadro Horóscopo</title>
-    <!-- Scripts do Firebase (Compat) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <title>Painel do Ouvinte - Horóscopo</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f3f0f7;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .card {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 6px 15px rgba(88, 28, 135, 0.1);
-            width: 100%;
-            max-width: 450px;
-            border-top: 5px solid #6b21a8;
-        }
-        h2 {
-            text-align: center;
-            color: #4c1d95;
-            margin-bottom: 20px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #5b21b6;
-            font-size: 14px;
-            font-weight: 600;
-        }
-        input, textarea, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #d8b4fe;
-            border-radius: 6px;
+        * {
             box-sizing: border-box;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
         }
-        input:focus, textarea:focus, select:focus {
-            border-color: #7c3aed;
-            box-shadow: 0 0 5px rgba(124, 58, 237, 0.3);
+        body {
+            background-color: #0b0713;
+            color: #ffffff;
+            padding: 20px;
         }
-        button {
-            width: 100%;
-            padding: 11px;
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .logo-area h1 {
+            color: #ff2a85;
+            font-size: 22px;
+        }
+        .logo-area p {
+            color: #a0a0a0;
+            font-size: 13px;
+        }
+        .btn-voltar {
             background-color: #7c3aed;
             color: white;
             border: none;
+            padding: 8px 16px;
             border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
             cursor: pointer;
-            margin-top: 10px;
-            transition: background-color 0.2s;
-        }
-        button:hover {
-            background-color: #6d28d9;
-        }
-        .status-msg {
-            text-align: center;
-            font-size: 13px;
-            color: #047857;
-            margin-top: 10px;
             font-weight: bold;
+            text-decoration: none;
+        }
+        .content-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #140d24;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .horoscope-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        .sign-card {
+            background: #1f1235;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #7c3aed;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .sign-card:hover {
+            background: #2c1b4d;
+        }
+        .sign-card h4 {
+            color: #ff2a85;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        .sign-card p {
+            font-size: 12px;
+            color: #a0a0a0;
         }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h2>Painel do Ouvinte - Horóscopo</h2>
-        
-        <div class="form-group">
-            <label>Seu Identificador / E-mail</label>
-            <input type="text" id="ouvinte-id" placeholder="Digite seu e-mail para sincronizar" onblur="carregarDadosNuvem()">
+    <header>
+        <div class="logo-area">
+            <h1>Horóscopo do Dia</h1>
+            <p>Descubra o que os astros preparam para o seu signo hoje</p>
         </div>
+        <div>
+            <a href="ouvinte_cards_radio.html" class="btn-voltar">Voltar ao Painel</a>
+        </div>
+    </header>
 
-        <div class="form-group">
-            <label>Seu Signo</label>
-            <select id="hor-signo" onchange="salvarDadosNuvem()">
-                <option value="Áries">Áries</option>
-                <option value="Touro">Touro</option>
-                <option value="Gêmeos">Gêmeos</option>
-                <option value="Câncer">Câncer</option>
-                <option value="Leão">Leão</option>
-                <option value="VirAqui está o código completo do novo arquivo **`ouvinte_horoscopo.html`**, criado seguindo exatamente o mesmo padrão visual em tons de roxo e integrado ao **Firebase Realtime Database** para sincronização automática na nuvem:
+    <div class="content-container">
+        <h3 style="margin-bottom: 20px; font-size: 16px; color: #e0e0e0;">✨ Escolha o seu Signo</h3>
+        
+        <div class="horoscope-grid">
+            <div class="sign-card">
+                <h4>Áries</h4>
+                <p>Energia em alta para novos projetos e conquistas profissionais.</p>
+            </div>
+            <div class="sign-card">
+                <h4>Touro</h4>
+                <p>Momento excelente para focar na estabilidade financeira e pessoal.</p>
+            </div>
+            <div class="sign-card">
+                <h4>Gêmeos</h4>
+                <p>A comunicação estará facilitada. Aproveite para negociar e dialogar.</p>
+            </div>
+            <div class="sign-card">
+                <h4>Câncer</h4>
+                <p>Sua intuição estará mais forte do que nunca. Siga seus instintos.</p>
+            </div>
+            <div class="sign-card">
+                <h4>Leão</h4>
+                <p>O brilho pessoal atrai olhares e oportunidades de destaque.</p>
+            </div>
+            <div class="sign-card">
+                <h4>Virgem</h4>
+                <p>Organização e foco trarão resultados surpreendentes hoje.</p>
+            </div>
+        </div>
+    </div>
 
-```html
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel do Ouvinte - Horóscopo</title>
-    <!-- Scripts do Firebase (Compat) -->
-    <script src="[https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js](https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js)"></script>
-    <script src="[https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js](https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js)"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f3f0f7;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .card {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 6px 15px rgba(88, 28, 135, 0.1);
-            width: 100%;
-            max-width: 450px;
-            border-top: 5px solid #6b21a8;
-        }
-        h2 {
-            text-align: center;
-            color: #4c1d95;
-            margin-bottom: 20px;
-        }
-        .form-group {
-            margin-bottom: 15px;
+</body>
+</html>
