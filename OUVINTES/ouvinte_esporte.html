@@ -3,181 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel do Ouvinte - Quadro Esporte</title>
-    <!-- Scripts do Firebase (Compat) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <title>Painel do Ouvinte - Esportes</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f3f0f7;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .card {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 6px 15px rgba(88, 28, 135, 0.1);
-            width: 100%;
-            max-width: 450px;
-            border-top: 5px solid #6b21a8;
-        }
-        h2 {
-            text-align: center;
-            color: #4c1d95;
-            margin-bottom: 20px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #5b21b6;
-            font-size: 14px;
-            font-weight: 600;
-        }
-        input, textarea, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #d8b4fe;
-            border-radius: 6px;
+        * {
             box-sizing: border-box;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
         }
-        input:focus, textarea:focus, select:focus {
-            border-color: #7c3aed;
-            box-shadow: 0 0 5px rgba(124, 58, 237, 0.3);
+        body {
+            background-color: #0b0713;
+            color: #ffffff;
+            padding: 20px;
         }
-        button {
-            width: 100%;
-            padding: 11px;
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .logo-area h1 {
+            color: #ff2a85;
+            font-size: 22px;
+        }
+        .logo-area p {
+            color: #a0a0a0;
+            font-size: 13px;
+        }
+        .btn-voltar {
             background-color: #7c3aed;
             color: white;
             border: none;
+            padding: 8px 16px;
             border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
             cursor: pointer;
-            margin-top: 10px;
-            transition: background-color 0.2s;
-        }
-        button:hover {
-            background-color: #6d28d9;
-        }
-        .status-msg {
-            text-align: center;
-            font-size: 13px;
-            color: #047857;
-            margin-top: 10px;
             font-weight: bold;
+            text-decoration: none;
+        }
+        .content-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #140d24;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .sport-card {
+            background: #1f1235;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #7c3aed;
+            font-size: 14px;
+        }
+        .sport-card h4 {
+            color: #ff2a85;
+            margin-bottom: 8px;
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h2>Painel do Ouvinte - Esportes</h2>
+    <header>
+        <div class="logo-area">
+            <h1>Notícias do Esporte</h1>
+            <p>Fique por dentro de tudo o que rola no mundo esportivo</p>
+        </div>
+        <div>
+            <a href="ouvinte_cards_radio.html" class="btn-voltar">Voltar ao Painel</a>
+        </div>
+    </header>
+
+    <div class="content-container">
+        <h3 style="margin-bottom: 20px; font-size: 16px; color: #e0e0e0;">⚽ Últimas Notícias e Placares</h3>
         
-        <div class="form-group">
-            <label>Seu Identificador / E-mail</label>
-            <input type="text" id="ouvinte-id" placeholder="Digite seu e-mail para sincronizar" onblur="carregarDadosNuvem()">
+        <div class="sport-card">
+            <h4>Campeonato Brasileiro</h4>
+            <p>Acompanhe em tempo real a rodada do Brasileirão e os principais lances dos jogos de hoje.</p>
         </div>
 
-        <div class="form-group">
-            <label>Time de Coração</label>
-            <input type="text" id="esp-time" placeholder="Ex: Meu Time FC" oninput="salvarDadosNuvem()">
+        <div class="sport-card">
+            <h4>Futebol Internacional</h4>
+            <p>Resumo dos confrontos da UEFA Champions League e ligas europeias.</p>
         </div>
 
-        <div class="form-group">
-            <label>Esporte Favorito</label>
-            <select id="esp-modalidade" onchange="salvarDadosNuvem()">
-                <option value="Futebol">Futebol</option>
-                <option value="Basquete">Basquete</option>
-                <option value="Fórmula 1">Fórmula 1</option>
-                <option value="Vôlei">Vôlei</option>
-            </select>
+        <div class="sport-card">
+            <h4>Outros Esportes</h4>
+            <p>Fórmula 1, Basquete (NBA), Vôlei e as principais competições mundiais.</p>
         </div>
-
-        <div class="form-group">
-            <label>Mensagem / Palpite para o Quadro</label>
-            <textarea id="esp-mensagem" rows="3" placeholder="Deixe seu recado esportivo..." oninput="salvarDadosNuvem()"></textarea>
-        </div>
-
-        <div id="status-salvamento" class="status-msg"></div>
     </div>
 
-    <script>
-        // Configuração do Firebase utilizando o seu projeto
-        const firebaseConfig = {
-            databaseURL: "https://novo-jeito-de-ouvir-radio-default-rtdb.firebaseio.com"
-        };
-
-        // Inicializar Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const db = firebase.database();
-
-        // Função para salvar automaticamente na nuvem ao alterar qualquer campo
-        function salvarDadosNuvem() {
-            const ouvinteId = document.getElementById('ouvinte-id').value.trim();
-            
-            if (!ouvinteId) {
-                return; // Só salva se houver um identificador preenchido
-            }
-
-            // Limpa o e-mail para usar como chave segura no Firebase (remove pontos)
-            const chaveUsuario = ouvinteId.replace(/\./g, '_');
-
-            const dadosPainel = {
-                time: document.getElementById('esp-time').value,
-                modalidade: document.getElementById('esp-modalidade').value,
-                mensagem: document.getElementById('esp-mensagem').value,
-                ultimaAtualizacao: new Date().toLocaleString()
-            };
-
-            db.ref('ouvintes_esporte/' + chaveUsuario).set(dadosPainel)
-                .then(() => {
-                    const status = document.getElementById('status-salvamento');
-                    status.innerText = "Sincronizado na nuvem com sucesso!";
-                    setTimeout(() => { status.innerText = ""; }, 2500);
-                })
-                .catch((error) => {
-                    console.error("Erro ao salvar no Firebase: ", error);
-                });
-        }
-
-        // Função para carregar os dados salvos na nuvem ao digitar o e-mail e sair do campo
-        function carregarDadosNuvem() {
-            const ouvinteId = document.getElementById('ouvinte-id').value.trim();
-            if (!ouvinteId) return;
-
-            const chaveUsuario = ouvinteId.replace(/\./g, '_');
-
-            db.ref('ouvintes_esporte/' + chaveUsuario).once('value')
-                .then((snapshot) => {
-                    const dados = snapshot.val();
-                    if (dados) {
-                        document.getElementById('esp-time').value = dados.time || '';
-                        document.getElementById('esp-modalidade').value = dados.modalidade || 'Futebol';
-                        document.getElementById('esp-mensagem').value = dados.mensagem || '';
-                        
-                        const status = document.getElementById('status-salvamento');
-                        status.innerText = "Dados recuperados da nuvem!";
-                        setTimeout(() => { status.innerText = ""; }, 2500);
-                    }
-                })
-                .catch((error) => {
-                    console.error("Erro ao buscar dados: ", error);
-                });
-        }
-    </script>
 </body>
 </html>
