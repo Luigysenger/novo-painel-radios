@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Ouvinte - Quadro Horóscopo</title>
+    <!-- Scripts do Firebase (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f0f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(88, 28, 135, 0.1);
+            width: 100%;
+            max-width: 450px;
+            border-top: 5px solid #6b21a8;
+        }
+        h2 {
+            text-align: center;
+            color: #4c1d95;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #5b21b6;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d8b4fe;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: #7c3aed;
+            box-shadow: 0 0 5px rgba(124, 58, 237, 0.3);
+        }
+        button {
+            width: 100%;
+            padding: 11px;
+            background-color: #7c3aed;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #6d28d9;
+        }
+        .status-msg {
+            text-align: center;
+            font-size: 13px;
+            color: #047857;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Painel do Ouvinte - Horóscopo</h2>
+        
+        <div class="form-group">
+            <label>Seu Identificador / E-mail</label>
+            <input type="text" id="ouvinte-id" placeholder="Digite seu e-mail para sincronizar" onblur="carregarDadosNuvem()">
+        </div>
+
+        <div class="form-group">
+            <label>Seu Signo</label>
+            <select id="hor-signo" onchange="salvarDadosNuvem()">
+                <option value="Áries">Áries</option>
+                <option value="Touro">Touro</option>
+                <option value="Gêmeos">Gêmeos</option>
+                <option value="Câncer">Câncer</option>
+                <option value="Leão">Leão</option>
+                <option value="VirAqui está o código completo do novo arquivo **`ouvinte_horoscopo.html`**, criado seguindo exatamente o mesmo padrão visual em tons de roxo e integrado ao **Firebase Realtime Database** para sincronização automática na nuvem:
+
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Ouvinte - Horóscopo</title>
+    <!-- Scripts do Firebase (Compat) -->
+    <script src="[https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js](https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js)"></script>
+    <script src="[https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js](https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js)"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f0f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(88, 28, 135, 0.1);
+            width: 100%;
+            max-width: 450px;
+            border-top: 5px solid #6b21a8;
+        }
+        h2 {
+            text-align: center;
+            color: #4c1d95;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
