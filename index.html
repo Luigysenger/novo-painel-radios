@@ -3,290 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Rádios - Login e Cadastro</title>
+    <title>Criar Cadastro - Sistema de Rádios</title>
     <style>
-        body {
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
             font-family: Arial, sans-serif;
-            background-color: #f3f0f7;
+        }
+        body {
+            background-color: #f0f2f5;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
+            padding: 20px;
         }
-        .card {
+        .register-card {
             background: #ffffff;
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 6px 15px rgba(88, 28, 135, 0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             width: 100%;
-            max-width: 400px;
-            border-top: 5px solid #6b21a8;
+            max-width: 450px;
+            border: 1px solid #e2e8f0;
         }
-        h2 {
+        .register-card h2 {
             text-align: center;
             color: #4c1d95;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            font-size: 22px;
         }
         .form-group {
             margin-bottom: 15px;
         }
-        label {
+        .form-group label {
             display: block;
+            font-size: 12px;
+            font-weight: bold;
+            color: #4c1d95;
             margin-bottom: 5px;
-            color: #5b21b6;
-            font-size: 14px;
-            font-weight: 600;
         }
-        input {
+        .form-group input {
             width: 100%;
             padding: 10px;
-            border: 1px solid #d8b4fe;
+            border: 1px solid #cbd5e1;
             border-radius: 6px;
-            box-sizing: border-box;
             font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s;
         }
-        input:focus {
-            border-color: #7c3aed;
-            box-shadow: 0 0 5px rgba(124, 58, 237, 0.3);
+        /* Força apenas o campo de apelido/primeiro nome em maiúsculo */
+        .uppercase-field {
+            text-transform: uppercase;
         }
-        button {
+        .btn-submit {
             width: 100%;
-            padding: 11px;
-            background-color: #7c3aed;
+            background: #7c3aed;
             color: white;
             border: none;
+            padding: 12px;
             border-radius: 6px;
-            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 10px;
-            transition: background-color 0.2s;
-        }
-        button:hover {
-            background-color: #6d28d9;
-        }
-        .secondary-btn {
-            background-color: #9ca3af;
-            margin-top: 5px;
-        }
-        .secondary-btn:hover {
-            background-color: #6b7280;
-        }
-        .hidden {
-            display: none;
-        }
-        .link-text {
-            text-align: center;
-            margin-top: 15px;
             font-size: 14px;
+            margin-top: 10px;
         }
-        .link-text a {
-            text-decoration: none;
-            cursor: pointer;
+        .btn-submit:hover {
+            background: #6d28d9;
         }
-        .link-cadastro {
-            color: #d97706;
+        .btn-back {
+            width: 100%;
+            background: #64748b;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
             font-weight: bold;
-        }
-        .link-cadastro:hover {
-            text-decoration: underline;
-        }
-        .link-senha {
-            color: #7c3aed;
-        }
-        .link-senha:hover {
-            text-decoration: underline;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 8px;
+            text-decoration: none;
+            display: block;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <!-- TELA DE LOGIN -->
-        <div id="login-screen">
-            <h2>Login do Sistema</h2>
-            <div class="form-group">
-                <label>Usuário ou E-mail</label>
-                <input type="text" id="login-user" placeholder="Digite seu usuário" onkeypress="verificarEnter(event)">
-            </div>
-            <div class="form-group">
-                <label>Senha</label>
-                <input type="password" id="login-pass" placeholder="Digite sua senha" onkeypress="verificarEnter(event)">
-            </div>
-            <button onclick="fazerLogin()">Entrar</button>
-            <div class="link-text">
-                <a class="link-cadastro" onclick="mostrarTela('cadastro-screen')">Não tenho cadastro</a> | 
-                <a class="link-senha" onclick="mostrarTela('recuperar-screen')">Esqueci minha senha</a>
-            </div>
+    <div class="register-card">
+        <h2>Criar Cadastro</h2>
+        
+        <div class="form-group">
+            <label>Primeiro Nome ou Apelido (Obrigatório Maiúsculo)</label>
+            <!-- A classe uppercase-field garante que só este campo fique em maiúsculo -->
+            <input type="text" id="apelido" class="uppercase-field" placeholder="Ex: LUIGY" oninput="this.value = this.value.toUpperCase()">
         </div>
 
-        <!-- TELA DE CADASTRO -->
-        <div id="cadastro-screen" class="hidden">
-            <h2>Criar Cadastro</h2>
-            <div class="form-group">
-                <label>Primeiro Nome ou Apelido (Maiúsculo automático)</label>
-                <input type="text" id="cad-apelido" oninput="this.value = this.value.toUpperCase()" placeholder="Ex: LUIGY">
-            </div>
-            <div class="form-group">
-                <label>Nome Completo</label>
-                <input type="text" id="cad-nome" placeholder="Digite seu nome completo">
-            </div>
-            <div class="form-group">
-                <label>E-mail</label>
-                <input type="email" id="cad-email" placeholder="seu@email.com">
-            </div>
-            <div class="form-group">
-                <label>Data de Nascimento (XX-XX-XXXX)</label>
-                <input type="text" id="cad-nasc" maxlength="10" placeholder="DD-MM-AAAA" oninput="mascaraData(this)">
-            </div>
-            <div class="form-group">
-                <label>Senha</label>
-                <input type="password" id="cad-pass" placeholder="Digite sua senha">
-            </div>
-            <div class="form-group">
-                <label>Confirme a Senha</label>
-                <input type="password" id="cad-pass-conf" placeholder="Digite a senha novamente">
-            </div>
-            <button onclick="salvarCadastro()">Cadastrar</button>
-            <button class="secondary-btn" onclick="mostrarTela('login-screen')">Voltar ao Login</button>
+        <div class="form-group">
+            <label>Nome Completo</label>
+            <input type="text" id="nomeCompleto" placeholder="Digite seu nome completo">
         </div>
 
-        <!-- TELA DE RECUPERAÇÃO DE SENHA -->
-        <div id="recuperar-screen" class="hidden">
-            <h2>Recuperar Senha</h2>
-            <div class="form-group">
-                <label>Digite seu E-mail cadastrado</label>
-                <input type="email" id="rec-email" placeholder="seu@email.com">
-            </div>
-            <div class="form-group">
-                <label>Digite sua Data de Nascimento</label>
-                <input type="text" id="rec-nasc" maxlength="10" placeholder="DD-MM-AAAA" oninput="mascaraData(this)">
-            </div>
-            
-            <div id="bloco-nova-senha" class="hidden">
-                <div class="form-group">
-                    <label>Digite a Nova Senha (diferente da antiga)</label>
-                    <input type="password" id="rec-nova-senha" placeholder="Nova senha">
-                </div>
-            </div>
-
-            <button id="btn-verificar" onclick="verificarRecuperacao()">Verificar Dados</button>
-            <button id="btn-salvar-nova" class="hidden" onclick="atualizarSenhaNova()">Salvar Nova Senha</button>
-            <button class="secondary-btn" onclick="mostrarTela('login-screen')">Voltar ao Login</button>
+        <div class="form-group">
+            <label>E-mail</label>
+            <input type="email" id="email" placeholder="seu@email.com">
         </div>
+
+        <div class="form-group">
+            <label>Data de Nascimento (XX-XX-XXXX)</label>
+            <input type="text" id="nascimento" placeholder="DD-MM-AAAA">
+        </div>
+
+        <div class="form-group">
+            <label>Senha</label>
+            <input type="password" id="senha" placeholder="Digite sua senha">
+        </div>
+
+        <div class="form-group">
+            <label>Confirme a Senha</label>
+            <input type="password" id="confirmaSenha" placeholder="Digite a senha novamente">
+        </div>
+
+        <button class="btn-submit">Cadastrar</button>
+        <a href="OUVINTES/ouvinte_cards_radio.html" class="btn-back">Voltar ao Login / Painel</a>
     </div>
 
-    <script>
-        // Função para alternar entre as telas
-        function mostrarTela(telaId) {
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('cadastro-screen').classList.add('hidden');
-            document.getElementById('recuperar-screen').classList.add('hidden');
-            document.getElementById(telaId).classList.remove('hidden');
-        }
-
-        // Formatação automática para data XX-XX-XXXX
-        function mascaraData(input) {
-            let valor = input.value.replace(/\D/g, '');
-            if (valor.length > 8) valor = valor.slice(0, 8);
-            
-            if (valor.length > 4) {
-                valor = valor.slice(0, 2) + '-' + valor.slice(2, 4) + '-' + valor.slice(4);
-            } else if (valor.length > 2) {
-                valor = valor.slice(0, 2) + '-' + valor.slice(2);
-            }
-            input.value = valor;
-        }
-
-        // Função para disparar o login ao pressionar Enter
-        function verificarEnter(event) {
-            if (event.key === 'Enter') {
-                fazerLogin();
-            }
-        }
-
-        // Lógica de Login temporária (compatível com o admin criado)
-        function fazerLogin() {
-            const usuario = document.getElementById('login-user').value;
-            const senha = document.getElementById('login-pass').value;
-
-            if (usuario === 'admin' && senha === '123') {
-                alert('Login efetuado com sucesso!');
-                window.location.href = 'ADMIN/adm.html';
-            } else {
-                alert('Usuário ou senha incorretos!');
-            }
-        }
-
-        // Lógica de Cadastro
-        function salvarCadastro() {
-            const apelido = document.getElementById('cad-apelido').value;
-            const nome = document.getElementById('cad-nome').value;
-            const email = document.getElementById('cad-email').value;
-            const nasc = document.getElementById('cad-nasc').value;
-            const senha = document.getElementById('cad-pass').value;
-            const confSenha = document.getElementById('cad-pass-conf').value;
-
-            if (!apelido || !nome || !email || !nasc || !senha) {
-                alert('Por favor, preencha todos os campos!');
-                return;
-            }
-
-            if (senha !== confSenha) {
-                alert('As senhas não coincidem!');
-                return;
-            }
-
-            // Salvando no navegador por enquanto para teste local estruturado
-            const dadosUsuario = { apelido, nome, email, nasc, senha };
-            localStorage.setItem(email, JSON.stringify(dadosUsuario));
-
-            alert('Cadastro realizado com sucesso! Faça login.');
-            mostrarTela('login-screen');
-        }
-
-        // Lógica de Recuperação de Senha
-        function verificarRecuperacao() {
-            const email = document.getElementById('rec-email').value;
-            const nasc = document.getElementById('rec-nasc').value;
-
-            const usuarioSalvo = JSON.parse(localStorage.getItem(email));
-
-            if (usuarioSalvo && usuarioSalvo.nasc === nasc) {
-                alert('Dados confirmados! Digite sua nova senha.');
-                document.getElementById('bloco-nova-senha').classList.remove('hidden');
-                document.getElementById('btn-verificar').classList.add('hidden');
-                document.getElementById('btn-salvar-nova').classList.remove('hidden');
-            } else {
-                alert('E-mail não encontrado ou data de nascimento incorreta.');
-            }
-        }
-
-        function atualizarSenhaNova() {
-            const email = document.getElementById('rec-email').value;
-            const novaSenha = document.getElementById('rec-nova-senha').value;
-
-            let usuarioSalvo = JSON.parse(localStorage.getItem(email));
-
-            if (!novaSenha) {
-                alert('Digite a nova senha!');
-                return;
-            }
-
-            if (novaSenha === usuarioSalvo.senha) {
-                alert('A nova senha não pode ser igual à senha cadastrada anteriormente!');
-                return;
-            }
-
-            usuarioSalvo.senha = novaSenha;
-            localStorage.setItem(email, JSON.stringify(usuarioSalvo));
-
-            alert('Senha alterada com sucesso! Faça login com a nova senha.');
-            mostrarTela('login-screen');
-        }
-    </script>
 </body>
 </html>
