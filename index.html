@@ -51,7 +51,6 @@
             border-radius: 6px;
             font-size: 14px;
         }
-        /* Força apenas o campo de apelido/primeiro nome em maiúsculo */
         .uppercase-field {
             text-transform: uppercase;
         }
@@ -94,39 +93,38 @@
         
         <div class="form-group">
             <label>Primeiro Nome ou Apelido (Obrigatório Maiúsculo)</label>
-            <input type="text" id="apelido" class="uppercase-field" placeholder="Nome ou Apelido" oninput="this.value = this.value.toUpperCase()">
+            <input type="text" id="apelido" class="uppercase-field" placeholder="Nome ou Apelido" autocomplete="off" oninput="this.value = this.value.toUpperCase()">
         </div>
 
         <div class="form-group">
             <label>Nome Completo</label>
-            <input type="text" id="nomeCompleto" placeholder="Digite seu nome completo">
+            <input type="text" id="nomeCompleto" placeholder="Digite seu nome completo" autocomplete="off">
         </div>
 
         <div class="form-group">
             <label>E-mail</label>
-            <input type="email" id="email" placeholder="seu@email.com">
+            <input type="email" id="email" placeholder="seu@email.com" autocomplete="off">
         </div>
 
         <div class="form-group">
             <label>Data de Nascimento (DD/MM/AAAA)</label>
-            <input type="text" id="nascimento" placeholder="DD/MM/AAAA" maxlength="10">
+            <input type="text" id="nascimento" placeholder="DD/MM/AAAA" maxlength="10" autocomplete="off">
         </div>
 
         <div class="form-group">
             <label>Senha</label>
-            <input type="password" id="senha" placeholder="Digite sua senha">
+            <input type="password" id="senha" placeholder="Digite sua senha" autocomplete="new-password">
         </div>
 
         <div class="form-group">
             <label>Confirme a Senha</label>
-            <input type="password" id="confirmaSenha" placeholder="Digite a senha novamente">
+            <input type="password" id="confirmaSenha" placeholder="Digite a senha novamente" autocomplete="new-password">
         </div>
 
         <button id="btnCadastrar" class="btn-submit">Cadastrar</button>
         <a href="OUVINTES/ouvinte_cards_radio.html" class="btn-back">Voltar ao Login / Painel</a>
     </div>
 
-    <!-- Script com a máscara de data e integração de cadastro com o Firebase -->
     <script type="module">
         import { db } from './firebase-config.js';
         import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -139,16 +137,27 @@
         const inputConfirmaSenha = document.getElementById('confirmaSenha');
         const btnCadastrar = document.getElementById('btnCadastrar');
 
-        // Máscara automática para Data de Nascimento (DD/MM/AAAA)
+        // Limpeza preventiva de campos ao carregar a página (evita o preenchimento automático do navegador)
+        window.addEventListener('DOMContentLoaded', () => {
+            inputApelido.value = "";
+            inputNomeCompleto.value = "";
+            inputEmail.value = "";
+            inputNascimento.value = "";
+            inputSenha.value = "";
+            inputConfirmaSenha.value = "";
+        });
+
+        // Máscara robusta e automática para Data de Nascimento (DD/MM/AAAA)
         inputNascimento.addEventListener('input', (e) => {
-            let v = e.target.value.replace(/\D/g, "");
-            if (v.length > 8) v = v.substring(0, 8);
-            if (v.length > 4) {
-                v = v.replace(/^(\d{2})(\d{2})(\d{0,4})/, "$1/$2/$3");
-            } else if (v.length > 2) {
-                v = v.replace(/^(\d{2})(\d{0,2})/, "$1/$2");
+            let valor = e.target.value.replace(/\D/g, "");
+            if (valor.length > 8) valor = valor.substring(0, 8);
+            
+            if (valor.length > 4) {
+                valor = valor.replace(/^(\d{2})(\d{2})(\d{0,4})/, "$1/$2/$3");
+            } else if (valor.length > 2) {
+                valor = valor.replace(/^(\d{2})(\d{0,2})/, "$1/$2");
             }
-            e.target.value = v;
+            e.target.value = valor;
         });
 
         // Função de Cadastro
@@ -171,7 +180,6 @@
             }
 
             try {
-                // Salva os dados do usuário no Firestore do Firebase
                 await addDoc(collection(db, "usuarios_cadastrados"), {
                     apelido: apelido,
                     nomeCompleto: nomeCompleto,
@@ -182,7 +190,6 @@
                 });
 
                 alert("Cadastro realizado com sucesso!");
-                // Redireciona para o painel principal do ouvinte após cadastrar
                 window.location.href = "OUVINTES/ouvinte_cards_radio.html";
             } catch (erro) {
                 console.error("Erro ao cadastrar:", erro);
@@ -190,10 +197,8 @@
             }
         }
 
-        // Evento de clique no botão Cadastrar
         btnCadastrar.addEventListener('click', realizarCadastro);
 
-        // Permitir o cadastro ao pressionar a tecla Enter em qualquer campo
         document.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 realizarCadastro();
