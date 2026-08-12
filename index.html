@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criar Cadastro - Sistema de Rádios</title>
+    <title>Login - Painel do Ouvinte</title>
     <style>
         * {
             box-sizing: border-box;
@@ -12,47 +12,50 @@
             font-family: Arial, sans-serif;
         }
         body {
-            background-color: #f0f2f5;
+            background-color: #0f1016;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            padding: 20px;
+            color: #ffffff;
         }
-        .register-card {
-            background: #ffffff;
-            padding: 30px;
+        .login-card {
+            background: #1a1c29;
+            padding: 35px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
             width: 100%;
-            max-width: 450px;
-            border: 1px solid #e2e8f0;
+            max-width: 400px;
+            border: 1px solid #2d2f45;
         }
-        .register-card h2 {
+        .login-card h2 {
             text-align: center;
-            color: #4c1d95;
+            color: #a855f7;
             margin-bottom: 25px;
-            font-size: 22px;
+            font-size: 24px;
         }
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         .form-group label {
             display: block;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: bold;
-            color: #4c1d95;
-            margin-bottom: 5px;
+            color: #c084fc;
+            margin-bottom: 8px;
         }
         .form-group input {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #cbd5e1;
+            padding: 12px;
+            background: #11131d;
+            border: 1px solid #374151;
             border-radius: 6px;
+            color: #ffffff;
             font-size: 14px;
         }
-        .uppercase-field {
-            text-transform: uppercase;
+        .form-group input:focus {
+            border-color: #a855f7;
+            outline: none;
         }
         .btn-submit {
             width: 100%;
@@ -63,148 +66,104 @@
             border-radius: 6px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 14px;
-            margin-top: 10px;
+            font-size: 15px;
+            transition: background 0.2s;
         }
         .btn-submit:hover {
             background: #6d28d9;
         }
-        .btn-back {
-            width: 100%;
-            background: #64748b;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 14px;
-            margin-top: 8px;
+        .login-links {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+        }
+        .login-links a {
+            color: #c084fc;
             text-decoration: none;
-            display: block;
-            text-align: center;
+        }
+        .login-links a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
-    <div class="register-card">
-        <h2>Criar Cadastro</h2>
+    <div class="login-card">
+        <h2>Painel do Ouvinte</h2>
         
         <div class="form-group">
-            <label>Primeiro Nome ou Apelido (Obrigatório Maiúsculo)</label>
-            <input type="text" id="apelido" class="uppercase-field" placeholder="Nome ou Apelido" autocomplete="off" oninput="this.value = this.value.toUpperCase()">
-        </div>
-
-        <div class="form-group">
-            <label>Nome Completo</label>
-            <input type="text" id="nomeCompleto" placeholder="Digite seu nome completo" autocomplete="off">
-        </div>
-
-        <div class="form-group">
-            <label>E-mail</label>
-            <input type="email" id="email" placeholder="seu@email.com" autocomplete="off">
-        </div>
-
-        <div class="form-group">
-            <label>Data de Nascimento (DD/MM/AAAA)</label>
-            <input type="text" id="nascimento" placeholder="DD/MM/AAAA" maxlength="10" autocomplete="off">
+            <label>E-mail ou Apelido</label>
+            <input type="text" id="loginUsuario" placeholder="Digite seu e-mail ou apelido" autocomplete="off">
         </div>
 
         <div class="form-group">
             <label>Senha</label>
-            <input type="password" id="senha" placeholder="Digite sua senha" autocomplete="new-password">
+            <input type="password" id="loginSenha" placeholder="Digite sua senha" autocomplete="current-password">
         </div>
 
-        <div class="form-group">
-            <label>Confirme a Senha</label>
-            <input type="password" id="confirmaSenha" placeholder="Digite a senha novamente" autocomplete="new-password">
-        </div>
+        <button id="btnLogin" class="btn-submit">Entrar</button>
 
-        <button id="btnCadastrar" class="btn-submit">Cadastrar</button>
-        <a href="OUVINTES/ouvinte_cards_radio.html" class="btn-back">Voltar ao Login / Painel</a>
+        <div class="login-links">
+            <a href="cadastro.html">Não tenho cadastro</a>
+            <a href="#" onclick="alert('Função de recuperação de senha em breve!'); return false;">Esqueci minha senha</a>
+        </div>
     </div>
 
     <script type="module">
         import { db } from './firebase-config.js';
-        import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        const inputNascimento = document.getElementById('nascimento');
-        const inputApelido = document.getElementById('apelido');
-        const inputNomeCompleto = document.getElementById('nomeCompleto');
-        const inputEmail = document.getElementById('email');
-        const inputSenha = document.getElementById('senha');
-        const inputConfirmaSenha = document.getElementById('confirmaSenha');
-        const btnCadastrar = document.getElementById('btnCadastrar');
+        const inputUsuario = document.getElementById('loginUsuario');
+        const inputSenha = document.getElementById('loginSenha');
+        const btnLogin = document.getElementById('btnLogin');
 
-        // Limpeza preventiva de campos ao carregar a página (evita o preenchimento automático do navegador)
+        // Limpa campos ao carregar para evitar dados antigos
         window.addEventListener('DOMContentLoaded', () => {
-            inputApelido.value = "";
-            inputNomeCompleto.value = "";
-            inputEmail.value = "";
-            inputNascimento.value = "";
+            inputUsuario.value = "";
             inputSenha.value = "";
-            inputConfirmaSenha.value = "";
         });
 
-        // Máscara robusta e automática para Data de Nascimento (DD/MM/AAAA)
-        inputNascimento.addEventListener('input', (e) => {
-            let valor = e.target.value.replace(/\D/g, "");
-            if (valor.length > 8) valor = valor.substring(0, 8);
-            
-            if (valor.length > 4) {
-                valor = valor.replace(/^(\d{2})(\d{2})(\d{0,4})/, "$1/$2/$3");
-            } else if (valor.length > 2) {
-                valor = valor.replace(/^(\d{2})(\d{0,2})/, "$1/$2");
-            }
-            e.target.value = valor;
-        });
-
-        // Função de Cadastro
-        async function realizarCadastro() {
-            const apelido = inputApelido.value.trim();
-            const nomeCompleto = inputNomeCompleto.value.trim();
-            const email = inputEmail.value.trim();
-            const nascimento = inputNascimento.value.trim();
+        async function realizarLogin() {
+            const usuario = inputUsuario.value.trim();
             const senha = inputSenha.value.trim();
-            const confirmaSenha = inputConfirmaSenha.value.trim();
 
-            if (!apelido || !email || !senha) {
-                alert("Por favor, preencha pelo menos o Apelido, E-mail e Senha.");
-                return;
-            }
-
-            if (senha !== confirmaSenha) {
-                alert("As senhas não coincidem!");
+            if (!usuario || !senha) {
+                alert("Por favor, preencha todos os campos.");
                 return;
             }
 
             try {
-                await addDoc(collection(db, "usuarios_cadastrados"), {
-                    apelido: apelido,
-                    nomeCompleto: nomeCompleto,
-                    email: email,
-                    nascimento: nascimento,
-                    senha: senha,
-                    timestamp: serverTimestamp()
+                // Consulta no Firebase se o usuário existe (por e-mail ou apelido)
+                const q = query(collection(db, "usuarios_cadastrados"), where("email", "==", usuario));
+                const querySnapshot = await getDocs(q);
+
+                let usuarioEncontrado = false;
+                querySnapshot.forEach((doc) => {
+                    const dados = doc.data();
+                    if (dados.senha === senha) {
+                        usuarioEncontrado = true;
+                    }
                 });
 
-                alert("Cadastro realizado com sucesso!");
-                window.location.href = "OUVINTES/ouvinte_cards_radio.html";
+                if (usuarioEncontrado) {
+                    alert("Login realizado com sucesso!");
+                    window.location.href = "OUVINTES/ouvinte_cards_radio.html";
+                } else {
+                    alert("E-mail/Apelido ou senha incorretos.");
+                }
             } catch (erro) {
-                console.error("Erro ao cadastrar:", erro);
-                alert("Erro ao realizar cadastro. Verifique sua conexão.");
+                console.error("Erro no login:", erro);
+                alert("Erro ao conectar com o banco de dados.");
             }
         }
 
-        btnCadastrar.addEventListener('click', realizarCadastro);
-
+        btnLogin.addEventListener('click', realizarLogin);
         document.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                realizarCadastro();
+                realizarLogin();
             }
         });
     </script>
-
 </body>
 </html>
