@@ -118,7 +118,6 @@
         const inputSenha = document.getElementById('loginSenha');
         const btnLogin = document.getElementById('btnLogin');
 
-        // Limpa campos ao carregar para evitar dados antigos
         window.addEventListener('DOMContentLoaded', () => {
             inputUsuario.value = "";
             inputSenha.value = "";
@@ -134,7 +133,6 @@
             }
 
             try {
-                // Consulta no Firebase se o usuário existe (por e-mail ou apelido)
                 const q = query(collection(db, "usuarios_cadastrados"), where("email", "==", usuario));
                 const querySnapshot = await getDocs(q);
 
