@@ -94,7 +94,6 @@
         
         <div class="form-group">
             <label>Primeiro Nome ou Apelido (Obrigatório Maiúsculo)</label>
-            <!-- A classe uppercase-field garante que só este campo fique em maiúsculo e o placeholder foi alterado -->
             <input type="text" id="apelido" class="uppercase-field" placeholder="Nome ou Apelido" oninput="this.value = this.value.toUpperCase()">
         </div>
 
@@ -109,8 +108,8 @@
         </div>
 
         <div class="form-group">
-            <label>Data de Nascimento (XX-XX-XXXX)</label>
-            <input type="text" id="nascimento" placeholder="DD-MM-AAAA">
+            <label>Data de Nascimento (DD/MM/AAAA)</label>
+            <input type="text" id="nascimento" placeholder="DD/MM/AAAA" maxlength="10">
         </div>
 
         <div class="form-group">
@@ -123,9 +122,84 @@
             <input type="password" id="confirmaSenha" placeholder="Digite a senha novamente">
         </div>
 
-        <button class="btn-submit">Cadastrar</button>
+        <button id="btnCadastrar" class="btn-submit">Cadastrar</button>
         <a href="OUVINTES/ouvinte_cards_radio.html" class="btn-back">Voltar ao Login / Painel</a>
     </div>
+
+    <!-- Script com a máscara de data e integração de cadastro com o Firebase -->
+    <script type="module">
+        import { db } from './firebase-config.js';
+        import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const inputNascimento = document.getElementById('nascimento');
+        const inputApelido = document.getElementById('apelido');
+        const inputNomeCompleto = document.getElementById('nomeCompleto');
+        const inputEmail = document.getElementById('email');
+        const inputSenha = document.getElementById('senha');
+        const inputConfirmaSenha = document.getElementById('confirmaSenha');
+        const btnCadastrar = document.getElementById('btnCadastrar');
+
+        // Máscara automática para Data de Nascimento (DD/MM/AAAA)
+        inputNascimento.addEventListener('input', (e) => {
+            let v = e.target.value.replace(/\D/g, "");
+            if (v.length > 8) v = v.substring(0, 8);
+            if (v.length > 4) {
+                v = v.replace(/^(\d{2})(\d{2})(\d{0,4})/, "$1/$2/$3");
+            } else if (v.length > 2) {
+                v = v.replace(/^(\d{2})(\d{0,2})/, "$1/$2");
+            }
+            e.target.value = v;
+        });
+
+        // Função de Cadastro
+        async function realizarCadastro() {
+            const apelido = inputApelido.value.trim();
+            const nomeCompleto = inputNomeCompleto.value.trim();
+            const email = inputEmail.value.trim();
+            const nascimento = inputNascimento.value.trim();
+            const senha = inputSenha.value.trim();
+            const confirmaSenha = inputConfirmaSenha.value.trim();
+
+            if (!apelido || !email || !senha) {
+                alert("Por favor, preencha pelo menos o Apelido, E-mail e Senha.");
+                return;
+            }
+
+            if (senha !== confirmaSenha) {
+                alert("As senhas não coincidem!");
+                return;
+            }
+
+            try {
+                // Salva os dados do usuário no Firestore do Firebase
+                await addDoc(collection(db, "usuarios_cadastrados"), {
+                    apelido: apelido,
+                    nomeCompleto: nomeCompleto,
+                    email: email,
+                    nascimento: nascimento,
+                    senha: senha,
+                    timestamp: serverTimestamp()
+                });
+
+                alert("Cadastro realizado com sucesso!");
+                // Redireciona para o painel principal do ouvinte após cadastrar
+                window.location.href = "OUVINTES/ouvinte_cards_radio.html";
+            } catch (erro) {
+                console.error("Erro ao cadastrar:", erro);
+                alert("Erro ao realizar cadastro. Verifique sua conexão.");
+            }
+        }
+
+        // Evento de clique no botão Cadastrar
+        btnCadastrar.addEventListener('click', realizarCadastro);
+
+        // Permitir o cadastro ao pressionar a tecla Enter em qualquer campo
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                realizarCadastro();
+            }
+        });
+    </script>
 
 </body>
 </html>
