@@ -140,7 +140,6 @@
 
         <!-- FLUXO DE RECUPERAÇÃO EM ETAPAS -->
         <div id="secaoRecuperacao" class="hidden">
-            <!-- ETAPA 1: DIGITAR E-MAIL -->
             <div id="recEtapa1">
                 <div class="form-group">
                     <label>DIGITE SEU E-MAIL</label>
@@ -149,7 +148,6 @@
                 <button id="btnAvancarRec1" class="btn-submit">AVANÇAR</button>
             </div>
 
-            <!-- ETAPA 2: DIGITAR NASCIMENTO -->
             <div id="recEtapa2" class="hidden">
                 <div class="form-group">
                     <label>DATA DE NASCIMENTO</label>
@@ -158,7 +156,6 @@
                 <button id="btnAvancarRec2" class="btn-submit">VERIFICAR</button>
             </div>
 
-            <!-- ETAPA 3: NOVA SENHA -->
             <div id="recEtapa3" class="hidden">
                 <div class="form-group">
                     <label>DIGITE SUA NOVA SENHA</label>
@@ -171,7 +168,6 @@
                 <button id="btnAtualizarSenha" class="btn-submit">ATUALIZAR SENHA</button>
             </div>
 
-            <!-- ETAPA 4: SUCESSO FINAL -->
             <div id="recEtapa4" class="hidden">
                 <p class="success-text">Pronto, agora basta fazer seu login e curtir suas rádios preferidas!</p>
                 <a href="#" id="btnIrParaLogin" class="btn-submit">FAZER LOGIN</a>
@@ -227,6 +223,14 @@
                 return;
             }
 
+            // ACESSO DIRETO DO ADMINISTRADOR APONTANDO PARA ADMIN/adm.html
+            if (email === "senger.luigy@gmail.com" && senha === "104528") {
+                localStorage.setItem('adminLogado', 'true');
+                alert("Login de Administrador realizado com sucesso!");
+                window.location.href = "ADMIN/adm.html";
+                return;
+            }
+
             try {
                 const dbRef = ref(db);
                 const snapshot = await get(child(dbRef, 'usuarios_cadastrados'));
@@ -256,7 +260,6 @@
             }
         }
 
-        // FUNÇÕES DE AÇÃO DA RECUPERAÇÃO
         async function executarEtapa1() {
             const email = document.getElementById('emailRec').value.trim();
             if (!email) { alert("Por favor, digite seu e-mail."); return; }
@@ -305,10 +308,7 @@
 
             try {
                 const usuarioRef = ref(db, 'usuarios_cadastrados/' + usuarioRecuperandoKey);
-                // Salva a senha real para permitir o login corretamente
-                await update(usuarioRef, {
-                    senha: novaSenha
-                });
+                await update(usuarioRef, { senha: novaSenha });
 
                 recEtapa3.classList.add('hidden');
                 recEtapa4.classList.remove('hidden');
@@ -319,7 +319,6 @@
             }
         }
 
-        // ABRIR TELA DE RECUPERAÇÃO
         btnEsqueciSenha.addEventListener('click', (e) => {
             e.preventDefault();
             secaoLogin.classList.add('hidden');
@@ -334,7 +333,6 @@
             document.getElementById('emailRec').value = "";
         });
 
-        // VOLTAR AO LOGIN
         function voltarAoLogin(e) {
             if (e) e.preventDefault();
             secaoRecuperacao.classList.add('hidden');
@@ -346,13 +344,11 @@
         document.getElementById('btnVoltarLogin').addEventListener('click', voltarAoLogin);
         document.getElementById('btnIrParaLogin').addEventListener('click', voltarAoLogin);
 
-        // BOTÕES DE CLIQUE DO MOUSE
         document.getElementById('btnAvancarRec1').addEventListener('click', executarEtapa1);
         document.getElementById('btnAvancarRec2').addEventListener('click', executarEtapa2);
         document.getElementById('btnAtualizarSenha').addEventListener('click', executarEtapa3);
         btnLogin.addEventListener('click', realizarLogin);
 
-        // SUPORTE COMPLETO À TECLA ENTER EM TODAS AS TELAS
         document.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 if (!secaoLogin.classList.contains('hidden')) {
