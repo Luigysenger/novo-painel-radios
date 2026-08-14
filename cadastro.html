@@ -150,30 +150,29 @@
         const inputConfirmaSenha = document.getElementById('confirmaSenha');
         const btnCadastrar = document.getElementById('btnCadastrar');
 
-        // Função universal e blindada para aplicar a máscara de data DD/MM/AAAA
-        function aplicarMascaraData(e) {
-            let valor = e.target.value.replace(/\D/g, '');
-            if (valor.length > 8) {
-                valor = valor.slice(0, 8);
-            }
+        // Função universal de formatação da data
+        function formatarData(input) {
+            let valor = input.value.replace(/\D/g, '');
+            if (valor.length > 8) valor = valor.slice(0, 8);
             
             if (valor.length > 4) {
-                e.target.value = valor.slice(0, 2) + '/' + valor.slice(2, 4) + '/' + valor.slice(4, 8);
+                input.value = valor.slice(0, 2) + '/' + valor.slice(2, 4) + '/' + valor.slice(4, 8);
             } else if (valor.length > 2) {
-                e.target.value = valor.slice(0, 2) + '/' + valor.slice(2);
+                input.value = valor.slice(0, 2) + '/' + valor.slice(2);
             } else {
-                e.target.value = valor;
+                input.value = valor;
             }
         }
 
-        // Ouvindo múltiplos eventos para garantir que funcione independentemente de como o usuário digite
-        inputNascimento.addEventListener('input', aplicarMascaraData);
-        inputNascimento.addEventListener('keyup', aplicarMascaraData);
-        inputNascimento.addEventListener('paste', (e) => {
-            setTimeout(() => aplicarMascaraData(e), 10);
-        });
+        // Aplica a máscara em qualquer alteração (inclusive se o navegador preencher sozinho)
+        inputNascimento.addEventListener('input', (e) => formatarData(e.target));
+        inputNascimento.addEventListener('keyup', (e) => formatarData(e.target));
+        inputNascimento.addEventListener('blur', (e) => formatarData(e.target));
 
         async function realizarCadastro() {
+            // Garante que a data está formatada antes de enviar
+            formatarData(inputNascimento);
+
             const apelido = inputApelido.value.trim();
             const nomeCompleto = inputNomeCompleto.value.trim();
             const email = inputEmail.value.trim();
