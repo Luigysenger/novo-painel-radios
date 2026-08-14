@@ -146,14 +146,20 @@
             inputConfirmaSenha.value = "";
         });
 
+        // Máscara robusta para formatar DD/MM/AAAA em tempo real
         inputNascimento.addEventListener('input', (e) => {
-            let valor = e.target.value.replace(/\D/g, "");
-            if (valor.length > 8) valor = valor.substring(0, 8);
-            if (valor.length > 4) {
-                valor = valor.replace(/^(\d{2})(\d{2})(\d{0,4})/, "$1/$2/$3");
-            } else if (valor.length > 2) {
-                valor = valor.replace(/^(\d{2})(\d{0,2})/, "$1/$2");
+            let valor = e.target.value.replace(/\D/g, ""); // Remove tudo que não for número
+            if (valor.length > 8) {
+                valor = valor.substring(0, 8); // Limita a 8 dígitos no total
             }
+            
+            // Aplica as barras automaticamente conforme os números são inseridos
+            if (valor.length > 4) {
+                valor = valor.replace(/^(\d{2})(\d{2})(\d{1,4})/, "$1/$2/$3");
+            } else if (valor.length > 2) {
+                valor = valor.replace(/^(\d{2})(\d{1,2})/, "$1/$2");
+            }
+            
             e.target.value = valor;
         });
 
