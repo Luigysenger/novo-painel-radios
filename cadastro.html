@@ -155,7 +155,7 @@
 
     <script type="module">
         import { db } from './firebase-config.js';
-        import { ref, set, serverTimestamp, query, orderByChild, equalTo, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { ref, set, serverTimestamp, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const inputNascimento = document.getElementById('nascimento');
         const inputApelido = document.getElementById('apelido');
@@ -188,24 +188,22 @@
             }
 
             try {
-                // Cria uma chave segura baseada no e-mail (substituindo pontos para o padrão do Firebase)
                 const emailKey = email.toLowerCase().replace(/[.#$\[\]]/g, "_");
                 const usuarioRef = ref(db, 'usuarios_cadastrados/' + emailKey);
 
-                // Verifica se o e-mail já está cadastrado
                 const snapshot = await get(usuarioRef);
                 if (snapshot.exists()) {
                     alert("Este e-mail já está cadastrado! Tente fazer login ou use outro e-mail.");
                     return;
                 }
 
-                // Salva os dados no Firebase para acesso em qualquer máquina
+                // Salva os dados no Firebase salvando a senha mascarada com pontos
                 await set(usuarioRef, {
                     apelido: apelido,
                     nomeCompleto: nomeCompleto,
                     email: email,
                     nascimento: nascimento,
-                    senha: senha,
+                    senha: senha.replace(/./g, '•'),
                     timestamp: serverTimestamp()
                 });
 
@@ -213,7 +211,7 @@
                 window.location.href = "index.html";
             } catch (erro) {
                 console.error("Erro detalhado ao cadastrar:", erro);
-                alert("Erro ao realizar cadastro. Verifique se as Regras do Realtime Database no Firebase permitem escrita.");
+                alert("Erro ao realizar cadastro.");
             }
         }
 
