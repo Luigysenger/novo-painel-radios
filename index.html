@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Painel do Ouvinte</title>
+    <title>Login - Sistema de Rádios</title>
     <style>
         * {
             box-sizing: border-box;
@@ -12,50 +12,44 @@
             font-family: Arial, sans-serif;
         }
         body {
-            background-color: #0f1016;
+            background-color: #f0f2f5;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            color: #ffffff;
+            padding: 20px;
         }
         .login-card {
-            background: #1a1c29;
-            padding: 35px;
+            background: #ffffff;
+            padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             width: 100%;
             max-width: 400px;
-            border: 1px solid #2d2f45;
+            border: 1px solid #e2e8f0;
         }
         .login-card h2 {
             text-align: center;
-            color: #a855f7;
+            color: #4c1d95;
             margin-bottom: 25px;
-            font-size: 24px;
+            font-size: 22px;
         }
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         .form-group label {
             display: block;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
-            color: #c084fc;
-            margin-bottom: 8px;
+            color: #4c1d95;
+            margin-bottom: 5px;
         }
         .form-group input {
             width: 100%;
-            padding: 12px;
-            background: #11131d;
-            border: 1px solid #374151;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
             border-radius: 6px;
-            color: #ffffff;
             font-size: 14px;
-        }
-        .form-group input:focus {
-            border-color: #a855f7;
-            outline: none;
         }
         .btn-submit {
             width: 100%;
@@ -66,92 +60,99 @@
             border-radius: 6px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 15px;
-            transition: background 0.2s;
+            font-size: 14px;
+            margin-top: 10px;
         }
         .btn-submit:hover {
             background: #6d28d9;
         }
-        .login-links {
-            margin-top: 20px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-        }
-        .login-links a {
-            color: #c084fc;
+        .btn-register {
+            width: 100%;
+            background: #ffffff;
+            color: #7c3aed;
+            border: 1px solid #7c3aed;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 8px;
             text-decoration: none;
+            display: block;
+            text-align: center;
         }
-        .login-links a:hover {
-            text-decoration: underline;
+        .btn-register:hover {
+            background: #f5f3ff;
         }
     </style>
 </head>
 <body>
 
     <div class="login-card">
-        <h2>Painel do Ouvinte</h2>
+        <h2>Entrar no Sistema</h2>
         
         <div class="form-group">
-            <label>E-mail ou Apelido</label>
-            <input type="text" id="loginUsuario" placeholder="Digite seu e-mail ou apelido" autocomplete="off">
+            <label>E-MAIL</label>
+            <input type="email" id="emailLogin" placeholder="seu@email.com" autocomplete="off">
         </div>
 
         <div class="form-group">
-            <label>Senha</label>
-            <input type="password" id="loginSenha" placeholder="Digite sua senha" autocomplete="current-password">
+            <label>SENHA</label>
+            <input type="password" id="senhaLogin" placeholder="Digite sua senha" autocomplete="current-password">
         </div>
 
         <button id="btnLogin" class="btn-submit">Entrar</button>
-
-        <div class="login-links">
-            <a href="cadastro.html">Não tenho cadastro</a>
-            <a href="#" onclick="alert('Função de recuperação de senha em breve!'); return false;">Esqueci minha senha</a>
-        </div>
+        <a href="cadastro.html" class="btn-register">Criar Novo Cadastro</a>
     </div>
 
     <script type="module">
         import { db } from './firebase-config.js';
-        import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { ref, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        const inputUsuario = document.getElementById('loginUsuario');
-        const inputSenha = document.getElementById('loginSenha');
+        const inputEmail = document.getElementById('emailLogin');
+        const inputSenha = document.getElementById('senhaLogin');
         const btnLogin = document.getElementById('btnLogin');
 
         window.addEventListener('DOMContentLoaded', () => {
-            inputUsuario.value = "";
+            inputEmail.value = "";
             inputSenha.value = "";
         });
 
         async function realizarLogin() {
-            const usuario = inputUsuario.value.trim();
+            const email = inputEmail.value.trim();
             const senha = inputSenha.value.trim();
 
-            if (!usuario || !senha) {
-                alert("Por favor, preencha todos os campos.");
+            if (!email || !senha) {
+                alert("Por favor, preencha o e-mail e a senha.");
                 return;
             }
 
             try {
-                const q = query(collection(db, "usuarios_cadastrados"), where("email", "==", usuario));
-                const querySnapshot = await getDocs(q);
+                const dbRef = ref(db);
+                const snapshot = await get(child(dbRef, 'usuarios_cadastrados'));
 
-                let usuarioEncontrado = false;
-                querySnapshot.forEach((doc) => {
-                    const dados = doc.data();
-                    if (dados.senha === senha) {
-                        usuarioEncontrado = true;
+                if (snapshot.exists()) {
+                    let usuarioEncontrado = false;
+                    snapshot.forEach((childSnapshot) => {
+                        const dados = childSnapshot.val();
+                        if (dados.email === email && dados.senha === senha) {
+                            usuarioEncontrado = true;
+                            // Salva o apelido no navegador para uso futuro
+                            localStorage.setItem('usuarioLogado', dados.apelido);
+                        }
+                    });
+
+                    if (usuarioEncontrado) {
+                        alert("Login realizado com sucesso!");
+                        window.location.href = "OUVINTES/index.html"; // Redireciona para a pasta de ouvintes
+                    } else {
+                        alert("E-mail ou senha incorretos!");
                     }
-                });
-
-                if (usuarioEncontrado) {
-                    alert("Login realizado com sucesso!");
-                    window.location.href = "OUVINTES/ouvinte_cards_radio.html";
                 } else {
-                    alert("E-mail/Apelido ou senha incorretos.");
+                    alert("Nenhum usuário cadastrado encontrado no sistema.");
                 }
             } catch (erro) {
-                console.error("Erro no login:", erro);
+                console.error("Erro ao fazer login:", erro);
                 alert("Erro ao conectar com o banco de dados.");
             }
         }
