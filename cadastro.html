@@ -146,22 +146,21 @@
             inputConfirmaSenha.value = "";
         });
 
-        // Máscara ultra-eficiente para formatar DD/MM/AAAA dinamicamente
+        // Máscara cirúrgica para inserção automática das barras na data
         inputNascimento.addEventListener('input', function (e) {
-            let v = e.target.value.replace(/\D/g, "");
-            if (v.length > 8) v = v.slice(0, 8);
+            let valor = e.target.value.replace(/\D/g, "");
+            if (valor.length > 8) {
+                valor = valor.slice(0, 8);
+            }
             
-            let resultado = "";
-            if (v.length > 0) {
-                resultado += v.substring(0, 2);
+            let formatado = "";
+            for (let i = 0; i < valor.length; i++) {
+                if (i === 2 || i === 4) {
+                    formatado += "/";
+                }
+                formatado += valor[i];
             }
-            if (v.length >= 3) {
-                resultado += '/' + v.substring(2, 4);
-            }
-            if (v.length >= 5) {
-                resultado += '/' + v.substring(4, 8);
-            }
-            e.target.value = resultado;
+            e.target.value = formatado;
         });
 
         async function realizarCadastro() {
