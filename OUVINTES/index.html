@@ -205,13 +205,18 @@
             text-align: center;
             cursor: grab;
             box-shadow: 0 6px 16px rgba(0,0,0,0.25);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border 0.15s ease;
             border: 2px solid transparent;
             position: relative;
         }
         .radio-card-user:hover { transform: translateY(-3px); box-shadow: 0 10px 22px rgba(0,0,0,0.35); }
         .radio-card-user:active { cursor: grabbing; }
         .radio-card-user.dragging { opacity: 0.4; }
+        .radio-card-user.drag-over {
+            border: 2px dashed #f472b6 !important;
+            transform: scale(1.03);
+            background-color: rgba(244, 114, 182, 0.2) !important;
+        }
         .radio-card-user.active-neon {
             border-color: #ffffff;
             box-shadow: 0 0 25px rgba(255, 255, 255, 0.8), inset 0 0 12px rgba(255,255,255,0.5);
@@ -223,6 +228,7 @@
             width: 100%;
             flex: 1;
             justify-content: center;
+            pointer-events: none; /* Garante que o arraste pegue bem no card */
         }
         .radio-card-user .icon {
             font-size: 32px;
@@ -527,10 +533,10 @@
                 <div id="sidebarRadioList"></div>
             </div>
 
-            <!-- Coluna 2: Grid Central de Preferidas (Arrastável) -->
+            <!-- Coluna 2: Grid Central de Preferidas (Arrastável com troca livre) -->
             <div class="center-panel">
                 <h3>GERENCIAR SUAS RÁDIOS PREFERIDAS</h3>
-                <div style="font-size: 11px; color: #94a3b8; margin-bottom: 15px; text-align: center; font-weight: 600;">2. ARRASTE PARA REORDENAR / CLIQUE PARA TOCAR</div>
+                <div style="font-size: 11px; color: #94a3b8; margin-bottom: 15px; text-align: center; font-weight: 600;">2. ARRASTE E SOLTE SOBRE OUTRO CARD PARA TROCAR DE LUGAR</div>
                 <div class="radios-grid-user" id="centerRadiosGrid"></div>
             </div>
 
@@ -700,6 +706,7 @@
             }
         }
 
+        // Evento para fechar o balão ao clicar em qualquer lugar da tela
         document.addEventListener('click', (e) => {
             if (balaoAviso.style.display === 'block') {
                 balaoAviso.style.display = 'none';
@@ -709,6 +716,10 @@
                     }
                 });
             }
+        });
+
+        window.addEventListener('focus', () => {
+            verificarNotificacaoRadioNova();
         });
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -877,48 +888,48 @@
                     abrirModalPincelOuvinte(radio.id, corCard, iconeCard);
                 });
 
-                card.addEventListener('dragstart', () => card.classList.add('dragging'));
+                // LÓGICA DE ARRASTAR E SOLTAR COM TROCA DIRETA DE POSIÇÃO (FLEXÍVEL)
+                card.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', radio.id);
+                    card.classList.add('dragging');
+                });
+
                 card.addEventListener('dragend', () => {
                     card.classList.remove('dragging');
-                    atualizarOrdemAposArrastar();
+                    document.querySelectorAll('.radio-card-user').forEach(c => c.classList.remove('drag-over'));
+                });
+
+                card.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    card.classList.add('drag-over');
+                });
+
+                card.addEventListener('dragleave', () => {
+                    card.classList.remove('drag-over');
+                });
+
+                card.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    card.classList.remove('drag-over');
+                    const draggedId = e.dataTransfer.getData('text/plain');
+                    const targetId = radio.id;
+
+                    if (draggedId && draggedId !== targetId) {
+                        const oldIndex = radiosFavoritasIds.indexOf(draggedId);
+                        const newIndex = radiosFavoritasIds.indexOf(targetId);
+
+                        if (oldIndex !== -1 && newIndex !== -1) {
+                            // Troca de posições exata (qualquer card para qualquer lugar)
+                            radiosFavoritasIds.splice(oldIndex, 1);
+                            radiosFavoritasIds.splice(newIndex, 0, draggedId);
+                            salvarPreferenciasNoFirebase();
+                            renderizarTudo();
+                        }
+                    }
                 });
 
                 centerRadiosGrid.appendChild(card);
             });
-
-            configurarAreaArrastar();
-        }
-
-        function atualizarOrdemAposArrastar() {
-            const cardsNaTela = Array.from(centerRadiosGrid.querySelectorAll('.radio-card-user'));
-            radiosFavoritasIds = cardsNaTela.map(c => c.dataset.id);
-            salvarPreferenciasNoFirebase();
-        }
-
-        function configurarAreaArrastar() {
-            centerRadiosGrid.addEventListener('dragover', e => {
-                e.preventDefault();
-                const cardEmArrasto = document.querySelector('.dragging');
-                const depoisDoElemento = obterElementoAposCursor(centerRadiosGrid, e.clientY);
-                if (depoisDoElemento == null) {
-                    centerRadiosGrid.appendChild(cardEmArrasto);
-                } else {
-                    centerRadiosGrid.insertBefore(cardEmArrasto, depoisDoElemento);
-                }
-            });
-        }
-
-        function obterElementoAposCursor(container, y) {
-            const cardsSemArrasto = Array.from(container.querySelectorAll('.radio-card-user:not(.dragging)'));
-            return cardsSemArrasto.reduce((closest, child) => {
-                const box = child.getBoundingClientRect();
-                const offset = y - box.top - box.height / 2;
-                if (offset < 0 && offset > closest.offset) {
-                    return { offset: offset, element: child };
-                } else {
-                    return closest;
-                }
-            }, { offset: Number.NEGATIVE_INFINITY }).element;
         }
 
         function tocarRadioPorObjeto(radio) {
