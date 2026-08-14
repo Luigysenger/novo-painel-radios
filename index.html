@@ -97,7 +97,6 @@
             color: #c4b5fd;
             text-decoration: underline;
         }
-        /* Estilos e animações para o fluxo dinâmico de recuperação */
         .hidden { display: none !important; }
         .slide-down { animation: slideDownAnim 0.4s ease-out forwards; }
         @keyframes slideDownAnim {
@@ -203,7 +202,6 @@
         const btnLogin = document.getElementById('btnLogin');
         const btnEsqueciSenha = document.getElementById('btnEsqueciSenha');
 
-        // Elementos de Recuperação
         const secaoLogin = document.getElementById('secaoLogin');
         const secaoRecuperacao = document.getElementById('secaoRecuperacao');
         const cardTitle = document.getElementById('cardTitle');
@@ -258,41 +256,8 @@
             }
         }
 
-        // ABRIR TELA DE RECUPERAÇÃO
-        btnEsqueciSenha.addEventListener('click', (e) => {
-            e.preventDefault();
-            secaoLogin.classList.add('hidden');
-            secaoRecuperacao.classList.remove('hidden');
-            secaoRecuperacao.classList.add('slide-down');
-            cardTitle.innerText = "Recuperar Senha";
-            
-            // Resetar etapas da recuperação
-            recEtapa1.classList.remove('hidden');
-            recEtapa2.classList.add('hidden');
-            recEtapa3.classList.add('hidden');
-            recEtapa4.classList.add('hidden');
-            document.getElementById('emailRec').value = "";
-        });
-
-        // VOLTAR AO LOGIN
-        document.getElementById('btnVoltarLogin').addEventListener('click', (e) => {
-            e.preventDefault();
-            secaoRecuperacao.classList.add('hidden');
-            secaoLogin.classList.remove('hidden');
-            secaoLogin.classList.add('slide-down');
-            cardTitle.innerText = "Entrar no Sistema";
-        });
-
-        document.getElementById('btnIrParaLogin').addEventListener('click', (e) => {
-            e.preventDefault();
-            secaoRecuperacao.classList.add('hidden');
-            secaoLogin.classList.remove('hidden');
-            secaoLogin.classList.add('slide-down');
-            cardTitle.innerText = "Entrar no Sistema";
-        });
-
-        // ETAPA 1: VALIDAR E-MAIL
-        document.getElementById('btnAvancarRec1').addEventListener('click', async () => {
+        // FUNÇÕES DE AÇÃO DA RECUPERAÇÃO
+        async function executarEtapa1() {
             const email = document.getElementById('emailRec').value.trim();
             if (!email) { alert("Por favor, digite seu e-mail."); return; }
 
@@ -314,10 +279,9 @@
                 console.error(err);
                 alert("Erro ao verificar e-mail no banco de dados.");
             }
-        });
+        }
 
-        // ETAPA 2: VALIDAR DATA DE NASCIMENTO
-        document.getElementById('btnAvancarRec2').addEventListener('click', () => {
+        function executarEtapa2() {
             const nascimento = document.getElementById('nascimentoRec').value.trim();
             if (!nascimento) { alert("Por favor, digite sua data de nascimento."); return; }
 
@@ -330,10 +294,9 @@
             } else {
                 alert("Data de nascimento incorreta.");
             }
-        });
+        }
 
-        // ETAPA 3: ATUALIZAR NOVA SENHA MASCARADA
-        document.getElementById('btnAtualizarSenha').addEventListener('click', async () => {
+        async function executarEtapa3() {
             const novaSenha = document.getElementById('novaSenhaRec').value.trim();
             const confirmaSenha = document.getElementById('confirmaSenhaRec').value.trim();
 
@@ -342,9 +305,9 @@
 
             try {
                 const usuarioRef = ref(db, 'usuarios_cadastrados/' + usuarioRecuperandoKey);
-                // Atualiza mascarando com pontos conforme sua regra anterior
+                // Salva a senha real para permitir o login corretamente
                 await update(usuarioRef, {
-                    senha: novaSenha.replace(/./g, '•')
+                    senha: novaSenha
                 });
 
                 recEtapa3.classList.add('hidden');
@@ -354,14 +317,52 @@
                 console.error(err);
                 alert("Erro ao atualizar a senha.");
             }
+        }
+
+        // ABRIR TELA DE RECUPERAÇÃO
+        btnEsqueciSenha.addEventListener('click', (e) => {
+            e.preventDefault();
+            secaoLogin.classList.add('hidden');
+            secaoRecuperacao.classList.remove('hidden');
+            secaoRecuperacao.classList.add('slide-down');
+            cardTitle.innerText = "Recuperar Senha";
+            
+            recEtapa1.classList.remove('hidden');
+            recEtapa2.classList.add('hidden');
+            recEtapa3.classList.add('hidden');
+            recEtapa4.classList.add('hidden');
+            document.getElementById('emailRec').value = "";
         });
 
+        // VOLTAR AO LOGIN
+        function voltarAoLogin(e) {
+            if (e) e.preventDefault();
+            secaoRecuperacao.classList.add('hidden');
+            secaoLogin.classList.remove('hidden');
+            secaoLogin.classList.add('slide-down');
+            cardTitle.innerText = "Entrar no Sistema";
+        }
+
+        document.getElementById('btnVoltarLogin').addEventListener('click', voltarAoLogin);
+        document.getElementById('btnIrParaLogin').addEventListener('click', voltarAoLogin);
+
+        // BOTÕES DE CLIQUE DO MOUSE
+        document.getElementById('btnAvancarRec1').addEventListener('click', executarEtapa1);
+        document.getElementById('btnAvancarRec2').addEventListener('click', executarEtapa2);
+        document.getElementById('btnAtualizarSenha').addEventListener('click', executarEtapa3);
         btnLogin.addEventListener('click', realizarLogin);
+
+        // SUPORTE COMPLETO À TECLA ENTER EM TODAS AS TELAS
         document.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                // Se estiver na tela de login normal, dispara o login
                 if (!secaoLogin.classList.contains('hidden')) {
                     realizarLogin();
+                } else if (!recEtapa1.classList.contains('hidden')) {
+                    executarEtapa1();
+                } else if (!recEtapa2.classList.contains('hidden')) {
+                    executarEtapa2();
+                } else if (!recEtapa3.classList.contains('hidden')) {
+                    executarEtapa3();
                 }
             }
         });
