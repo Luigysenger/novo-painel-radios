@@ -146,18 +146,17 @@
             inputConfirmaSenha.value = "";
         });
 
-        // Nova máscara ajustada para formatar a data automaticamente em tempo real
+        // Máscara otimizada para aplicar as barras automaticamente na data
         inputNascimento.addEventListener('input', function (e) {
-            let v = e.target.value.replace(/\D/g, "");
-            if (v.length > 8) v = v.slice(0, 8);
+            let valor = e.target.value.replace(/\D/g, "");
+            if (valor.length > 8) valor = valor.slice(0, 8);
             
-            if (v.length >= 5) {
-                e.target.value = v.slice(0, 2) + '/' + v.slice(2, 4) + '/' + v.slice(4, 8);
-            } else if (v.length >= 3) {
-                e.target.value = v.slice(0, 2) + '/' + v.slice(2, 4);
-            } else {
-                e.target.value = v;
+            if (valor.length > 4) {
+                valor = valor.replace(/^(\d{2})(\d{2})(\d{1,4})/, "$1/$2/$3");
+            } else if (valor.length > 2) {
+                valor = valor.replace(/^(\d{2})(\d{1,2})/, "$1/$2");
             }
+            e.target.value = valor;
         });
 
         async function realizarCadastro() {
