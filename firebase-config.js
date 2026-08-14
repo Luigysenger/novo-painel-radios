@@ -1,13 +1,9 @@
-// Configuração do Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
 const firebaseConfig = {
-  apiKey: "AIzaSyCLKtEJ2RIwc27RYX7x85QM5P2EQd9Vo",
-  authDomain: "novo-jeito-de-ouvir-radio.firebaseapp.com",
-  projectId: "novo-jeito-de-ouvir-radio",
-  storageBucket: "novo-jeito-de-ouvir-radio.firebasestorage.app",
-  messagingSenderId: "938297469983",
-  appId: "1:938297469983:web:9f52d127522363be1100ba"
+  // SUAS CONFIGURAÇÕES ATUAIS DO FIREBASE CONTINUAM AQUI
 };
 
-// Inicialização (usando o script via CDN para facilitar no Notepad)
-firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
+const app = initializeApp(firebaseConfig);
+export const db = getDatabase(app);
