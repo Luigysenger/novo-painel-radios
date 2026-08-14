@@ -121,7 +121,7 @@
 
         <div class="form-group">
             <label>DATA DE NASCIMENTO</label>
-            <input type="text" id="nascimento" placeholder="DD/MM/AAAA" maxlength="10" autocomplete="off">
+            <input type="text" id="nascimento" placeholder="DD/MM/AAAA" maxlength="10" autocomplete="off" oninput="mascaraData(this)">
         </div>
 
         <div class="form-group">
@@ -138,6 +138,22 @@
         <a href="index.html" class="btn-back">Voltar ao Login</a>
     </div>
 
+    <script>
+        // Função global acessível diretamente pelo HTML para forçar a máscara
+        window.mascaraData = function(elemento) {
+            let v = elemento.value.replace(/\D/g, '');
+            if (v.length > 8) v = v.slice(0, 8);
+            
+            if (v.length > 4) {
+                elemento.value = v.slice(0, 2) + '/' + v.slice(2, 4) + '/' + v.slice(4, 8);
+            } else if (v.length > 2) {
+                elemento.value = v.slice(0, 2) + '/' + v.slice(2);
+            } else {
+                elemento.value = v;
+            }
+        };
+    </script>
+
     <script type="module">
         import { db } from './firebase-config.js';
         import { ref, push, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -150,28 +166,15 @@
         const inputConfirmaSenha = document.getElementById('confirmaSenha');
         const btnCadastrar = document.getElementById('btnCadastrar');
 
-        // Função universal de formatação da data
-        function formatarData(input) {
-            let valor = input.value.replace(/\D/g, '');
-            if (valor.length > 8) valor = valor.slice(0, 8);
-            
-            if (valor.length > 4) {
-                input.value = valor.slice(0, 2) + '/' + valor.slice(2, 4) + '/' + valor.slice(4, 8);
-            } else if (valor.length > 2) {
-                input.value = valor.slice(0, 2) + '/' + valor.slice(2);
-            } else {
-                input.value = valor;
+        // Garante formatação caso o navegador preencha ao carregar
+        setTimeout(() => {
+            if (inputNascimento.value) {
+                window.mascaraData(inputNascimento);
             }
-        }
-
-        // Aplica a máscara em qualquer alteração (inclusive se o navegador preencher sozinho)
-        inputNascimento.addEventListener('input', (e) => formatarData(e.target));
-        inputNascimento.addEventListener('keyup', (e) => formatarData(e.target));
-        inputNascimento.addEventListener('blur', (e) => formatarData(e.target));
+        }, 200);
 
         async function realizarCadastro() {
-            // Garante que a data está formatada antes de enviar
-            formatarData(inputNascimento);
+            window.mascaraData(inputNascimento);
 
             const apelido = inputApelido.value.trim();
             const nomeCompleto = inputNomeCompleto.value.trim();
