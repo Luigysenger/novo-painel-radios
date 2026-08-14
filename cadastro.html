@@ -61,9 +61,6 @@
         .form-group input:focus {
             border-color: #8b5cf6;
         }
-        .uppercase-field {
-            text-transform: uppercase;
-        }
         .btn-submit {
             width: 100%;
             background: #7c3aed;
@@ -109,7 +106,7 @@
         
         <div class="form-group">
             <label>PRIMEIRO NOME OU APELIDO</label>
-            <input type="text" id="apelido" class="uppercase-field" placeholder="Ex: JOAO" autocomplete="off" oninput="this.value = this.value.toUpperCase()">
+            <input type="text" id="apelido" placeholder="Ex: JOAO" autocomplete="off" oninput="this.value = this.value.toUpperCase()">
         </div>
 
         <div class="form-group">
@@ -153,31 +150,18 @@
         const inputConfirmaSenha = document.getElementById('confirmaSenha');
         const btnCadastrar = document.getElementById('btnCadastrar');
 
-        window.addEventListener('DOMContentLoaded', () => {
-            inputApelido.value = "";
-            inputNomeCompleto.value = "";
-            inputEmail.value = "";
-            inputNascimento.value = "";
-            inputSenha.value = "";
-            inputConfirmaSenha.value = "";
-        });
+        // Máscara robusta para formatar DD/MM/AAAA enquanto digita
+        inputNascimento.addEventListener('input', (e) => {
+            let valor = e.target.value.replace(/\D/g, '');
+            if (valor.length > 8) valor = valor.slice(0, 8);
 
-        // Máscara cirúrgica ultra-eficiente para formatação em tempo real da data DD/MM/AAAA
-        inputNascimento.addEventListener('input', function (e) {
-            let v = e.target.value.replace(/\D/g, "");
-            if (v.length > 8) v = v.slice(0, 8);
-            
-            let resultado = "";
-            if (v.length > 0) {
-                resultado += v.substring(0, 2);
+            if (valor.length > 4) {
+                e.target.value = `${valor.slice(0, 2)}/${valor.slice(2, 4)}/${valor.slice(4)}`;
+            } else if (valor.length > 2) {
+                e.target.value = `${valor.slice(0, 2)}/${valor.slice(2)}`;
+            } else {
+                e.target.value = valor;
             }
-            if (v.length >= 3) {
-                resultado += '/' + v.substring(2, 4);
-            }
-            if (v.length >= 5) {
-                resultado += '/' + v.substring(4, 8);
-            }
-            e.target.value = resultado;
         });
 
         async function realizarCadastro() {
@@ -218,7 +202,8 @@
         }
 
         btnCadastrar.addEventListener('click', realizarCadastro);
-        document.addEventListener('keypress', (e) => {
+        
+        document.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 realizarCadastro();
             }
