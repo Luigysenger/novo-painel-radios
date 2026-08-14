@@ -5,6 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Ouvinte - Sistema de Rádios</title>
     <style>
+        /* ESTILO DO BALÃO DE NOTIFICAÇÃO (ADICIONADO) */
+        #balaoAviso {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #a855f7, #6d28d9);
+            color: #ffffff;
+            padding: 16px 30px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(109, 40, 217, 0.5);
+            z-index: 9999;
+            text-align: center;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.2);
+            animation: slideDown 0.5s ease-out;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translate(-50%, -50px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -465,13 +490,18 @@
         }
 
         .player-spacer {
-            min-width: 280px; /* Equilibra o flex layout perfeitamente */
+            min-width: 280px;
         }
 
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
+
+    <!-- ELEMENTO DO BALÃO DE AVISO (ADICIONADO) -->
+    <div id="balaoAviso">
+        Eiiii Ligadão! Tem Rádio nova adicionada pelo adm, Curta sem moderação.
+    </div>
 
     <div class="main-container">
         <div class="listener-header">
@@ -650,11 +680,46 @@
         let nomeUsuarioId = localStorage.getItem('usuarioLogado') || "ouvinte_anonimo";
         let chaveFirebaseUser = nomeUsuarioId.replace(/[^a-zA-Z0-9]/g, "_");
 
+        const balaoAviso = document.getElementById('balaoAviso');
+
+        // Lógica cirúrgica para verificar se há rádio nova e exibir o balão ao logar
+        async function verificarNotificacaoRadioNova() {
+            try {
+                const configRef = ref(db, 'configuracoes/ultima_radio_add');
+                const snapshot = await get(configRef);
+                
+                if (snapshot.exists()) {
+                    const dataNovaRadio = snapshot.val();
+                    const ultimaVista = localStorage.getItem('jaViuUltimaRadio');
+
+                    // Se a rádio cadastrada pelo admin for mais recente do que a última visualizada pelo ouvinte
+                    if (dataNovaRadio !== ultimaVista) {
+                        balaoAviso.style.display = 'block';
+                    }
+                }
+            } catch (err) {
+                console.error("Erro ao verificar nova rádio:", err);
+            }
+        }
+
+        // Evento para fechar o balão ao clicar em QUALQUER LUGAR da tela
+        document.addEventListener('click', (e) => {
+            if (balaoAviso.style.display === 'block') {
+                balaoAviso.style.display = 'none';
+                get(ref(db, 'configuracoes/ultima_radio_add')).then((snap) => {
+                    if (snap.exists()) {
+                        localStorage.setItem('jaViuUltimaRadio', snap.val());
+                    }
+                });
+            }
+        });
+
         window.addEventListener('DOMContentLoaded', () => {
             if (localStorage.getItem('usuarioLogado')) {
                 document.getElementById('nomeOuvinteDisplay').innerText = "Olá, " + localStorage.getItem('usuarioLogado');
             }
             carregarDadosDoPainel();
+            verificarNotificacaoRadioNova(); // Executa a verificação ao carregar a página de login do ouvinte
         });
 
         document.getElementById('btnSair').addEventListener('click', () => {
@@ -874,7 +939,7 @@
             playerNameDisplay.innerText = radio.nome;
             playerIconDisplay.innerText = custom.icone || radio.icone || "📻";
             playerStatusText.innerText = `Ouvindo Rádio: ${radio.nome}`;
-            btnPlayPause.innerText = "⏹️"; // Muda para Stop quando está tocando
+            btnPlayPause.innerText = "⏹️";
 
             audioElement.src = radio.url;
             audioElement.play().catch(err => console.error("Erro no stream:", err));
@@ -896,7 +961,6 @@
             tocarRadioPorObjeto(radiosAtivasNoCentro[anterior]);
         });
 
-        // Botão Play/Stop Inteligente
         btnPlayPause.addEventListener('click', () => {
             const radiosAtivasNoCentro = radiosFavoritasIds.map(id => todasRadiosGlobal.find(r => r.id === id)).filter(Boolean);
             if (audioElement.paused) {
@@ -909,7 +973,7 @@
                 }
             } else {
                 audioElement.pause();
-                btnPlayPause.innerText = "▶️"; // Volta para Play
+                btnPlayPause.innerText = "▶️";
                 playerStatusText.innerText = "Rádio pausada";
                 document.querySelectorAll('.radio-card-user').forEach(c => c.classList.remove('active-neon'));
             }
