@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel do Ouvinte</title>
+    <style>
+        body { font-family: Arial; text-align: center; padding: 50px; background: #f0f2f5; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 30px; }
+        a { display: block; padding: 20px; background: #7c3aed; color: white; text-decoration: none; border-radius: 10px; font-weight: bold; }
+        a:hover { background: #6d28d9; }
+    </style>
+</head>
+<body>
+    <h1>Bem-vindo, <span id="nomeOuvinte">Ouvinte</span>!</h1>
+    <p>Escolha uma opção abaixo:</p>
+
+    <div class="menu-grid">
+        <a href="ouvinte_cards_radio.html">Rádios</a>
+        <a href="ouvinte_chat.html">Chat</a>
+        <a href="ouvinte_esporte.html">Esporte</a>
+        <a href="ouvinte_horoscopo.html">Horóscopo</a>
+    </div>
+
+    <script>
+        // Pega o nome salvo no login anterior
+        const nome = localStorage.getItem('usuarioLogado');
+        if (nome) {
+            document.getElementById('nomeOuvinte').innerText = nome;
+        }
+    </script>
+</body>
+</html>
