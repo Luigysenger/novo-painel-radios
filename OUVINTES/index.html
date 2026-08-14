@@ -2,31 +2,577 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Painel do Ouvinte</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Ouvinte - Sistema de Rádios</title>
     <style>
-        body { font-family: Arial; text-align: center; padding: 50px; background: #f0f2f5; }
-        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 30px; }
-        a { display: block; padding: 20px; background: #7c3aed; color: white; text-decoration: none; border-radius: 10px; font-weight: bold; }
-        a:hover { background: #6d28d9; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 130px;
+        }
+        .main-container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+        /* Topo do Ouvinte */
+        .listener-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 15px;
+        }
+        .listener-info h1 {
+            font-size: 22px;
+            color: #f472b6;
+            margin-bottom: 4px;
+        }
+        .listener-info p {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        .listener-widgets {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 13px;
+            color: #cbd5e1;
+        }
+        .btn-sair {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .btn-sair:hover { background: #dc2626; }
+
+        .banner-title {
+            text-align: center;
+            color: #f472b6;
+            font-size: 16px;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        /* Layout de Colunas da Foto */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr 340px;
+            gap: 20px;
+        }
+
+        /* Coluna 1: Lista Lateral de Rádios */
+        .sidebar-panel {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 15px;
+            max-height: 550px;
+            overflow-y: auto;
+        }
+        .sidebar-panel h3 {
+            font-size: 13px;
+            color: #cbd5e1;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+        .radio-list-item {
+            background: #1e1b4b;
+            border: 1px solid #4338ca;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .radio-list-item:hover {
+            background: #312e81;
+        }
+        .radio-list-item span {
+            font-size: 12px;
+            color: #f8fafc;
+            font-weight: bold;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Coluna 2: Grid Central de Cards Coloridos */
+        .center-panel {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 550px;
+        }
+        .center-panel h3 {
+            font-size: 13px;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+        .radios-grid-user {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        .radio-card-user {
+            background-color: var(--card-bg, #64748b);
+            border-radius: 14px;
+            padding: 20px 10px;
+            height: 130px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 2px solid transparent;
+        }
+        .radio-card-user:hover {
+            transform: translateY(-3px);
+        }
+        .radio-card-user.active-neon {
+            border-color: #ffffff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.7), inset 0 0 10px rgba(255,255,255,0.4);
+        }
+        .radio-card-user .icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        .radio-card-user h4 {
+            font-size: 12px;
+            color: #0f172a;
+            font-weight: bold;
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Coluna 3: Horóscopo e Mensagens ao ADM */
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .horoscope-card, .message-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 15px;
+        }
+        .horoscope-card h3 {
+            font-size: 13px;
+            color: #f472b6;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .signs-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            font-size: 10px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .sign-badge {
+            background: #1e1b4b;
+            padding: 6px 2px;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #cbd5e1;
+            font-weight: bold;
+        }
+        .sign-badge:hover { background: #4338ca; color: #fff; }
+        .horoscope-result {
+            font-size: 11px;
+            color: #94a3b8;
+            text-align: center;
+            margin-top: 8px;
+            min-height: 30px;
+        }
+
+        .message-card h3 {
+            font-size: 12px;
+            color: #cbd5e1;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        .message-card textarea {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 10px;
+            color: #fff;
+            font-size: 12px;
+            resize: none;
+            height: 70px;
+            outline: none;
+            margin-bottom: 8px;
+        }
+        .btn-send-msg {
+            background: #9333ea;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .btn-send-msg:hover { background: #7e22ce; }
+
+        /* Player Fixo Inferior Estilo Rádio de Carro */
+        .car-player-bar {
+            position: fixed;
+            bottom: 0; left: 0; width: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid #334155;
+            padding: 12px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 900;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+        }
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .player-info h4 { font-size: 15px; color: #f8fafc; }
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .control-btn {
+            background: #334155;
+            color: white;
+            border: none;
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.2s;
+        }
+        .control-btn:hover { background: #7c3aed; }
+        .control-btn.main-play { width: 50px; height: 50px; background: #7c3aed; font-size: 20px; }
+        .control-btn.main-play:hover { background: #6d28d9; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-    <h1>Bem-vindo, <span id="nomeOuvinte">Ouvinte</span>!</h1>
-    <p>Escolha uma opção abaixo:</p>
 
-    <div class="menu-grid">
-        <a href="ouvinte_cards_radio.html">Rádios</a>
-        <a href="ouvinte_chat.html">Chat</a>
-        <a href="ouvinte_esporte.html">Esporte</a>
-        <a href="ouvinte_horoscopo.html">Horóscopo</a>
+    <div class="main-container">
+        <!-- Topo -->
+        <div class="listener-header">
+            <div class="listener-info">
+                <h1>Painel do Ouvinte</h1>
+                <p id="nomeOuvinteDisplay">Olá, Ouvinte</p>
+            </div>
+            <div class="listener-widgets">
+                <span id="relogioDigital">00:00:00</span>
+                <span id="climaInfo">Salvador: 23°C</span>
+                <button class="btn-sair" id="btnSair">SAIR</button>
+            </div>
+        </div>
+
+        <div class="banner-title">🎧 CURTA AQUI SUAS RÁDIOS PREFERIDAS</div>
+
+        <!-- Layout em 3 Colunas idêntico à foto -->
+        <div class="dashboard-grid">
+            
+            <!-- Coluna 1: Lista Lateral -->
+            <div class="sidebar-panel">
+                <h3>GERENCIAR SUAS RÁDIOS PREFERIDAS</h3>
+                <div style="font-size: 11px; color: #94a3b8; margin-bottom: 10px;">1. ADICIONE SUAS RÁDIOS</div>
+                <div id="sidebarRadioList">
+                    <!-- Preenchido via Firebase -->
+                </div>
+            </div>
+
+            <!-- Coluna 2: Grid Central de Cards -->
+            <div class="center-panel">
+                <h3>GERENCIAR SUAS RÁDIOS PREFERIDAS</h3>
+                <div style="font-size: 11px; color: #94a3b8; margin-bottom: 15px; text-align: center;">2. ARRASTE PARA REORDENAR / CLIQUE PARA TOCAR</div>
+                <div class="radios-grid-user" id="centerRadiosGrid">
+                    <!-- Preenchido via Firebase -->
+                </div>
+            </div>
+
+            <!-- Coluna 3: Horóscopo e Mensagens -->
+            <div class="right-panel">
+                <div class="horoscope-card">
+                    <h3>✨ HORÓSCOPO DO DIA</h3>
+                    <div class="signs-grid">
+                        <div class="sign-badge" onclick="verHoroscopo('Áries')">ÁRIES</div>
+                        <div class="sign-badge" onclick="verHoroscopo('Touro')">TOURO</div>
+                        <div class="sign-badge" onclick="verHoroscopo('Gêmeos')">GÊMEOS</div>
+                        <div class="sign-badge" onclick="verHoroscopo('Câncer')">CÂNCER</div>
+                        <div class="sign-badge" onclick="verHoroscopo('Leão')">LEÃO</div>
+                        <div class="sign-badge" onclick="verHoroscopo('Virgem')">VIRGEM</div>
+                        <div class="sign-badge" onclick="verHoroscopo('Libra')">LIBRA</div>
+                        <div class="sign-badge" onclick="verHoroscopo('Escorpião')">ESCORP</div>
+                        <div class="sign-badge" onclick="verHoroscopo('Sagitário')">SAGIT</div>
+                        <div class="sign-badge" onclick="verHoroscopo('Capricórnio')">CAPRIC</div>
+                        <div class="sign-badge" onclick="verHoroscopo('Aquário')">AQUÁR</div>
+                        <div class="sign-badge" onclick="verHoroscopo('Peixes')">PEIXES</div>
+                    </div>
+                    <div class="horoscope-result" id="horoscopeResultText">Clique em um signo acima para ver a previsão astral! ✨</div>
+                </div>
+
+                <div class="message-card">
+                    <h3>✉️ MANDE MENSAGEM PARA O ADM PARA PEDIR PARA ADICIONAR UMA RÁDIO QUE VOCÊ GOSTE</h3>
+                    <textarea id="msgAdminInput" placeholder="Escreva seu recado ou pedido de rádio aqui... (Enter envia)"></textarea>
+                    <button class="btn-send-msg" id="btnEnviarMsg">Enviar Mensagem</button>
+                </div>
+            </div>
+
+        </div>
     </div>
 
+    <!-- Player Fixo Inferior -->
+    <div class="car-player-bar hidden" id="carPlayerBar">
+        <div class="player-info">
+            <span id="playerIconDisplay" style="font-size: 26px;">📻</span>
+            <div>
+                <h4 id="playerNameDisplay">Nenhuma rádio selecionada</h4>
+            </div>
+        </div>
+        <div class="player-controls">
+            <button class="control-btn" id="btnAnterior" title="Rádio Anterior">⏮️</button>
+            <button class="control-btn main-play" id="btnPlayPause" title="Tocar / Pausar">▶️</button>
+            <button class="control-btn" id="btnProximo" title="Próxima Rádio">⏭️</button>
+        </div>
+    </div>
+
+    <audio id="audioStreaming" preload="none"></audio>
+
     <script>
-        // Pega o nome salvo no login anterior
-        const nome = localStorage.getItem('usuarioLogado');
-        if (nome) {
-            document.getElementById('nomeOuvinte').innerText = nome;
+        // Relógio digital em tempo real
+        setInterval(() => {
+            const agora = new Date();
+            document.getElementById('relogioDigital').innerText = agora.toLocaleTimeString();
+        }, 1000);
+
+        // Previsões do Horóscopo do Dia
+        const previsoes = {
+            'Áries': 'Sua energia estará em alta hoje! Aproveite para iniciar novos projetos.',
+            'Touro': 'Momento de foco financeiro e estabilidade emocional. Confie no seu instinto.',
+            'Gêmeos': 'Sua comunicação será sua maior aliada hoje. Excelentes diálogos à vista.',
+            'Câncer': 'Dia propício para cuidar do lar e das relações familiares mais próximas.',
+            'Leão': 'O seu brilho pessoal vai se destacar em qualquer ambiente que você pisar.',
+            'Virgem': 'Organização e clareza mental trarão resultados surpreendentes no trabalho.',
+            'Libra': 'Busque o equilíbrio nas decisões. Parcerias produtivas estão surgindo.',
+            'Escorpião': 'Intuição muito forte hoje. Suas escolhas trarão grandes transformações.',
+            'Sagitário': 'Otimismo e vontade de expandir horizontes. Ótimo dia para novos ares!',
+            'Capricórnio': 'Dedicação aos objetivos trará o reconhecimento que você tanto espera.',
+            'Aquário': 'Ideias inovadoras e criativas vão contagiar as pessoas ao seu redor.',
+            'Peixes': 'Sensibilidade e inspiração artística em evidência. Siga sua intuição!'
+        };
+
+        window.verHoroscopo = function(signo) {
+            document.getElementById('horoscopeResultText').innerText = `${signo}: ${previsoes[signo]}`;
+        };
+    </script>
+
+    <script type="module">
+        import { db } from '../firebase-config.js';
+        import { ref, get, push, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const usuarioLogado = localStorage.getItem('usuarioLogado');
+            if (!usuarioLogado) {
+                // Se não estiver logado como ouvinte, pode ser um teste livre, mas idealmente redireciona
+                document.getElementById('nomeOuvinteDisplay').innerText = "Olá, Ouvinte Anônimo";
+            } else {
+                document.getElementById('nomeOuvinteDisplay').innerText = "Olá, " + usuarioLogado;
+            }
+            carregarRadiosDoOuvinte();
+        });
+
+        document.getElementById('btnSair').addEventListener('click', () => {
+            audioElement.pause();
+            localStorage.removeItem('usuarioLogado');
+            window.location.href = "../index.html";
+        });
+
+        let listaRadiosOuvinte = [];
+        let indiceRadioAtual = -1;
+        const audioElement = document.getElementById('audioStreaming');
+        const carPlayerBar = document.getElementById('carPlayerBar');
+        const playerNameDisplay = document.getElementById('playerNameDisplay');
+        const playerIconDisplay = document.getElementById('playerIconDisplay');
+        const btnPlayPause = document.getElementById('btnPlayPause');
+        const sidebarRadioList = document.getElementById('sidebarRadioList');
+        const centerRadiosGrid = document.getElementById('centerRadiosGrid');
+
+        // Carregar do Firebase (mesmo banco do ADM)
+        async function carregarRadiosDoOuvinte() {
+            try {
+                const radiosRef = ref(db, 'radios_cadastradas');
+                const snapshot = await get(radiosRef);
+
+                sidebarRadioList.innerHTML = "";
+                centerRadiosGrid.innerHTML = "";
+                listaRadiosOuvinte = [];
+
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        const id = childSnapshot.key;
+                        const dados = childSnapshot.val();
+                        listaRadiosOuvinte.push({ id, ...dados });
+                    });
+
+                    listaRadiosOuvinte.forEach((radio, index) => {
+                        const corCard = radio.cor || "#86efac";
+                        const iconeCard = radio.icone || "📻";
+
+                        // 1. Criar item na lista lateral esquerda
+                        const sideItem = document.createElement('div');
+                        sideItem.className = 'radio-list-item';
+                        sideItem.innerHTML = `
+                            <span style="font-size: 16px;">${iconeCard}</span>
+                            <span title="${radio.nome}">${radio.nome}</span>
+                        `;
+                        sideItem.addEventListener('click', () => tocarRadioPorIndice(index));
+                        sidebarRadioList.appendChild(sideItem);
+
+                        // 2. Criar card central colorido
+                        const card = document.createElement('div');
+                        card.className = 'radio-card-user';
+                        card.id = `user-card-${index}`;
+                        card.style.setProperty('--card-bg', corCard);
+                        card.innerHTML = `
+                            <div class="icon">${iconeCard}</div>
+                            <h4 title="${radio.nome}">${radio.nome}</h4>
+                        `;
+                        card.addEventListener('click', () => tocarRadioPorIndice(index));
+                        centerRadiosGrid.appendChild(card);
+                    });
+
+                } else {
+                    sidebarRadioList.innerHTML = "<p style='font-size:11px; color:#94a3b8;'>Nenhuma rádio disponível.</p>";
+                    centerRadiosGrid.innerHTML = "<p style='font-size:11px; color:#94a3b8;'>Aguardando o ADM cadastrar rádios.</p>";
+                    carPlayerBar.classList.add('hidden');
+                }
+            } catch (err) {
+                console.error("Erro ao carregar rádios do ouvinte:", err);
+            }
         }
+
+        // Tocar rádio imediatamente sem mensagens
+        function tocarRadioPorIndice(index) {
+            if (index < 0 || index >= listaRadiosOuvinte.length) return;
+            indiceRadioAtual = index;
+            const radio = listaRadiosOuvinte[indiceRadioAtual];
+
+            document.querySelectorAll('.radio-card-user').forEach((c, idx) => {
+                if (idx === indiceRadioAtual) c.classList.add('active-neon');
+                else c.classList.remove('active-neon');
+            });
+
+            carPlayerBar.classList.remove('hidden');
+            playerNameDisplay.innerText = radio.nome;
+            playerIconDisplay.innerText = radio.icone || "📻";
+            btnPlayPause.innerText = "⏸️";
+
+            audioElement.src = radio.url;
+            audioElement.play().catch(err => console.error("Erro ao reproduzir stream:", err));
+        }
+
+        document.getElementById('btnProximo').addEventListener('click', () => {
+            if (listaRadiosOuvinte.length === 0) return;
+            let proximo = indiceRadioAtual + 1;
+            if (proximo >= listaRadiosOuvinte.length) proximo = 0;
+            tocarRadioPorIndice(proximo);
+        });
+
+        document.getElementById('btnAnterior').addEventListener('click', () => {
+            if (listaRadiosOuvinte.length === 0) return;
+            let anterior = indiceRadioAtual - 1;
+            if (anterior < 0) anterior = listaRadiosOuvinte.length - 1;
+            tocarRadioPorIndice(anterior);
+        });
+
+        btnPlayPause.addEventListener('click', () => {
+            if (audioElement.paused) {
+                if (indiceRadioAtual === -1 && listaRadiosOuvinte.length > 0) {
+                    tocarRadioPorIndice(0);
+                } else if (indiceRadioAtual !== -1) {
+                    audioElement.play();
+                    btnPlayPause.innerText = "⏸️";
+                }
+            } else {
+                audioElement.pause();
+                btnPlayPause.innerText = "▶️";
+            }
+        });
+
+        // Enviar mensagem para o ADM via Firebase
+        const btnEnviarMsg = document.getElementById('btnEnviarMsg');
+        const msgAdminInput = document.getElementById('msgAdminInput');
+
+        async function enviarMensagemParaAdm() {
+            const texto = msgAdminInput.value.trim();
+            if (!texto) {
+                alert("Digite uma mensagem antes de enviar.");
+                return;
+            }
+
+            const remetente = localStorage.getItem('usuarioLogado') || "Ouvinte Anônimo";
+
+            try {
+                const msgsRef = ref(db, 'mensagens_ouvintes');
+                const novaMsgRef = push(msgsRef);
+                await set(novaMsgRef, {
+                    remetente: remetente,
+                    mensagem: texto,
+                    data: new Date().toLocaleString()
+                });
+                alert("Mensagem enviada com sucesso para o Administrador!");
+                msgAdminInput.value = "";
+            } catch (err) {
+                console.error("Erro ao enviar mensagem:", err);
+                alert("Erro ao enviar mensagem.");
+            }
+        }
+
+        btnEnviarMsg.addEventListener('click', enviarMensagemParaAdm);
+        msgAdminInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                enviarMensagemParaAdm();
+            }
+        });
     </script>
 </body>
 </html>
