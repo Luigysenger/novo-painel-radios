@@ -150,8 +150,8 @@
         const inputConfirmaSenha = document.getElementById('confirmaSenha');
         const btnCadastrar = document.getElementById('btnCadastrar');
 
-        // Máscara ultra-precisa para formatar a data automaticamente enquanto digita
-        inputNascimento.addEventListener('input', function (e) {
+        // Função universal e blindada para aplicar a máscara de data DD/MM/AAAA
+        function aplicarMascaraData(e) {
             let valor = e.target.value.replace(/\D/g, '');
             if (valor.length > 8) {
                 valor = valor.slice(0, 8);
@@ -164,6 +164,13 @@
             } else {
                 e.target.value = valor;
             }
+        }
+
+        // Ouvindo múltiplos eventos para garantir que funcione independentemente de como o usuário digite
+        inputNascimento.addEventListener('input', aplicarMascaraData);
+        inputNascimento.addEventListener('keyup', aplicarMascaraData);
+        inputNascimento.addEventListener('paste', (e) => {
+            setTimeout(() => aplicarMascaraData(e), 10);
         });
 
         async function realizarCadastro() {
