@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Senha - Sistema de Rádios</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .recovery-card {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 35px 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+        .recovery-card h2 {
+            text-align: center;
+            color: #f8fafc;
+            margin-bottom: 25px;
+            font-size: 22px;
+            letter-spacing: 0.5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: bold;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 11px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #f8fafc;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus {
+            border-color: #8b5cf6;
+        }
+        .btn-submit {
+            width: 100%;
+            background: #7c3aed;
+            color: white;
+            border: none;
+            padding: 13px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+        .btn-submit:hover {
+            background: #6d28d9;
+        }
+        .btn-back {
+            width: 100%;
+            background: transparent;
+            color: #94a3b8;
+            border: 1px solid #334155;
+            padding: 11px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 8px;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .btn-back:hover {
+            background: #334155;
+            color: #f8fafc;
+        }
+        /* Classes para animação em etapas */
+        .hidden { display: none !important; }
+        .slide-down { animation: slideDownAnim 0.5s ease-out forwards; }
+        @keyframes slideDownAnim {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .success-text {
+            text-align: center;
+            color: #4ade80;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="recovery-card" id="cardContainer">
+        <h2 id="titulo">Recuperar Senha</h2>
+
+        <!-- ETAPA 1: DIGITAR O E-MAIL -->
+        <div id="etapa1" class="slide-down">
+            <div class="form-group">
+                <label>DIGITE SEU E-MAIL CADASTRADO</label>
+                <input type="email" id="emailRecuperacao" placeholder="seu@email.com" autocomplete="off">
+            </div>
+            <button type="button" id="btnEtapa1" class="btn-submit">AVANÇAR</button>
+        </div>
+
+        <!-- ETAPA 2: DIGITAR DATA DE NASCIMENTO -->
+        <div id="etapa2" class="hidden">
+            <div class="form-group">
+                <label>CONFIRME SUA DATA DE NASCIMENTO</label>
+                <input type="text" id="nascimentoRecuperacao" placeholder="DD/MM/AAAA" maxlength="10" autocomplete="off" oninput="mascaraData(this)">
+            </div>
+            <button type="button" id="btnEtapa2" class="btn-submit">VERIFICAR</button>
+        </div>
+
+        <!-- ETAPA 3: NOVA SENHA -->
+        <div id="etapa3" class="hidden">
+            <div class="form-group">
+                <label>DIGITE SUA NOVA SENHA</label>
+                <input type="password" id="novaSenha" placeholder="Nova senha" autocomplete="new-password">
+            </div>
+            <div class="form-group">
+                <label>CONFIRME A NOVA SENHA</label>
+                <input type="password" id="confirmaNovaSenha" placeholder="Repita a nova senha" autocomplete="new-password">
+            </div>
+            <button type="button" id="btnEtapa3" class="btn-submit">ATUALIZAR SENHA</button>
+        </div>
+
+        <!-- ETAPA 4: SUCESSO -->
+        <div id="etapa4" class="hidden">
+            <p class="success-text">Pronto, agora basta fazer seu login e curtir suas rádios preferidas!</p>
+            <a href="index.html" class="btn-submit" style="display: block; text-align: center; text-decoration: none;">FAZER LOGIN</a>
+        </div>
+
+        <a href="index.html" class="btn-back" id="btnVoltar">Voltar ao Login</a>
+    </div>
+
+    <script>
+        window.mascaraData = function(elemento) {
+            let v = elemento.value.replace(/\D/g, '');
+            if (v.length > 8) v = v.slice(0, 8);
+            if (v.length > 4) { elemento.value = v.slice(0, 2) + '/' + v.slice(2, 4) + '/' + v.slice(4, 8); }
+            else if (v.length > 2) { elemento.value = v.slice(0, 2) + '/' + v.slice(2); }
+            else { elemento.value = v; }
+        };
+    </script>
+
+    <script type="module">
+        import { db } from './firebase-config.js';
+        import { ref, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        let dadosDoUsuario = null;
+        let emailKeyGlobal = "";
+
+        const etapa1 = document.getElementById('etapa1');
+        const etapa2 = document.getElementById('etapa2');
+        const etapa3 = document.getElementById('etapa3');
+        const etapa4 = document.getElementById('etapa4');
+        const titulo = document.getElementById('titulo');
+        const btnVoltar = document.getElementById('btnVoltar');
+
+        // FUNÇÃO ETAPA 1: VERIFICAR E-MAIL
+        document.getElementById('btnEtapa1').addEventListener('click', async () => {
+            const email = document.getElementById('emailRecuperacao').value.trim();
+            if (!email) { alert("Por favor, digite seu e-mail."); return; }
+
+            emailKeyGlobal = email.toLowerCase().replace(/[.#$\[\]]/g, "_");
+            const usuarioRef = ref(db, 'usuarios_cadastrados/' + emailKeyGlobal);
+
+            try {
+                const snapshot = await get(usuarioRef);
+                if (snapshot.exists()) {
+                    dadosDoUsuario = snapshot.val();
+                    // Ocultar Etapa 1, Mostrar Etapa 2
+                    etapa1.classList.add('hidden');
+                    etapa2.classList.remove('hidden');
+                    etapa2.classList.add('slide-down');
+                } else {
+                    alert("Este e-mail não foi encontrado no sistema.");
+                }
+            } catch (erro) {
+                console.error(erro);
+                alert("Erro ao buscar dados. Verifique a conexão.");
+            }
+        });
+
+        // FUNÇÃO ETAPA 2: VERIFICAR DATA DE NASCIMENTO
+        document.getElementById('btnEtapa2').addEventListener('click', () => {
+            const nascimento = document.getElementById('nascimentoRecuperacao').value.trim();
+            if (!nascimento) { alert("Por favor, digite sua data de nascimento."); return; }
+
+            if (nascimento === dadosDoUsuario.nascimento) {
+                // Ocultar Etapa 2, Mostrar Etapa 3
+                etapa2.classList.add('hidden');
+                etapa3.classList.remove('hidden');
+                etapa3.classList.add('slide-down');
+            } else {
+                alert("Data de nascimento incorreta.");
+            }
+        });
+
+        // FUNÇÃO ETAPA 3: SALVAR NOVA SENHA
+        document.getElementById('btnEtapa3').addEventListener('click', async () => {
+            const novaSenha = document.getElementById('novaSenha').value.trim();
+            const confirmaNovaSenha = document.getElementById('confirmaNovaSenha').value.trim();
+
+            if (!novaSenha || !confirmaNovaSenha) { alert("Por favor, preencha as senhas."); return; }
+            if (novaSenha !== confirmaNovaSenha) { alert("As senhas não coincidem!"); return; }
+
+            try {
+                const usuarioRef = ref(db, 'usuarios_cadastrados/' + emailKeyGlobal);
+                // Atualiza a senha no Firebase mascarada com pontos, mantendo sua regra anterior
+                await update(usuarioRef, {
+                    senha: novaSenha.replace(/./g, '•')
+                });
+
+                // Ocultar tudo e mostrar mensagem de sucesso final
+                titulo.classList.add('hidden');
+                btnVoltar.classList.add('hidden');
+                etapa3.classList.add('hidden');
+                etapa4.classList.remove('hidden');
+                etapa4.classList.add('slide-down');
+            } catch (erro) {
+                console.error(erro);
+                alert("Erro ao atualizar a senha.");
+            }
+        });
+    </script>
+</body>
+</html>
