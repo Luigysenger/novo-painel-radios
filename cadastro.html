@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criar Cadastro - Sistema de Rádios</title>
+    <title>Criar Novo Cadastro - Sistema de Rádios</title>
     <style>
         * {
             box-sizing: border-box;
@@ -150,15 +150,15 @@
         const inputConfirmaSenha = document.getElementById('confirmaSenha');
         const btnCadastrar = document.getElementById('btnCadastrar');
 
-        // Máscara robusta para formatar DD/MM/AAAA enquanto digita
+        // Máscara reativa aprimorada para formatar DD/MM/AAAA em tempo real
         inputNascimento.addEventListener('input', (e) => {
             let valor = e.target.value.replace(/\D/g, '');
             if (valor.length > 8) valor = valor.slice(0, 8);
 
             if (valor.length > 4) {
-                e.target.value = `${valor.slice(0, 2)}/${valor.slice(2, 4)}/${valor.slice(4)}`;
+                e.target.value = valor.slice(0, 2) + '/' + valor.slice(2, 4) + '/' + valor.slice(4, 8);
             } else if (valor.length > 2) {
-                e.target.value = `${valor.slice(0, 2)}/${valor.slice(2)}`;
+                e.target.value = valor.slice(0, 2) + '/' + valor.slice(2);
             } else {
                 e.target.value = valor;
             }
@@ -196,8 +196,8 @@
                 alert("Cadastro realizado com sucesso!");
                 window.location.href = "index.html";
             } catch (erro) {
-                console.error("Erro ao cadastrar:", erro);
-                alert("Erro ao realizar cadastro. Verifique sua conexão.");
+                console.error("Erro detalhado ao cadastrar:", erro);
+                alert("Erro ao realizar cadastro. Verifique as regras do banco no Firebase.");
             }
         }
 
