@@ -3,164 +3,361 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Entrar no Sistema - Radios</title>
+    <title>Login - Sistema de Rádios</title>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Arial, sans-serif;
         }
         body {
-            background: linear-gradient(135deg, #090d16 0%, #17153a 100%);
-            color: #f8fafc;
-            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
             display: flex;
             justify-content: center;
             align-items: center;
+            height: 100vh;
+            padding: 20px;
         }
         .login-card {
-            background: rgba(23, 31, 53, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px;
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(10px);
             padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
             width: 100%;
-            max-width: 400px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-            text-align: center;
+            max-width: 420px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
         }
         .login-card h2 {
-            font-size: 22px;
+            text-align: center;
             color: #f8fafc;
             margin-bottom: 30px;
-            font-weight: 700;
+            font-size: 24px;
             letter-spacing: 0.5px;
         }
-        .input-group {
-            text-align: left;
+        .form-group {
             margin-bottom: 20px;
         }
-        .input-group label {
+        .form-group label {
             display: block;
             font-size: 11px;
+            font-weight: bold;
             color: #94a3b8;
-            font-weight: 700;
             margin-bottom: 8px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .input-group input {
+        .form-group input {
             width: 100%;
-            background: rgba(15, 23, 42, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 12px 15px;
-            color: #fff;
+            padding: 12px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
             font-size: 14px;
+            color: #f8fafc;
             outline: none;
             transition: border-color 0.2s;
         }
-        .input-group input:focus {
-            border-color: #a855f7;
+        .form-group input:focus {
+            border-color: #8b5cf6;
         }
         .btn-submit {
-            background: linear-gradient(135deg, #9333ea, #7e22ce);
+            width: 100%;
+            background: #7c3aed;
             color: white;
             border: none;
-            width: 100%;
-            padding: 13px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 14px;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(147, 51, 234, 0.4);
-            transition: all 0.2s;
+            font-size: 15px;
             margin-top: 10px;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: block;
+            text-align: center;
         }
         .btn-submit:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(147, 51, 234, 0.6);
+            background: #6d28d9;
         }
-        .login-links {
+        .actions-links {
             display: flex;
             justify-content: space-between;
             margin-top: 20px;
-            font-size: 12px;
+            font-size: 13px;
         }
-        .login-links a {
-            color: #94a3b8;
+        .actions-links a {
+            color: #a78bfa;
             text-decoration: none;
             transition: color 0.2s;
+            cursor: pointer;
         }
-        .login-links a:hover {
-            color: #f472b6;
+        .actions-links a:hover {
+            color: #c4b5fd;
             text-decoration: underline;
+        }
+        .hidden { display: none !important; }
+        .slide-down { animation: slideDownAnim 0.4s ease-out forwards; }
+        @keyframes slideDownAnim {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .success-text {
+            text-align: center;
+            color: #4ade80;
+            font-size: 15px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
     <div class="login-card">
-        <h2>Entrar no Sistema</h2>
-        <form id="loginForm">
-            <div class="input-group">
-                <label>E-mail</label>
-                <input type="email" id="loginEmail" required placeholder="seu@email.com">
+        <h2 id="cardTitle">Entrar no Sistema</h2>
+        
+        <!-- FLUXO DE LOGIN NORMAL -->
+        <div id="secaoLogin">
+            <div class="form-group">
+                <label>E-MAIL</label>
+                <input type="email" id="emailLogin" placeholder="seu@email.com" autocomplete="off">
             </div>
-            <div class="input-group">
-                <label>Senha</label>
-                <input type="password" id="loginSenha" required placeholder="••••••••">
+
+            <div class="form-group">
+                <label>SENHA</label>
+                <input type="password" id="senhaLogin" placeholder="••••••••" autocomplete="current-password">
             </div>
-            <button type="submit" class="btn-submit">ACESSAR PAINEL</button>
-        </form>
-        <div class="login-links">
-            <a href="recuperar.html">Esqueci a senha</a>
-            <a href="cadastro.html">Não tenho cadastro</a>
+
+            <button id="btnLogin" class="btn-submit">ACESSAR PAINEL</button>
+
+            <div class="actions-links">
+                <a href="#" id="btnEsqueciSenha">Esqueci a senha</a>
+                <a href="cadastro.html">Não tenho cadastro</a>
+            </div>
+        </div>
+
+        <!-- FLUXO DE RECUPERAÇÃO EM ETAPAS -->
+        <div id="secaoRecuperacao" class="hidden">
+            <div id="recEtapa1">
+                <div class="form-group">
+                    <label>DIGITE SEU E-MAIL</label>
+                    <input type="email" id="emailRec" placeholder="seu@email.com" autocomplete="off">
+                </div>
+                <button id="btnAvancarRec1" class="btn-submit">AVANÇAR</button>
+            </div>
+
+            <div id="recEtapa2" class="hidden">
+                <div class="form-group">
+                    <label>DATA DE NASCIMENTO</label>
+                    <input type="text" id="nascimentoRec" placeholder="DD/MM/AAAA" maxlength="10" autocomplete="off" oninput="mascaraData(this)">
+                </div>
+                <button id="btnAvancarRec2" class="btn-submit">VERIFICAR</button>
+            </div>
+
+            <div id="recEtapa3" class="hidden">
+                <div class="form-group">
+                    <label>DIGITE SUA NOVA SENHA</label>
+                    <input type="password" id="novaSenhaRec" placeholder="Digite a nova senha" autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label>CONFIRME A NOVA SENHA</label>
+                    <input type="password" id="confirmaSenhaRec" placeholder="Repita a nova senha" autocomplete="new-password">
+                </div>
+                <button id="btnAtualizarSenha" class="btn-submit">ATUALIZAR SENHA</button>
+            </div>
+
+            <div id="recEtapa4" class="hidden">
+                <p class="success-text">Pronto, agora basta fazer seu login e curtir suas rádios preferidas!</p>
+                <a href="#" id="btnIrParaLogin" class="btn-submit">FAZER LOGIN</a>
+            </div>
+
+            <div class="actions-links" style="justify-content: center; margin-top: 15px;">
+                <a href="#" id="btnVoltarLogin">Voltar ao Login</a>
+            </div>
         </div>
     </div>
 
+    <script>
+        window.mascaraData = function(elemento) {
+            let v = elemento.value.replace(/\D/g, '');
+            if (v.length > 8) v = v.slice(0, 8);
+            if (v.length > 4) { elemento.value = v.slice(0, 2) + '/' + v.slice(2, 4) + '/' + v.slice(4, 8); }
+            else if (v.length > 2) { elemento.value = v.slice(0, 2) + '/' + v.slice(2); }
+            else { elemento.value = v; }
+        };
+    </script>
+
     <script type="module">
         import { db } from './firebase-config.js';
-        import { ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { ref, get, child, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value.trim();
-            const senha = document.getElementById('loginSenha').value.trim();
+        const inputEmail = document.getElementById('emailLogin');
+        const inputSenha = document.getElementById('senhaLogin');
+        const btnLogin = document.getElementById('btnLogin');
+        const btnEsqueciSenha = document.getElementById('btnEsqueciSenha');
 
-            if (email === "adm@admin.com" && senha === "admin123") {
-                localStorage.setItem('usuarioLogado', 'Administrador');
-                // Redirecionamento direto sem alertas
-                window.location.href = "ADM/index.html";
+        const secaoLogin = document.getElementById('secaoLogin');
+        const secaoRecuperacao = document.getElementById('secaoRecuperacao');
+        const cardTitle = document.getElementById('cardTitle');
+        const recEtapa1 = document.getElementById('recEtapa1');
+        const recEtapa2 = document.getElementById('recEtapa2');
+        const recEtapa3 = document.getElementById('recEtapa3');
+        const recEtapa4 = document.getElementById('recEtapa4');
+
+        let usuarioRecuperandoKey = null;
+        let dadosUsuarioRec = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            inputEmail.value = "";
+            inputSenha.value = "";
+        });
+
+        async function realizarLogin() {
+            const email = inputEmail.value.trim();
+            const senha = inputSenha.value.trim();
+
+            if (!email || !senha) {
+                alert("Por favor, preencha o e-mail e a senha.");
+                return;
+            }
+
+            // ACESSO DIRETO DO ADMINISTRADOR APONTANDO PARA ADMIN/adm.html
+            if (email === "senger.luigy@gmail.com" && senha === "104528") {
+                localStorage.setItem('adminLogado', 'true');
+                window.location.href = "ADMIN/adm.html";
                 return;
             }
 
             try {
-                const ouvintesRef = ref(db, 'cadastros_ouvintes');
-                const snapshot = await get(ouvintesRef);
-
-                let usuarioEncontrado = null;
+                const dbRef = ref(db);
+                const snapshot = await get(child(dbRef, 'usuarios_cadastrados'));
 
                 if (snapshot.exists()) {
-                    snapshot.forEach((child) => {
-                        const dados = child.val();
-                        if (dados.email.toLowerCase() === email.toLowerCase() && dados.senha === senha) {
-                            usuarioEncontrado = dados;
+                    let usuarioEncontrado = false;
+                    snapshot.forEach((childSnapshot) => {
+                        const dados = childSnapshot.val();
+                        if (dados.email === email && dados.senha === senha) {
+                            usuarioEncontrado = true;
+                            localStorage.setItem('usuarioLogado', dados.apelido);
                         }
                     });
-                }
 
-                if (usuarioEncontrado) {
-                    localStorage.setItem('usuarioLogado', usuarioEncontrado.nome || email);
-                    // Ajuste cirúrgico: Removido o alert() e aberto o painel diretamente
-                    window.location.href = "OUVINTES/index.html";
+                    if (usuarioEncontrado) {
+                        window.location.href = "OUVINTES/index.html";
+                    } else {
+                        alert("E-mail ou senha incorretos!");
+                    }
                 } else {
-                    alert("E-mail ou senha incorretos!");
+                    alert("Nenhum usuário cadastrado encontrado no sistema.");
+                }
+            } catch (erro) {
+                console.error("Erro ao fazer login:", erro);
+                alert("Erro ao conectar com o banco de dados.");
+            }
+        }
+
+        async function executarEtapa1() {
+            const email = document.getElementById('emailRec').value.trim();
+            if (!email) { alert("Por favor, digite seu e-mail."); return; }
+
+            usuarioRecuperandoKey = email.toLowerCase().replace(/[.#$\[\]]/g, "_");
+            const usuarioRef = ref(db, 'usuarios_cadastrados/' + usuarioRecuperandoKey);
+
+            try {
+                const snapshot = await get(usuarioRef);
+                if (snapshot.exists()) {
+                    dadosUsuarioRec = snapshot.val();
+                    recEtapa1.classList.add('hidden');
+                    recEtapa2.classList.remove('hidden');
+                    recEtapa2.classList.add('slide-down');
+                    document.getElementById('nascimentoRec').value = "";
+                } else {
+                    alert("Este e-mail não foi encontrado no sistema.");
                 }
             } catch (err) {
-                console.error("Erro ao fazer login:", err);
-                alert("Erro ao conectar com o banco de dados.");
+                console.error(err);
+                alert("Erro ao verificar e-mail no banco de dados.");
+            }
+        }
+
+        function executarEtapa2() {
+            const nascimento = document.getElementById('nascimentoRec').value.trim();
+            if (!nascimento) { alert("Por favor, digite sua data de nascimento."); return; }
+
+            if (nascimento === dadosUsuarioRec.nascimento) {
+                recEtapa2.classList.add('hidden');
+                recEtapa3.classList.remove('hidden');
+                recEtapa3.classList.add('slide-down');
+                document.getElementById('novaSenhaRec').value = "";
+                document.getElementById('confirmaSenhaRec').value = "";
+            } else {
+                alert("Data de nascimento incorreta.");
+            }
+        }
+
+        async function executarEtapa3() {
+            const novaSenha = document.getElementById('novaSenhaRec').value.trim();
+            const confirmaSenha = document.getElementById('confirmaSenhaRec').value.trim();
+
+            if (!novaSenha || !confirmaSenha) { alert("Preencha os campos de senha."); return; }
+            if (novaSenha !== confirmaSenha) { alert("As senhas não coincidem!"); return; }
+
+            try {
+                const usuarioRef = ref(db, 'usuarios_cadastrados/' + usuarioRecuperandoKey);
+                await update(usuarioRef, { senha: novaSenha });
+
+                recEtapa3.classList.add('hidden');
+                recEtapa4.classList.remove('hidden');
+                recEtapa4.classList.add('slide-down');
+            } catch (err) {
+                console.error(err);
+                alert("Erro ao atualizar a senha.");
+            }
+        }
+
+        btnEsqueciSenha.addEventListener('click', (e) => {
+            e.preventDefault();
+            secaoLogin.classList.add('hidden');
+            secaoRecuperacao.classList.remove('hidden');
+            secaoRecuperacao.classList.add('slide-down');
+            cardTitle.innerText = "Recuperar Senha";
+            
+            recEtapa1.classList.remove('hidden');
+            recEtapa2.classList.add('hidden');
+            recEtapa3.classList.add('hidden');
+            recEtapa4.classList.add('hidden');
+            document.getElementById('emailRec').value = "";
+        });
+
+        function voltarAoLogin(e) {
+            if (e) e.preventDefault();
+            secaoRecuperacao.classList.add('hidden');
+            secaoLogin.classList.remove('hidden');
+            secaoLogin.classList.add('slide-down');
+            cardTitle.innerText = "Entrar no Sistema";
+        }
+
+        document.getElementById('btnVoltarLogin').addEventListener('click', voltarAoLogin);
+        document.getElementById('btnIrParaLogin').addEventListener('click', voltarAoLogin);
+
+        document.getElementById('btnAvancarRec1').addEventListener('click', executarEtapa1);
+        document.getElementById('btnAvancarRec2').addEventListener('click', executarEtapa2);
+        document.getElementById('btnAtualizarSenha').addEventListener('click', executarEtapa3);
+        btnLogin.addEventListener('click', realizarLogin);
+
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                if (!secaoLogin.classList.contains('hidden')) {
+                    realizarLogin();
+                } else if (!recEtapa1.classList.contains('hidden')) {
+                    executarEtapa1();
+                } else if (!recEtapa2.classList.contains('hidden')) {
+                    executarEtapa2();
+                } else if (!recEtapa3.classList.contains('hidden')) {
+                    executarEtapa3();
+                }
             }
         });
     </script>
