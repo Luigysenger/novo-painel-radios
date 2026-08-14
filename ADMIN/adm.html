@@ -16,10 +16,10 @@
             color: #f8fafc;
             min-height: 100vh;
             padding: 20px;
-            padding-bottom: 120px; /* Espaço para o player fixo */
+            padding-bottom: 120px;
         }
         .container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
         }
         header {
@@ -72,7 +72,7 @@
             margin-bottom: 5px;
             letter-spacing: 1px;
         }
-        .form-group input, .form-group select {
+        .form-group input {
             width: 100%;
             padding: 11px;
             background: #0f172a;
@@ -82,7 +82,7 @@
             color: #f8fafc;
             outline: none;
         }
-        .form-group input:focus, .form-group select:focus {
+        .form-group input:focus {
             border-color: #8b5cf6;
         }
         .btn-salvar {
@@ -101,72 +101,78 @@
         }
         .radios-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 20px;
         }
+
+        /* Estilo Moderno dos Cards Inspirado no seu Painel */
         .radio-card {
-            background: rgba(30, 41, 59, 0.85);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 20px;
+            background-color: var(--card-bg, #64748b);
+            border-radius: 16px;
+            padding: 20px 15px;
             position: relative;
             display: flex;
             flex-direction: column;
+            align-items: center;
             justify-content: space-between;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 150px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border: 2px solid transparent;
         }
         .radio-card:hover {
-            transform: translateY(-3px);
+            transform: translateY(-4px);
         }
-        /* Estilo Neon quando a rádio está ativa/tocando */
+        /* Neon ao redor quando ativo */
         .radio-card.active-neon {
-            border-color: var(--card-color, #a78bfa);
-            box-shadow: 0 0 15px var(--card-color, #a78bfa), inset 0 0 10px rgba(255, 255, 255, 0.1);
+            border-color: #ffffff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.3);
         }
-        .radio-header {
+        .radio-card-top {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 8px;
+            text-align: center;
+            width: 100%;
         }
         .radio-icon-display {
-            font-size: 24px;
+            font-size: 36px;
+            margin-bottom: 8px;
         }
         .radio-card h3 {
-            font-size: 16px;
-            color: #f8fafc;
-            word-break: break-all;
-        }
-        .radio-card p {
-            font-size: 12px;
-            color: #94a3b8;
-            word-break: break-all;
-            margin-bottom: 15px;
+            font-size: 13px;
+            color: #0f172a;
+            font-weight: bold;
+            text-align: center;
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .card-actions {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            border-top: 1px solid #334155;
-            padding-top: 12px;
-        }
-        .card-tools-right {
-            display: flex;
-            gap: 10px;
+            width: 100%;
+            border-top: 1px solid rgba(0, 0, 0, 0.15);
+            padding-top: 8px;
         }
         .action-btn {
             background: transparent;
             border: none;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             transition: transform 0.1s;
         }
         .action-btn:hover {
-            transform: scale(1.15);
+            transform: scale(1.2);
+        }
+        .card-tools-right {
+            display: flex;
+            gap: 8px;
         }
 
-        /* PAINEL FLUTUANTE DE PERSONALIZAÇÃO (Cores e Ícones) */
+        /* Modal de Personalização (20 Cores + 20 Ícones) */
         .customizer-modal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -178,38 +184,38 @@
         }
         .customizer-content {
             background: #1e293b;
-            padding: 30px;
+            padding: 25px;
             border-radius: 12px;
             width: 100%;
-            max-width: 450px;
+            max-width: 480px;
             border: 1px solid #475569;
         }
         .customizer-content h3 {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             color: #a78bfa;
             font-size: 18px;
         }
-        .color-picker-wrapper {
-            display: flex;
-            gap: 10px;
+        .color-picker-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
             margin-bottom: 15px;
-            flex-wrap: wrap;
         }
         .color-dot {
-            width: 30px; height: 30px;
+            width: 36px; height: 36px;
             border-radius: 50%;
             cursor: pointer;
             border: 2px solid transparent;
+            transition: transform 0.1s;
         }
-        .color-dot.selected {
-            border-color: #fff;
-            transform: scale(1.1);
-        }
+        .color-dot:hover { transform: scale(1.1); }
+        .color-dot.selected { border-color: #fff; transform: scale(1.15); box-shadow: 0 0 10px #fff; }
+
         .icons-grid-picker {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            max-height: 180px;
+            gap: 8px;
+            max-height: 140px;
             overflow-y: auto;
             margin-bottom: 20px;
             padding: 5px;
@@ -217,29 +223,24 @@
             border-radius: 8px;
         }
         .icon-option {
-            font-size: 24px;
+            font-size: 22px;
             text-align: center;
-            padding: 8px;
+            padding: 6px;
             cursor: pointer;
             border-radius: 6px;
             border: 1px solid transparent;
         }
-        .icon-option:hover {
-            background: #334155;
-        }
-        .icon-option.selected {
-            background: #7c3aed;
-            border-color: #c4b5fd;
-        }
+        .icon-option:hover { background: #334155; }
+        .icon-option.selected { background: #7c3aed; border-color: #c4b5fd; }
 
-        /* PLAYER FIXO ESTILO RÁDIO DE CARRO NA PARTE INFERIOR */
+        /* Player Estilo Rádio de Carro na Base */
         .car-player-bar {
             position: fixed;
             bottom: 0; left: 0; width: 100%;
             background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(10px);
             border-top: 1px solid #334155;
-            padding: 15px 30px;
+            padding: 12px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -251,14 +252,7 @@
             align-items: center;
             gap: 15px;
         }
-        .player-info h4 {
-            font-size: 15px;
-            color: #f8fafc;
-        }
-        .player-info span {
-            font-size: 12px;
-            color: #94a3b8;
-        }
+        .player-info h4 { font-size: 15px; color: #f8fafc; }
         .player-controls {
             display: flex;
             align-items: center;
@@ -268,26 +262,18 @@
             background: #334155;
             color: white;
             border: none;
-            width: 45px; height: 45px;
+            width: 42px; height: 42px;
             border-radius: 50%;
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
             transition: background 0.2s;
         }
-        .control-btn:hover {
-            background: #7c3aed;
-        }
-        .control-btn.main-play {
-            width: 55px; height: 55px;
-            background: #7c3aed;
-            font-size: 22px;
-        }
-        .control-btn.main-play:hover {
-            background: #6d28d9;
-        }
+        .control-btn:hover { background: #7c3aed; }
+        .control-btn.main-play { width: 50px; height: 50px; background: #7c3aed; font-size: 20px; }
+        .control-btn.main-play:hover { background: #6d28d9; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -299,7 +285,6 @@
             <button class="btn-sair" id="btnSair">Sair</button>
         </header>
 
-        <!-- Formulário para Adicionar / Editar Rádio -->
         <div class="card-form">
             <h2 id="formTitulo">Adicionar Nova Rádio</h2>
             <input type="hidden" id="radioIdEditando">
@@ -316,33 +301,42 @@
         </div>
 
         <h2>Rádios Cadastradas</h2>
-        <div class="radios-grid" id="gridRadios">
-            <!-- Cards gerados dinamicamente -->
-        </div>
+        <div class="radios-grid" id="gridRadios"></div>
     </div>
 
-    <!-- MODAL DE PERSONALIZAÇÃO (CORES E ÍCONES) -->
+    <!-- MODAL DE PERSONALIZAÇÃO (20 CORES E 20 ÍCONES) -->
     <div id="modalPersonalizacao" class="customizer-modal hidden">
         <div class="customizer-content">
-            <h3>Personalizar Rádio</h3>
+            <h3>Personalizar Card da Rádio</h3>
             <input type="hidden" id="customRadioId">
             
-            <label style="font-size: 11px; font-weight: bold; color: #94a3b8; margin-bottom: 8px; display: block;">ESCOLHA A COR DO CARD (NEON)</label>
-            <div class="color-picker-wrapper" id="colorPickerWrapper">
-                <!-- Cores predefinidas -->
-                <div class="color-dot" style="background: #7c3aed;" data-color="#7c3aed"></div>
-                <div class="color-dot" style="background: #ef4444;" data-color="#ef4444"></div>
-                <div class="color-dot" style="background: #3b82f6;" data-color="#3b82f6"></div>
-                <div class="color-dot" style="background: #10b981;" data-color="#10b981"></div>
-                <div class="color-dot" style="background: #f59e0b;" data-color="#f59e0b"></div>
-                <div class="color-dot" style="background: #ec4899;" data-color="#ec4899"></div>
-                <div class="color-dot" style="background: #06b6d4;" data-color="#06b6d4"></div>
-                <div class="color-dot" style="background: #84cc16;" data-color="#84cc16"></div>
+            <label style="font-size: 11px; font-weight: bold; color: #94a3b8; margin-bottom: 6px; display: block;">ESCOLHA A COR DO CARD (20 OPÇÕES)</label>
+            <div class="color-picker-grid" id="colorPickerGrid">
+                <!-- 20 Cores Suaves / Pastéis idênticas ao estilo da foto -->
+                <div class="color-dot" style="background: #a3e635;" data-color="#a3e635"></div>
+                <div class="color-dot" style="background: #bef264;" data-color="#bef264"></div>
+                <div class="color-dot" style="background: #86efac;" data-color="#86efac"></div>
+                <div class="color-dot" style="background: #6ee7b7;" data-color="#6ee7b7"></div>
+                <div class="color-dot" style="background: #5eead4;" data-color="#5eead4"></div>
+                <div class="color-dot" style="background: #7dd3fc;" data-color="#7dd3fc"></div>
+                <div class="color-dot" style="background: #93c5fd;" data-color="#93c5fd"></div>
+                <div class="color-dot" style="background: #c4b5fd;" data-color="#c4b5fd"></div>
+                <div class="color-dot" style="background: #f472b6;" data-color="#f472b6"></div>
+                <div class="color-dot" style="background: #fda4af;" data-color="#fda4af"></div>
+                <div class="color-dot" style="background: #fcd34d;" data-color="#fcd34d"></div>
+                <div class="color-dot" style="background: #fde047;" data-color="#fde047"></div>
+                <div class="color-dot" style="background: #fb923c;" data-color="#fb923c"></div>
+                <div class="color-dot" style="background: #d8b4fe;" data-color="#d8b4fe"></div>
+                <div class="color-dot" style="background: #a5b4fc;" data-color="#a5b4fc"></div>
+                <div class="color-dot" style="background: #cbd5e1;" data-color="#cbd5e1"></div>
+                <div class="color-dot" style="background: #94a3b8;" data-color="#94a3b8"></div>
+                <div class="color-dot" style="background: #64748b;" data-color="#64748b"></div>
+                <div class="color-dot" style="background: #e2e8f0;" data-color="#e2e8f0"></div>
+                <div class="color-dot" style="background: #fbcfe8;" data-color="#fbcfe8"></div>
             </div>
 
-            <label style="font-size: 11px; font-weight: bold; color: #94a3b8; margin-bottom: 8px; display: block;">ESCOLHA UM ÍCONE</label>
+            <label style="font-size: 11px; font-weight: bold; color: #94a3b8; margin-bottom: 6px; display: block;">ESCOLHA UM ÍCONE</label>
             <div class="icons-grid-picker" id="iconsGridPicker">
-                <!-- 20 Ícones diferentes -->
                 <div class="icon-option" data-icon="📻">📻</div>
                 <div class="icon-option" data-icon="🎵">🎵</div>
                 <div class="icon-option" data-icon="🎶">🎶</div>
@@ -365,20 +359,19 @@
                 <div class="icon-option" data-icon="🔊">🔊</div>
             </div>
 
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
                 <button type="button" id="btnSalvarPersonalizacao" class="btn-salvar" style="flex: 1;">SALVAR</button>
                 <button type="button" id="btnFecharModal" class="btn-salvar" style="background: #475569; flex: 1;">CANCELAR</button>
             </div>
         </div>
     </div>
 
-    <!-- PLAYER FIXO INFERIOR (ESTILO RÁDIO DE CARRO) -->
+    <!-- PLAYER FIXO INFERIOR -->
     <div class="car-player-bar hidden" id="carPlayerBar">
         <div class="player-info">
-            <span id="playerIconDisplay" style="font-size: 28px;">📻</span>
+            <span id="playerIconDisplay" style="font-size: 26px;">📻</span>
             <div>
                 <h4 id="playerNameDisplay">Selecione uma Rádio</h4>
-                <span id="playerStatusDisplay">Parado</span>
             </div>
         </div>
         <div class="player-controls">
@@ -388,7 +381,6 @@
         </div>
     </div>
 
-    <!-- Elemento de áudio oculto para o streaming -->
     <audio id="audioStreaming" preload="none"></audio>
 
     <script type="module">
@@ -405,7 +397,7 @@
         });
 
         document.getElementById('btnSair').addEventListener('click', () => {
-            pararAudio();
+            audioElement.pause();
             localStorage.removeItem('adminLogado');
             window.location.href = "../index.html";
         });
@@ -418,21 +410,17 @@
         const formTitulo = document.getElementById('formTitulo');
         const gridRadios = document.getElementById('gridRadios');
 
-        // Variáveis globais do player de rádio
         let listaRadiosObj = [];
         let indiceRadioAtual = -1;
         const audioElement = document.getElementById('audioStreaming');
         const carPlayerBar = document.getElementById('carPlayerBar');
         const playerNameDisplay = document.getElementById('playerNameDisplay');
-        const playerStatusDisplay = document.getElementById('playerStatusDisplay');
         const playerIconDisplay = document.getElementById('playerIconDisplay');
         const btnPlayPause = document.getElementById('btnPlayPause');
 
-        // Seleção no Modal
-        let corSelecionada = "#7c3aed";
+        let corSelecionada = "#86efac";
         let iconeSelecionado = "📻";
 
-        // Gerenciar seleção de cores no modal
         document.querySelectorAll('.color-dot').forEach(dot => {
             dot.addEventListener('click', (e) => {
                 document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
@@ -441,7 +429,6 @@
             });
         });
 
-        // Gerenciar seleção de ícones no modal
         document.querySelectorAll('.icon-option').forEach(opt => {
             opt.addEventListener('click', (e) => {
                 document.querySelectorAll('.icon-option').forEach(o => o.classList.remove('selected'));
@@ -450,7 +437,6 @@
             });
         });
 
-        // SALVAR OU EDITAR RÁDIO
         async function salvarRadio() {
             const nome = nomeRadioInput.value.trim();
             const url = urlRadioInput.value.trim();
@@ -465,30 +451,24 @@
                 if (idEdicao) {
                     const radioRef = ref(db, 'radios_cadastradas/' + idEdicao);
                     await update(radioRef, { nome: nome, url: url });
-                    alert("Rádio atualizada com sucesso!");
                 } else {
                     const radiosRef = ref(db, 'radios_cadastradas');
                     const novaRadioRef = push(radiosRef);
                     await set(novaRadioRef, { 
                         nome: nome, 
                         url: url, 
-                        cor: "#7c3aed", 
+                        cor: "#86efac", 
                         icone: "📻" 
                     });
-                    alert("Rádio cadastrada com sucesso!");
                 }
-
                 limparFormulario();
                 carregarRadios();
             } catch (erro) {
                 console.error("Erro ao salvar rádio:", erro);
-                alert("Erro ao salvar rádio no Firebase.");
             }
         }
 
-        // CARREGAR RÁDIOS DO FIREBASE
         async function carregarRadios() {
-            gridRadios.innerHTML = "<p style='color: #94a3b8;'>Carregando rádios...</p>";
             try {
                 const radiosRef = ref(db, 'radios_cadastradas');
                 const snapshot = await get(radiosRef);
@@ -504,34 +484,30 @@
                     });
 
                     listaRadiosObj.forEach((radio, index) => {
-                        const corCard = radio.cor || "#7c3aed";
+                        const corCard = radio.cor || "#86efac";
                         const iconeCard = radio.icone || "📻";
 
                         const card = document.createElement('div');
                         card.className = 'radio-card';
                         card.id = `card-radio-${index}`;
-                        card.style.setProperty('--card-color', corCard);
+                        card.style.setProperty('--card-bg', corCard);
                         
                         card.innerHTML = `
-                            <div>
-                                <div class="radio-header">
-                                    <span class="radio-icon-display">${iconeCard}</span>
-                                    <h3>${radio.nome}</h3>
-                                </div>
-                                <p>${radio.url}</p>
+                            <div class="radio-card-top">
+                                <span class="radio-icon-display">${iconeCard}</span>
+                                <h3 title="${radio.nome}">${radio.nome}</h3>
                             </div>
                             <div class="card-actions">
-                                <button class="action-btn btn-deletar" title="Deletar Rádio" data-id="${radio.id}">🗑️</button>
+                                <button class="action-btn btn-deletar" title="Deletar" data-id="${radio.id}">🗑️</button>
                                 <div class="card-tools-right">
-                                    <button class="action-btn btn-personalizar" title="Personalizar Cores e Ícone" data-id="${radio.id}" data-cor="${corCard}" data-icone="${iconeCard}">🎨</button>
-                                    <button class="action-btn btn-editar" title="Editar Rádio" data-id="${radio.id}" data-nome="${radio.nome}" data-url="${radio.url}">✏️</button>
+                                    <button class="action-btn btn-personalizar" title="Personalizar" data-id="${radio.id}" data-cor="${corCard}" data-icone="${iconeCard}">🎨</button>
+                                    <button class="action-btn btn-editar" title="Editar" data-id="${radio.id}" data-nome="${radio.nome}" data-url="${radio.url}">✏️</button>
                                 </div>
                             </div>
                         `;
 
-                        // Clicar no card ativa a rádio estilo rádio de carro
+                        // Ao clicar no card, toca imediatamente sem mensagens na tela
                         card.addEventListener('click', (e) => {
-                            // Evita disparar se clicar nos botões de ação
                             if (e.target.closest('button')) return;
                             tocarRadioPorIndice(index);
                         });
@@ -539,26 +515,19 @@
                         gridRadios.appendChild(card);
                     });
 
-                    // Atribuir eventos aos botões internos
                     document.querySelectorAll('.btn-deletar').forEach(btn => {
                         btn.addEventListener('click', (e) => deletarRadio(e.target.getAttribute('data-id')));
                     });
 
                     document.querySelectorAll('.btn-editar').forEach(btn => {
                         btn.addEventListener('click', (e) => {
-                            const id = e.target.getAttribute('data-id');
-                            const nome = e.target.getAttribute('data-nome');
-                            const url = e.target.getAttribute('data-url');
-                            prepararEdicao(id, nome, url);
+                            prepararEdicao(e.target.getAttribute('data-id'), e.target.getAttribute('data-nome'), e.target.getAttribute('data-url'));
                         });
                     });
 
                     document.querySelectorAll('.btn-personalizar').forEach(btn => {
                         btn.addEventListener('click', (e) => {
-                            const id = e.target.getAttribute('data-id');
-                            const corAtual = e.target.getAttribute('data-cor');
-                            const iconeAtual = e.target.getAttribute('data-icone');
-                            abrirModalPersonalizacao(id, corAtual, iconeAtual);
+                            abrirModalPersonalizacao(e.target.getAttribute('data-id'), e.target.getAttribute('data-cor'), e.target.getAttribute('data-icone'));
                         });
                     });
 
@@ -568,17 +537,15 @@
                 }
             } catch (erro) {
                 console.error("Erro ao carregar rádios:", erro);
-                gridRadios.innerHTML = "<p style='color: #ef4444;'>Erro ao carregar rádios do banco.</p>";
             }
         }
 
-        // FUNÇÃO DE TOCAR RÁDIO (ESTILO RÁDIO DE CARRO)
+        // Tocar rádio imediatamente sem alertas
         function tocarRadioPorIndice(index) {
             if (index < 0 || index >= listaRadiosObj.length) return;
             indiceRadioAtual = index;
             const radio = listaRadiosObj[indiceRadioAtual];
 
-            // Atualiza visual Neon nos cards
             document.querySelectorAll('.radio-card').forEach((c, idx) => {
                 if (idx === indiceRadioAtual) {
                     c.classList.add('active-neon');
@@ -587,35 +554,19 @@
                 }
             });
 
-            // Configura player inferior
             carPlayerBar.classList.remove('hidden');
             playerNameDisplay.innerText = radio.nome;
             playerIconDisplay.innerText = radio.icone || "📻";
-            playerStatusDisplay.innerText = "Conectando...";
             btnPlayPause.innerText = "⏸️";
 
             audioElement.src = radio.url;
-            audioElement.play().then(() => {
-                playerStatusDisplay.innerText = "Tocando ao vivo";
-            }).catch(err => {
-                console.error("Erro ao reproduzir streaming:", err);
-                playerStatusDisplay.innerText = "Erro ao reproduzir stream";
-                alert("Não foi possível reproduzir este link de streaming diretamente. Verifique se o link é válido.");
-            });
+            audioElement.play().catch(err => console.error("Erro no stream:", err));
         }
 
-        function pararAudio() {
-            audioElement.pause();
-            audioElement.src = "";
-            playerStatusDisplay.innerText = "Parado";
-            btnPlayPause.innerText = "▶️";
-        }
-
-        // BOTÕES DE CONTROLE DO PLAYER INFERIOR
         document.getElementById('btnProximo').addEventListener('click', () => {
             if (listaRadiosObj.length === 0) return;
             let proximo = indiceRadioAtual + 1;
-            if (proximo >= listaRadiosObj.length) proximo = 0; // Loop infinito estilo carro
+            if (proximo >= listaRadiosObj.length) proximo = 0;
             tocarRadioPorIndice(proximo);
         });
 
@@ -632,41 +583,30 @@
                     tocarRadioPorIndice(0);
                 } else if (indiceRadioAtual !== -1) {
                     audioElement.play();
-                    playerStatusDisplay.innerText = "Tocando ao vivo";
                     btnPlayPause.innerText = "⏸️";
                 }
             } else {
                 audioElement.pause();
-                playerStatusDisplay.innerText = "Pausado";
                 btnPlayPause.innerText = "▶️";
             }
         });
 
-        // MODAL DE PERSONALIZAÇÃO
         const modalPersonalizacao = document.getElementById('modalPersonalizacao');
         const customRadioIdInput = document.getElementById('customRadioId');
 
         function abrirModalPersonalizacao(id, corAtual, iconeAtual) {
             customRadioIdInput.value = id;
-            corSelecionada = corAtual || "#7c3aed";
+            corSelecionada = corAtual || "#86efac";
             iconeSelecionado = iconeAtual || "📻";
 
-            // Marca visualmente a cor correta
             document.querySelectorAll('.color-dot').forEach(dot => {
-                if (dot.getAttribute('data-color') === corSelecionada) {
-                    dot.classList.add('selected');
-                } else {
-                    dot.classList.remove('selected');
-                }
+                if (dot.getAttribute('data-color') === corSelecionada) dot.classList.add('selected');
+                else dot.classList.remove('selected');
             });
 
-            // Marca visualmente o ícone correto
             document.querySelectorAll('.icon-option').forEach(opt => {
-                if (opt.getAttribute('data-icon') === iconeSelecionado) {
-                    opt.classList.add('selected');
-                } else {
-                    opt.classList.remove('selected');
-                }
+                if (opt.getAttribute('data-icon') === iconeSelecionado) opt.classList.add('selected');
+                else opt.classList.remove('selected');
             });
 
             modalPersonalizacao.classList.remove('hidden');
@@ -680,29 +620,21 @@
             const id = customRadioIdInput.value;
             try {
                 const radioRef = ref(db, 'radios_cadastradas/' + id);
-                await update(radioRef, {
-                    cor: corSelecionada,
-                    icone: iconeSelecionado
-                });
-                alert("Personalização salva com sucesso!");
+                await update(radioRef, { cor: corSelecionada, icone: iconeSelecionado });
                 modalPersonalizacao.classList.add('hidden');
                 carregarRadios();
             } catch (err) {
                 console.error("Erro ao salvar customização:", err);
-                alert("Erro ao salvar no banco de dados.");
             }
         });
 
-        // DELETAR RÁDIO
         async function deletarRadio(id) {
             if (confirm("Tem certeza que deseja excluir esta rádio?")) {
                 try {
                     await remove(ref(db, 'radios_cadastradas/' + id));
-                    alert("Rádio removida com sucesso!");
                     carregarRadios();
                 } catch (erro) {
                     console.error("Erro ao remover rádio:", erro);
-                    alert("Erro ao remover rádio.");
                 }
             }
         }
@@ -728,12 +660,6 @@
 
         btnCancelarEdicao.addEventListener('click', limparFormulario);
         btnSalvarRadio.addEventListener('click', salvarRadio);
-
-        document.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && modalPersonalizacao.classList.contains('hidden')) {
-                salvarRadio();
-            }
-        });
     </script>
 </body>
 </html>
