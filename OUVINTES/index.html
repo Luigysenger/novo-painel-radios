@@ -9,14 +9,14 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            background: linear-gradient(135deg, #090d16 0%, #17153a 100%);
             color: #f8fafc;
             min-height: 100vh;
             padding: 20px;
-            padding-bottom: 130px;
+            padding-bottom: 140px;
         }
         .main-container {
             max-width: 1350px;
@@ -27,13 +27,14 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 25px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
             padding-bottom: 15px;
         }
         .listener-info h1 {
             font-size: 22px;
             color: #f472b6;
             margin-bottom: 4px;
+            font-weight: 700;
         }
         .listener-info p {
             font-size: 13px;
@@ -47,24 +48,26 @@
             color: #cbd5e1;
         }
         .btn-sair {
-            background: #ef4444;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
+            padding: 8px 18px;
+            border-radius: 8px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
             font-size: 12px;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+            transition: all 0.2s ease;
         }
-        .btn-sair:hover { background: #dc2626; }
+        .btn-sair:hover { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(239, 68, 68, 0.4); }
 
         .banner-title {
             text-align: center;
             color: #f472b6;
-            font-size: 16px;
+            font-size: 15px;
             margin-bottom: 25px;
-            letter-spacing: 1px;
-            font-weight: bold;
+            letter-spacing: 1.5px;
+            font-weight: 700;
         }
 
         .dashboard-grid {
@@ -73,91 +76,102 @@
             gap: 20px;
         }
 
-        /* Coluna 1: Lista Lateral com Botões + e - */
+        /* Coluna 1: Lista Lateral */
         .sidebar-panel {
-            background: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px;
-            padding: 15px;
+            background: rgba(23, 31, 53, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 18px;
             max-height: 580px;
             overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         }
         .sidebar-panel h3 {
-            font-size: 13px;
+            font-size: 12px;
             color: #cbd5e1;
-            margin-bottom: 12px;
-            letter-spacing: 0.5px;
+            margin-bottom: 14px;
+            letter-spacing: 0.8px;
+            font-weight: 700;
         }
         .radio-side-item {
-            background: #1e1b4b;
-            border: 1px solid #4338ca;
-            padding: 8px 12px;
-            border-radius: 8px;
+            background: rgba(30, 27, 75, 0.6);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            padding: 10px 12px;
+            border-radius: 10px;
             margin-bottom: 10px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 8px;
+            transition: all 0.2s;
+        }
+        .radio-side-item:hover {
+            border-color: rgba(99, 102, 241, 0.5);
+            background: rgba(30, 27, 75, 0.9);
         }
         .radio-side-info {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             overflow: hidden;
         }
         .radio-side-info span {
             font-size: 12px;
             color: #f8fafc;
-            font-weight: bold;
+            font-weight: 600;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
         .btn-action-col {
-            background: #334155;
-            color: #fff;
             border: none;
-            width: 28px; height: 28px;
-            border-radius: 6px;
+            width: 30px; height: 30px;
+            border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 15px;
             flex-shrink: 0;
-            transition: background 0.2s;
+            transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
-        .btn-action-col.btn-plus { background: #10b981; }
-        .btn-action-col.btn-plus:hover { background: #059669; }
-        .btn-action-col.btn-minus { background: #ef4444; }
-        .btn-action-col.btn-minus:hover { background: #dc2626; }
+        .btn-action-col.btn-plus { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+        .btn-action-col.btn-plus:hover { transform: scale(1.05); }
+        .btn-action-col.btn-minus { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
+        .btn-action-col.btn-minus:hover { transform: scale(1.05); }
 
-        /* Coluna 2: Grid Central de Cards Coloridos com Pincel e Drag&Drop */
+        /* Coluna 2: Grid Central */
         .center-panel {
-            background: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px;
+            background: rgba(23, 31, 53, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
             padding: 20px;
             min-height: 580px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         }
         .center-panel h3 {
-            font-size: 13px;
+            font-size: 12px;
             color: #cbd5e1;
-            margin-bottom: 20px;
+            margin-bottom: 6px;
             text-align: center;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
+            font-weight: 700;
         }
         .radios-grid-user {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 15px;
             min-height: 450px;
+            margin-top: 15px;
         }
         .radio-card-user {
             background-color: var(--card-bg, #64748b);
             border-radius: 14px;
-            padding: 15px 10px;
+            padding: 15px 12px;
             height: 140px;
             display: flex;
             flex-direction: column;
@@ -165,16 +179,17 @@
             justify-content: space-between;
             text-align: center;
             cursor: grab;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            transition: box-shadow 0.2s;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             border: 2px solid transparent;
             position: relative;
         }
+        .radio-card-user:hover { transform: translateY(-3px); box-shadow: 0 10px 22px rgba(0,0,0,0.35); }
         .radio-card-user:active { cursor: grabbing; }
         .radio-card-user.dragging { opacity: 0.4; }
         .radio-card-user.active-neon {
             border-color: #ffffff;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.7), inset 0 0 10px rgba(255,255,255,0.4);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.8), inset 0 0 12px rgba(255,255,255,0.5);
         }
         .card-top-content {
             display: flex;
@@ -185,13 +200,14 @@
             justify-content: center;
         }
         .radio-card-user .icon {
-            font-size: 30px;
-            margin-bottom: 5px;
+            font-size: 32px;
+            margin-bottom: 6px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
         }
         .radio-card-user h4 {
             font-size: 12px;
             color: #0f172a;
-            font-weight: bold;
+            font-weight: 800;
             width: 100%;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -201,17 +217,22 @@
             display: flex;
             justify-content: flex-end;
             width: 100%;
-            border-top: 1px solid rgba(0,0,0,0.15);
-            padding-top: 5px;
+            border-top: 1px solid rgba(0,0,0,0.12);
+            padding-top: 6px;
         }
         .btn-pincel {
-            background: transparent;
+            background: rgba(255,255,255,0.3);
             border: none;
+            width: 24px; height: 24px;
+            border-radius: 50%;
             cursor: pointer;
-            font-size: 13px;
-            transition: transform 0.1s;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, background 0.2s;
         }
-        .btn-pincel:hover { transform: scale(1.25); }
+        .btn-pincel:hover { transform: scale(1.15); background: rgba(255,255,255,0.6); }
 
         /* Coluna 3: Horóscopo e Mensagens */
         .right-panel {
@@ -220,16 +241,20 @@
             gap: 20px;
         }
         .horoscope-card, .message-card {
-            background: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px;
-            padding: 15px;
+            background: rgba(23, 31, 53, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         }
         .horoscope-card h3 {
-            font-size: 13px;
+            font-size: 12px;
             color: #f472b6;
             margin-bottom: 12px;
             text-align: center;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
         .signs-grid {
             display: grid;
@@ -240,59 +265,68 @@
             margin-bottom: 10px;
         }
         .sign-badge {
-            background: #1e1b4b;
+            background: rgba(30, 27, 75, 0.7);
+            border: 1px solid rgba(99, 102, 241, 0.2);
             padding: 6px 2px;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             color: #cbd5e1;
-            font-weight: bold;
+            font-weight: 700;
+            transition: all 0.2s;
         }
-        .sign-badge:hover { background: #4338ca; color: #fff; }
+        .sign-badge:hover { background: #4338ca; color: #fff; border-color: #6366f1; }
         .horoscope-result {
             font-size: 11px;
             color: #94a3b8;
             text-align: center;
             margin-top: 8px;
             min-height: 30px;
+            line-height: 1.4;
         }
 
         .message-card h3 {
-            font-size: 12px;
+            font-size: 11px;
             color: #cbd5e1;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             line-height: 1.4;
+            font-weight: 700;
         }
         .message-card textarea {
             width: 100%;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 6px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
             padding: 10px;
             color: #fff;
             font-size: 12px;
             resize: none;
-            height: 70px;
+            height: 75px;
             outline: none;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            transition: border-color 0.2s;
         }
+        .message-card textarea:focus { border-color: #a855f7; }
         .btn-send-msg {
-            background: #9333ea;
+            background: linear-gradient(135deg, #9333ea, #7e22ce);
             color: white;
             border: none;
             width: 100%;
             padding: 10px;
-            border-radius: 6px;
-            font-weight: bold;
+            border-radius: 8px;
+            font-weight: 700;
             font-size: 12px;
             cursor: pointer;
+            box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+            transition: all 0.2s;
         }
-        .btn-send-msg:hover { background: #7e22ce; }
+        .btn-send-msg:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(147, 51, 234, 0.4); }
 
-        /* Modal de Personalização do Ouvinte (20 Cores + Ícones) */
+        /* Modal de Personalização */
         .customizer-modal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -301,31 +335,34 @@
         .customizer-content {
             background: #1e293b;
             padding: 25px;
-            border-radius: 12px;
+            border-radius: 16px;
             width: 100%;
             max-width: 480px;
-            border: 1px solid #475569;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
         .customizer-content h3 {
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             color: #a78bfa;
             font-size: 18px;
+            font-weight: 700;
         }
         .color-picker-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            margin-bottom: 15px;
+            gap: 10px;
+            margin-bottom: 20px;
         }
         .color-dot {
             width: 36px; height: 36px;
             border-radius: 50%;
             cursor: pointer;
             border: 2px solid transparent;
-            transition: transform 0.1s;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
-        .color-dot:hover { transform: scale(1.1); }
-        .color-dot.selected { border-color: #fff; transform: scale(1.15); box-shadow: 0 0 10px #fff; }
+        .color-dot:hover { transform: scale(1.15); }
+        .color-dot.selected { border-color: #fff; transform: scale(1.2); box-shadow: 0 0 12px #fff; }
 
         .icons-grid-picker {
             display: grid;
@@ -334,62 +371,103 @@
             max-height: 140px;
             overflow-y: auto;
             margin-bottom: 20px;
-            padding: 5px;
+            padding: 8px;
             background: #0f172a;
-            border-radius: 8px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
         .icon-option {
             font-size: 22px;
             text-align: center;
             padding: 6px;
             cursor: pointer;
-            border-radius: 6px;
+            border-radius: 8px;
             border: 1px solid transparent;
+            transition: background 0.2s;
         }
         .icon-option:hover { background: #334155; }
         .icon-option.selected { background: #7c3aed; border-color: #c4b5fd; }
 
-        /* Player Fixo Inferior */
+        /* PLAYER PROFISSIONAL INFERIOR REESTRUTURADO */
         .car-player-bar {
             position: fixed;
             bottom: 0; left: 0; width: 100%;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid #334155;
-            padding: 12px 30px;
+            background: rgba(13, 18, 30, 0.95);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 14px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 900;
-            box-shadow: -5px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.6);
         }
         .player-info {
             display: flex;
             align-items: center;
             gap: 15px;
+            min-width: 280px;
         }
-        .player-info h4 { font-size: 15px; color: #f8fafc; }
+        .player-icon-box {
+            font-size: 32px;
+            background: rgba(124, 58, 237, 0.15);
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .player-text-details h4 {
+            font-size: 14px;
+            color: #f8fafc;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+        .player-status-sub {
+            font-size: 11px;
+            color: #38bdf8;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        
         .player-controls {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 18px;
         }
         .control-btn {
-            background: #334155;
+            background: rgba(255, 255, 255, 0.06);
             color: white;
-            border: none;
-            width: 42px; height: 42px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 40px; height: 40px;
             border-radius: 50%;
-            font-size: 16px;
+            font-size: 14px;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: background 0.2s;
+            transition: all 0.2s ease;
         }
-        .control-btn:hover { background: #7c3aed; }
-        .control-btn.main-play { width: 50px; height: 50px; background: #7c3aed; font-size: 20px; }
-        .control-btn.main-play:hover { background: #6d28d9; }
+        .control-btn:hover { background: rgba(124, 58, 237, 0.4); border-color: #7c3aed; transform: scale(1.08); }
+        
+        .control-btn.main-play {
+            width: 52px; height: 52px;
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            border: none;
+            font-size: 18px;
+            box-shadow: 0 4px 15px rgba(109, 40, 217, 0.4);
+        }
+        .control-btn.main-play:hover {
+            background: linear-gradient(135deg, #7c3aed, #5b21b6);
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(109, 40, 217, 0.6);
+        }
+
+        .player-spacer {
+            min-width: 280px; /* Equilibra o flex layout perfeitamente */
+        }
+
         .hidden { display: none !important; }
     </style>
 </head>
@@ -415,14 +493,14 @@
             <!-- Coluna 1: Gerenciar Rádios com botões + e - -->
             <div class="sidebar-panel">
                 <h3>GERENCIAR SUAS RÁDIOS PREFERIDAS</h3>
-                <div style="font-size: 11px; color: #94a3b8; margin-bottom: 10px;">1. ADICIONE SUAS RÁDIOS</div>
+                <div style="font-size: 11px; color: #94a3b8; margin-bottom: 12px; font-weight: 600;">1. ADICIONE SUAS RÁDIOS</div>
                 <div id="sidebarRadioList"></div>
             </div>
 
             <!-- Coluna 2: Grid Central de Preferidas (Arrastável) -->
             <div class="center-panel">
                 <h3>GERENCIAR SUAS RÁDIOS PREFERIDAS</h3>
-                <div style="font-size: 11px; color: #94a3b8; margin-bottom: 15px; text-align: center;">2. ARRASTE PARA REORDENAR / CLIQUE PARA TOCAR</div>
+                <div style="font-size: 11px; color: #94a3b8; margin-bottom: 15px; text-align: center; font-weight: 600;">2. ARRASTE PARA REORDENAR / CLIQUE PARA TOCAR</div>
                 <div class="radios-grid-user" id="centerRadiosGrid"></div>
             </div>
 
@@ -457,13 +535,13 @@
         </div>
     </div>
 
-    <!-- MODAL DE PERSONALIZAÇÃO DO OUVINTE (20 CORES + ÍCONES) -->
+    <!-- MODAL DE PERSONALIZAÇÃO -->
     <div id="modalPersonalizacaoOuvinte" class="customizer-modal hidden">
         <div class="customizer-content">
             <h3>Personalizar Rádio</h3>
             <input type="hidden" id="customRadioIdOuvinte">
             
-            <label style="font-size: 11px; font-weight: bold; color: #94a3b8; margin-bottom: 6px; display: block;">ESCOLHA A COR DO CARD (20 OPÇÕES)</label>
+            <label style="font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 8px; display: block;">ESCOLHA A COR DO CARD (20 OPÇÕES)</label>
             <div class="color-picker-grid" id="colorPickerGridOuvinte">
                 <div class="color-dot" style="background: #a3e635;" data-color="#a3e635"></div>
                 <div class="color-dot" style="background: #bef264;" data-color="#bef264"></div>
@@ -487,7 +565,7 @@
                 <div class="color-dot" style="background: #fbcfe8;" data-color="#fbcfe8"></div>
             </div>
 
-            <label style="font-size: 11px; font-weight: bold; color: #94a3b8; margin-bottom: 6px; display: block;">ESCOLHA UM ÍCONE</label>
+            <label style="font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 8px; display: block;">ESCOLHA UM ÍCONE</label>
             <div class="icons-grid-picker" id="iconsGridPickerOuvinte">
                 <div class="icon-option" data-icon="📻">📻</div>
                 <div class="icon-option" data-icon="🎵">🎵</div>
@@ -518,19 +596,23 @@
         </div>
     </div>
 
-    <!-- Player Fixo Inferior -->
+    <!-- Player Fixo Inferior Profissional -->
     <div class="car-player-bar hidden" id="carPlayerBar">
         <div class="player-info">
-            <span id="playerIconDisplay" style="font-size: 26px;">📻</span>
-            <div>
+            <div class="player-icon-box" id="playerIconDisplay">📻</div>
+            <div class="player-text-details">
                 <h4 id="playerNameDisplay">Nenhuma rádio selecionada</h4>
+                <div class="player-status-sub" id="playerStatusText">Pronto para tocar</div>
             </div>
         </div>
+        
         <div class="player-controls">
             <button class="control-btn" id="btnAnterior" title="Rádio Anterior">⏮️</button>
-            <button class="control-btn main-play" id="btnPlayPause" title="Tocar / Pausar">▶️</button>
+            <button class="control-btn main-play" id="btnPlayPause" title="Tocar / Parar">▶️</button>
             <button class="control-btn" id="btnProximo" title="Próxima Rádio">⏭️</button>
         </div>
+
+        <div class="player-spacer"></div>
     </div>
 
     <audio id="audioStreaming" preload="none"></audio>
@@ -563,10 +645,9 @@
 
     <script type="module">
         import { db } from '../firebase-config.js';
-        import { ref, get, push, set, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { ref, get, push, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         let nomeUsuarioId = localStorage.getItem('usuarioLogado') || "ouvinte_anonimo";
-        // Limpar string para usar como chave no Firebase
         let chaveFirebaseUser = nomeUsuarioId.replace(/[^a-zA-Z0-9]/g, "_");
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -586,11 +667,13 @@
         let radiosFavoritasIds = [];
         let customizacoesOuvinte = {};
         let indiceRadioAtual = -1;
+        let rádioAtivaNomeGlobal = "";
 
         const audioElement = document.getElementById('audioStreaming');
         const carPlayerBar = document.getElementById('carPlayerBar');
         const playerNameDisplay = document.getElementById('playerNameDisplay');
         const playerIconDisplay = document.getElementById('playerIconDisplay');
+        const playerStatusText = document.getElementById('playerStatusText');
         const btnPlayPause = document.getElementById('btnPlayPause');
         const sidebarRadioList = document.getElementById('sidebarRadioList');
         const centerRadiosGrid = document.getElementById('centerRadiosGrid');
@@ -616,7 +699,6 @@
 
         async function carregarDadosDoPainel() {
             try {
-                // 1. Carregar preferências do ouvinte no Firebase
                 const prefRef = ref(db, `ouvintes_preferencias/${chaveFirebaseUser}`);
                 const prefSnap = await get(prefRef);
                 if (prefSnap.exists()) {
@@ -625,7 +707,6 @@
                     customizacoesOuvinte = dados.customizacoes || {};
                 }
 
-                // 2. Carregar todas as rádios globais cadastradas pelo ADM
                 const radiosRef = ref(db, 'radios_cadastradas');
                 const snapshot = await get(radiosRef);
 
@@ -655,7 +736,6 @@
         }
 
         function renderizarTudo() {
-            // Renderizar Coluna Lateral
             sidebarRadioList.innerHTML = "";
             if (todasRadiosGlobal.length === 0) {
                 sidebarRadioList.innerHTML = "<p style='font-size:11px; color:#94a3b8;'>Nenhuma rádio cadastrada pelo ADM.</p>";
@@ -691,7 +771,6 @@
                 });
             }
 
-            // Renderizar Grid Central
             centerRadiosGrid.innerHTML = "";
             const radiosAtivasNoCentro = radiosFavoritasIds.map(id => todasRadiosGlobal.find(r => r.id === id)).filter(Boolean);
 
@@ -701,7 +780,7 @@
                 return;
             }
 
-            radiosAtivasNoCentro.forEach((radio, index) => {
+            radiosAtivasNoCentro.forEach((radio) => {
                 const custom = customizacoesOuvinte[radio.id] || {};
                 const corCard = custom.cor || radio.cor || "#86efac";
                 const iconeCard = custom.icone || radio.icone || "📻";
@@ -711,6 +790,10 @@
                 card.draggable = true;
                 card.dataset.id = radio.id;
                 card.style.setProperty('--card-bg', corCard);
+
+                if (radio.nome === rádioAtivaNomeGlobal && !audioElement.paused) {
+                    card.classList.add('active-neon');
+                }
 
                 card.innerHTML = `
                     <div class="card-top-content">
@@ -722,19 +805,16 @@
                     </div>
                 `;
 
-                // Tocar rádio ao clicar no card (exceto no pincel)
                 card.addEventListener('click', (e) => {
                     if (e.target.closest('.btn-pincel')) return;
                     tocarRadioPorObjeto(radio);
                 });
 
-                // Botão de Pincel para o Ouvinte customizar
                 card.querySelector('.btn-pincel').addEventListener('click', (e) => {
                     e.stopPropagation();
                     abrirModalPincelOuvinte(radio.id, corCard, iconeCard);
                 });
 
-                // Drag and Drop (Arrastar para reordenar)
                 card.addEventListener('dragstart', () => card.classList.add('dragging'));
                 card.addEventListener('dragend', () => {
                     card.classList.remove('dragging');
@@ -779,10 +859,10 @@
             }, { offset: Number.NEGATIVE_INFINITY }).element;
         }
 
-        // Tocar Rádio imediatamente
         function tocarRadioPorObjeto(radio) {
             const radiosAtivasNoCentro = radiosFavoritasIds.map(id => todasRadiosGlobal.find(r => r.id === id)).filter(Boolean);
             indiceRadioAtual = radiosAtivasNoCentro.findIndex(r => r.id === radio.id);
+            rádioAtivaNomeGlobal = radio.nome;
 
             document.querySelectorAll('.radio-card-user').forEach(c => {
                 if (c.dataset.id === radio.id) c.classList.add('active-neon');
@@ -793,7 +873,8 @@
             carPlayerBar.classList.remove('hidden');
             playerNameDisplay.innerText = radio.nome;
             playerIconDisplay.innerText = custom.icone || radio.icone || "📻";
-            btnPlayPause.innerText = "⏸️";
+            playerStatusText.innerText = `Ouvindo Rádio: ${radio.nome}`;
+            btnPlayPause.innerText = "⏹️"; // Muda para Stop quando está tocando
 
             audioElement.src = radio.url;
             audioElement.play().catch(err => console.error("Erro no stream:", err));
@@ -815,6 +896,7 @@
             tocarRadioPorObjeto(radiosAtivasNoCentro[anterior]);
         });
 
+        // Botão Play/Stop Inteligente
         btnPlayPause.addEventListener('click', () => {
             const radiosAtivasNoCentro = radiosFavoritasIds.map(id => todasRadiosGlobal.find(r => r.id === id)).filter(Boolean);
             if (audioElement.paused) {
@@ -822,15 +904,17 @@
                     tocarRadioPorObjeto(radiosAtivasNoCentro[0]);
                 } else if (indiceRadioAtual !== -1) {
                     audioElement.play();
-                    btnPlayPause.innerText = "⏸️";
+                    btnPlayPause.innerText = "⏹️";
+                    playerStatusText.innerText = `Ouvindo Rádio: ${rádioAtivaNomeGlobal}`;
                 }
             } else {
                 audioElement.pause();
-                btnPlayPause.innerText = "▶️";
+                btnPlayPause.innerText = "▶️"; // Volta para Play
+                playerStatusText.innerText = "Rádio pausada";
+                document.querySelectorAll('.radio-card-user').forEach(c => c.classList.remove('active-neon'));
             }
         });
 
-        // Modal Pincel do Ouvinte
         const modalOuvinte = document.getElementById('modalPersonalizacaoOuvinte');
         const customRadioIdOuvinteInput = document.getElementById('customRadioIdOuvinte');
 
@@ -867,7 +951,6 @@
             renderizarTudo();
         });
 
-        // Enviar Mensagem para o ADM
         const btnEnviarMsg = document.getElementById('btnEnviarMsg');
         const msgAdminInput = document.getElementById('msgAdminInput');
 
