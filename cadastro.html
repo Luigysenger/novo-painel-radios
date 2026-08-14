@@ -134,12 +134,11 @@
             <input type="password" id="confirmaSenha" placeholder="Digite a senha novamente" autocomplete="new-password">
         </div>
 
-        <button id="btnCadastrar" class="btn-submit">FINALIZAR CADASTRO</button>
+        <button type="button" id="btnCadastrar" class="btn-submit">FINALIZAR CADASTRO</button>
         <a href="index.html" class="btn-back">Voltar ao Login</a>
     </div>
 
     <script>
-        // Função global acessível diretamente pelo HTML para forçar a máscara
         window.mascaraData = function(elemento) {
             let v = elemento.value.replace(/\D/g, '');
             if (v.length > 8) v = v.slice(0, 8);
@@ -156,7 +155,7 @@
 
     <script type="module">
         import { db } from './firebase-config.js';
-        import { ref, push, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { ref, set, serverTimestamp, query, orderByChild, equalTo, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const inputNascimento = document.getElementById('nascimento');
         const inputApelido = document.getElementById('apelido');
@@ -166,14 +165,9 @@
         const inputConfirmaSenha = document.getElementById('confirmaSenha');
         const btnCadastrar = document.getElementById('btnCadastrar');
 
-        // Garante formatação caso o navegador preencha ao carregar
-        setTimeout(() => {
-            if (inputNascimento.value) {
-                window.mascaraData(inputNascimento);
-            }
-        }, 200);
-
-        async function realizarCadastro() {
+        async function realizarCadastro(e) {
+            if (e) e.preventDefault();
+            
             window.mascaraData(inputNascimento);
 
             const apelido = inputApelido.value.trim();
@@ -194,8 +188,19 @@
             }
 
             try {
-                const novoUsuarioRef = push(ref(db, 'usuarios_cadastrados'));
-                await set(novoUsuarioRef, {
+                // Cria uma chave segura baseada no e-mail (substituindo pontos para o padrão do Firebase)
+                const emailKey = email.toLowerCase().replace(/[.#$\[\]]/g, "_");
+                const usuarioRef = ref(db, 'usuarios_cadastrados/' + emailKey);
+
+                // Verifica se o e-mail já está cadastrado
+                const snapshot = await get(usuarioRef);
+                if (snapshot.exists()) {
+                    alert("Este e-mail já está cadastrado! Tente fazer login ou use outro e-mail.");
+                    return;
+                }
+
+                // Salva os dados no Firebase para acesso em qualquer máquina
+                await set(usuarioRef, {
                     apelido: apelido,
                     nomeCompleto: nomeCompleto,
                     email: email,
@@ -204,11 +209,11 @@
                     timestamp: serverTimestamp()
                 });
 
-                alert("Cadastro realizado com sucesso!");
+                alert("Cadastro realizado com sucesso! Você já pode fazer login.");
                 window.location.href = "index.html";
             } catch (erro) {
-                console.error("Erro ao cadastrar:", erro);
-                alert("Erro ao realizar cadastro. Verifique sua conexão ou regras do Firebase.");
+                console.error("Erro detalhado ao cadastrar:", erro);
+                alert("Erro ao realizar cadastro. Verifique se as Regras do Realtime Database no Firebase permitem escrita.");
             }
         }
 
@@ -216,7 +221,7 @@
         
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                realizarCadastro();
+                realizarCadastro(e);
             }
         });
     </script>
