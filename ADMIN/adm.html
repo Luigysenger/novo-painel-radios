@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel do Administrador - Gerenciamento</title>
+    <title>Painel Administrativo - Gerenciar Rádios</title>
     <style>
         * {
             box-sizing: border-box;
@@ -12,90 +12,314 @@
             font-family: Arial, sans-serif;
         }
         body {
-            background-color: #0b0713;
-            color: #ffffff;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #f8fafc;
+            min-height: 100vh;
             padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
         }
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 15px;
+            background: rgba(30, 41, 59, 0.85);
+            padding: 20px 30px;
+            border-radius: 12px;
             margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .logo-area h1 {
-            color: #ff2a85;
-            font-size: 22px;
-        }
-        .logo-area p {
-            color: #a0a0a0;
-            font-size: 13px;
+        header h1 {
+            font-size: 20px;
+            color: #f8fafc;
         }
         .btn-sair {
-            background-color: #ff2a85;
+            background: #ef4444;
             color: white;
             border: none;
-            padding: 8px 16px;
+            padding: 8px 15px;
             border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
-            text-decoration: none;
+            font-size: 13px;
         }
-        .admin-grid {
+        .btn-sair:hover {
+            background: #dc2626;
+        }
+        .card-form {
+            background: rgba(30, 41, 59, 0.85);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .card-form h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #a78bfa;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: bold;
+            color: #94a3b8;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 11px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #f8fafc;
+            outline: none;
+        }
+        .form-group input:focus {
+            border-color: #8b5cf6;
+        }
+        .btn-salvar {
+            background: #7c3aed;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        .btn-salvar:hover {
+            background: #6d28d9;
+        }
+        .radios-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 20px;
         }
-        .panel-box {
-            background: #140d24;
+        .radio-card {
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
-        .panel-box h3 {
+        .radio-card h3 {
             font-size: 16px;
+            margin-bottom: 8px;
+            color: #f8fafc;
+            word-break: break-all;
+        }
+        .radio-card p {
+            font-size: 12px;
+            color: #94a3b8;
+            word-break: break-all;
             margin-bottom: 15px;
-            color: #e0e0e0;
         }
-        .admin-card {
-            background: #1f1235;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #7c3aed;
-            font-size: 14px;
+        .card-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #334155;
+            padding-top: 12px;
         }
+        .action-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.1s;
+        }
+        .action-btn:hover {
+            transform: scale(1.15);
+        }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo-area">
-            <h1>Painel do Administrador</h1>
-            <p>Gerencie rádios, usuários e mensagens do sistema</p>
-        </div>
-        <div>
-            <a href="../OUVINTES/ouvinte_cards_radio.html" class="btn-sair">Sair / Voltar ao Painel</a>
-        </div>
-    </header>
+    <div class="container">
+        <header>
+            <h1>Painel do Administrador (Rádios)</h1>
+            <button class="btn-sair" id="btnSair">Sair</button>
+        </header>
 
-    <div class="admin-grid">
-        <!-- Coluna de Gerenciamento de Rádios -->
-        <div class="panel-box">
-            <h3>📻 Gerenciar Rádios do Sistema</h3>
-            <div class="admin-card">Maringá FM - Status: Ativa</div>
-            <div class="admin-card">Jovem Pam Cascavel - Status: Ativa</div>
-            <div class="admin-card">Antena 1 - Status: Ativa</div>
+        <!-- Formulário para Adicionar / Editar Rádio -->
+        <div class="card-form">
+            <h2 id="formTitulo">Adicionar Nova Rádio</h2>
+            <input type="hidden" id="radioIdEditando">
+            <div class="form-group">
+                <label>NOME DA RÁDIO</label>
+                <input type="text" id="nomeRadio" placeholder="Ex: Rádio Hits FM" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>URL / LINK DE STREAMING</label>
+                <input type="text" id="urlRadio" placeholder="https://exemplo.com/stream" autocomplete="off">
+            </div>
+            <button type="button" id="btnSalvarRadio" class="btn-salvar">CADASTRAR RÁDIO</button>
+            <button type="button" id="btnCancelarEdicao" class="btn-salvar hidden" style="background: #475569; margin-left: 10px;">CANCELAR</button>
         </div>
 
-        <!-- Coluna de Mensagens Recebidas -->
-        <div class="panel-box">
-            <h3>💬 Mensagens e Pedidos dos Ouvintes</h3>
-            <div class="admin-card">"Adicionar rádio Mix FM por favor!"</div>
-            <div class="admin-card">"Parabéns pela programação da rádio."</div>
+        <h2>Rádios Cadastradas</h2>
+        <div class="radios-grid" id="gridRadios">
+            <!-- Os cards serão injetados dinamicamente aqui -->
         </div>
     </div>
 
+    <script type="module">
+        import { db } from '../firebase-config.js';
+        import { ref, set, push, get, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const adminLogado = localStorage.getItem('adminLogado');
+            if (adminLogado !== 'true') {
+                alert("Acesso restrito! Faça login com a conta de Administrador.");
+                window.location.href = "../index.html";
+            }
+            carregarRadios();
+        });
+
+        document.getElementById('btnSair').addEventListener('click', () => {
+            localStorage.removeItem('adminLogado');
+            window.location.href = "../index.html";
+        });
+
+        const nomeRadioInput = document.getElementById('nomeRadio');
+        const urlRadioInput = document.getElementById('urlRadio');
+        const btnSalvarRadio = document.getElementById('btnSalvarRadio');
+        const btnCancelarEdicao = document.getElementById('btnCancelarEdicao');
+        const radioIdEditandoInput = document.getElementById('radioIdEditando');
+        const formTitulo = document.getElementById('formTitulo');
+        const gridRadios = document.getElementById('gridRadios');
+
+        async function salvarRadio() {
+            const nome = nomeRadioInput.value.trim();
+            const url = urlRadioInput.value.trim();
+            const idEdicao = radioIdEditandoInput.value;
+
+            if (!nome || !url) {
+                alert("Por favor, preencha o nome e o link da rádio.");
+                return;
+            }
+
+            try {
+                if (idEdicao) {
+                    const radioRef = ref(db, 'radios_cadastradas/' + idEdicao);
+                    await update(radioRef, { nome: nome, url: url });
+                    alert("Rádio atualizada com sucesso!");
+                } else {
+                    const radiosRef = ref(db, 'radios_cadastradas');
+                    const novaRadioRef = push(radiosRef);
+                    await set(novaRadioRef, { nome: nome, url: url });
+                    alert("Rádio cadastrada com sucesso!");
+                }
+
+                limparFormulario();
+                carregarRadios();
+            } catch (erro) {
+                console.error("Erro ao salvar rádio:", erro);
+                alert("Erro ao salvar rádio no Firebase.");
+            }
+        }
+
+        async function carregarRadios() {
+            gridRadios.innerHTML = "<p style='color: #94a3b8;'>Carregando rádios...</p>";
+            try {
+                const radiosRef = ref(db, 'radios_cadastradas');
+                const snapshot = await get(radiosRef);
+
+                gridRadios.innerHTML = "";
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        const id = childSnapshot.key;
+                        const dados = childSnapshot.val();
+
+                        const card = document.createElement('div');
+                        card.className = 'radio-card';
+                        card.innerHTML = `
+                            <div>
+                                <h3>📻 ${dados.nome}</h3>
+                                <p>${dados.url}</p>
+                            </div>
+                            <div class="card-actions">
+                                <button class="action-btn btn-deletar" title="Deletar Rádio" data-id="${id}">🗑️</button>
+                                <button class="action-btn btn-editar" title="Editar Rádio" data-id="${id}" data-nome="${dados.nome}" data-url="${dados.url}">✏️</button>
+                            </div>
+                        `;
+                        gridRadios.appendChild(card);
+                    });
+
+                    document.querySelectorAll('.btn-deletar').forEach(btn => {
+                        btn.addEventListener('click', (e) => deletarRadio(e.target.getAttribute('data-id')));
+                    });
+
+                    document.querySelectorAll('.btn-editar').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const id = e.target.getAttribute('data-id');
+                            const nome = e.target.getAttribute('data-nome');
+                            const url = e.target.getAttribute('data-url');
+                            prepararEdicao(id, nome, url);
+                        });
+                    });
+
+                } else {
+                    gridRadios.innerHTML = "<p style='color: #94a3b8;'>Nenhuma rádio cadastrada ainda.</p>";
+                }
+            } catch (erro) {
+                console.error("Erro ao carregar rádios:", erro);
+                gridRadios.innerHTML = "<p style='color: #ef4444;'>Erro ao carregar rádios do banco.</p>";
+            }
+        }
+
+        async function deletarRadio(id) {
+            if (confirm("Tem certeza que deseja excluir esta rádio?")) {
+                try {
+                    await remove(ref(db, 'radios_cadastradas/' + id));
+                    alert("Rádio removida com sucesso!");
+                    carregarRadios();
+                } catch (erro) {
+                    console.error("Erro ao remover rádio:", erro);
+                    alert("Erro ao remover rádio.");
+                }
+            }
+        }
+
+        function prepararEdicao(id, nome, url) {
+            radioIdEditandoInput.value = id;
+            nomeRadioInput.value = nome;
+            urlRadioInput.value = url;
+            formTitulo.innerText = "Editar Rádio";
+            btnSalvarRadio.innerText = "ATUALIZAR RÁDIO";
+            btnCancelarEdicao.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function limparFormulario() {
+            radioIdEditandoInput.value = "";
+            nomeRadioInput.value = "";
+            urlRadioInput.value = "";
+            formTitulo.innerText = "Adicionar Nova Rádio";
+            btnSalvarRadio.innerText = "CADASTRAR RÁDIO";
+            btnCancelarEdicao.classList.add('hidden');
+        }
+
+        btnCancelarEdicao.addEventListener('click', limparFormulario);
+        btnSalvarRadio.addEventListener('click', salvarRadio);
+
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                salvarRadio();
+            }
+        });
+    </script>
 </body>
 </html>
