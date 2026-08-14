@@ -146,21 +146,18 @@
             inputConfirmaSenha.value = "";
         });
 
-        // Máscara cirúrgica para inserção automática das barras na data
-        inputNascimento.addEventListener('input', function (e) {
-            let valor = e.target.value.replace(/\D/g, "");
-            if (valor.length > 8) {
-                valor = valor.slice(0, 8);
-            }
+        // Máscara cirúrgica baseada em keyup para forçar a formatação DD/MM/AAAA em tempo real
+        inputNascimento.addEventListener('keyup', function (e) {
+            let v = e.target.value.replace(/\D/g, "");
+            if (v.length > 8) v = v.slice(0, 8);
             
-            let formatado = "";
-            for (let i = 0; i < valor.length; i++) {
-                if (i === 2 || i === 4) {
-                    formatado += "/";
-                }
-                formatado += valor[i];
+            if (v.length >= 5) {
+                e.target.value = v.slice(0, 2) + '/' + v.slice(2, 4) + '/' + v.slice(4, 8);
+            } else if (v.length >= 3) {
+                e.target.value = v.slice(0, 2) + '/' + v.slice(2, 4);
+            } else {
+                e.target.value = v;
             }
-            e.target.value = formatado;
         });
 
         async function realizarCadastro() {
