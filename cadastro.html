@@ -92,32 +92,32 @@
         <h2>Criar Cadastro</h2>
         
         <div class="form-group">
-            <label>Primeiro Nome ou Apelido (Obrigatório Maiúsculo)</label>
+            <label>PRIMEIRO NOME OU APELIDO</label>
             <input type="text" id="apelido" class="uppercase-field" placeholder="Nome ou Apelido" autocomplete="off" oninput="this.value = this.value.toUpperCase()">
         </div>
 
         <div class="form-group">
-            <label>Nome Completo</label>
+            <label>NOME COMPLETO</label>
             <input type="text" id="nomeCompleto" placeholder="Digite seu nome completo" autocomplete="off">
         </div>
 
         <div class="form-group">
-            <label>E-mail</label>
+            <label>E-MAIL</label>
             <input type="email" id="email" placeholder="seu@email.com" autocomplete="off">
         </div>
 
         <div class="form-group">
-            <label>Data de Nascimento (DD/MM/AAAA)</label>
+            <label>DATA DE NASCIMENTO</label>
             <input type="text" id="nascimento" placeholder="DD/MM/AAAA" maxlength="10" autocomplete="off">
         </div>
 
         <div class="form-group">
-            <label>Senha</label>
+            <label>SENHA</label>
             <input type="password" id="senha" placeholder="Digite sua senha" autocomplete="new-password">
         </div>
 
         <div class="form-group">
-            <label>Confirme a Senha</label>
+            <label>CONFIRME A SENHA</label>
             <input type="password" id="confirmaSenha" placeholder="Digite a senha novamente" autocomplete="new-password">
         </div>
 
@@ -146,17 +146,22 @@
             inputConfirmaSenha.value = "";
         });
 
-        // Máscara otimizada para aplicar as barras automaticamente na data
+        // Máscara ultra-eficiente para formatar DD/MM/AAAA dinamicamente
         inputNascimento.addEventListener('input', function (e) {
-            let valor = e.target.value.replace(/\D/g, "");
-            if (valor.length > 8) valor = valor.slice(0, 8);
+            let v = e.target.value.replace(/\D/g, "");
+            if (v.length > 8) v = v.slice(0, 8);
             
-            if (valor.length > 4) {
-                valor = valor.replace(/^(\d{2})(\d{2})(\d{1,4})/, "$1/$2/$3");
-            } else if (valor.length > 2) {
-                valor = valor.replace(/^(\d{2})(\d{1,2})/, "$1/$2");
+            let resultado = "";
+            if (v.length > 0) {
+                resultado += v.substring(0, 2);
             }
-            e.target.value = valor;
+            if (v.length >= 3) {
+                resultado += '/' + v.substring(2, 4);
+            }
+            if (v.length >= 5) {
+                resultado += '/' + v.substring(4, 8);
+            }
+            e.target.value = resultado;
         });
 
         async function realizarCadastro() {
