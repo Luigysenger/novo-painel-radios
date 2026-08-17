@@ -228,7 +228,7 @@
             width: 100%;
             flex: 1;
             justify-content: center;
-            pointer-events: none; /* Garante que o arraste pegue bem no card */
+            pointer-events: none;
         }
         .radio-card-user .icon {
             font-size: 32px;
@@ -265,13 +265,13 @@
         }
         .btn-pincel:hover { transform: scale(1.15); background: rgba(255,255,255,0.6); }
 
-        /* Coluna 3: Horóscopo e Mensagens */
+        /* Coluna 3: Palavra do Dia (Bíblia e Mensagens) */
         .right-panel {
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
-        .horoscope-card, .message-card {
+        .bible-card, .message-card {
             background: rgba(23, 31, 53, 0.75);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255,255,255,0.06);
@@ -279,7 +279,7 @@
             padding: 18px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         }
-        .horoscope-card h3 {
+        .bible-card h3 {
             font-size: 12px;
             color: #f472b6;
             margin-bottom: 12px;
@@ -287,31 +287,33 @@
             font-weight: 700;
             letter-spacing: 0.5px;
         }
-        .signs-grid {
+        .bible-options-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-            font-size: 10px;
-            text-align: center;
-            margin-bottom: 10px;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
         }
-        .sign-badge {
-            background: rgba(30, 27, 75, 0.7);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            padding: 6px 2px;
-            border-radius: 6px;
+        .bible-btn {
+            background: rgba(30, 27, 75, 0.8);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 10px 8px;
+            border-radius: 8px;
             cursor: pointer;
-            color: #cbd5e1;
+            color: #e2e8f0;
             font-weight: 700;
+            font-size: 11px;
+            text-align: center;
             transition: all 0.2s;
         }
-        .sign-badge:hover { background: #4338ca; color: #fff; border-color: #6366f1; }
-        .horoscope-result {
+        .bible-btn:hover { background: #4338ca; color: #fff; border-color: #818cf8; transform: translateY(-1px); }
+        .bible-daily-verse {
             font-size: 11px;
-            color: #94a3b8;
+            color: #cbd5e1;
             text-align: center;
-            margin-top: 8px;
-            min-height: 30px;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
             line-height: 1.4;
         }
 
@@ -418,6 +420,31 @@
         }
         .icon-option:hover { background: #334155; }
         .icon-option.selected { background: #7c3aed; border-color: #c4b5fd; }
+
+        /* Modal da Bíblia */
+        .bible-modal-content {
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 550px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            color: #f8fafc;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .bible-text-display {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.08);
+            margin-top: 15px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #e2e8f0;
+            min-height: 120px;
+        }
 
         /* PLAYER PROFISSIONAL INFERIOR REESTRUTURADO */
         .car-player-bar {
@@ -533,32 +560,24 @@
                 <div id="sidebarRadioList"></div>
             </div>
 
-            <!-- Coluna 2: Grid Central de Preferidas (Arrastável com troca livre) -->
+            <!-- Coluna 2: Grid Central de Preferidas -->
             <div class="center-panel">
                 <h3>GERENCIAR SUAS RÁDIOS PREFERIDAS</h3>
                 <div style="font-size: 11px; color: #94a3b8; margin-bottom: 15px; text-align: center; font-weight: 600;">2. ARRASTE E SOLTE SOBRE OUTRO CARD PARA TROCAR DE LUGAR</div>
                 <div class="radios-grid-user" id="centerRadiosGrid"></div>
             </div>
 
-            <!-- Coluna 3: Horóscopo e Mensagens -->
+            <!-- Coluna 3: Palavra do Dia & Mensagens -->
             <div class="right-panel">
-                <div class="horoscope-card">
-                    <h3>✨ HORÓSCOPO DO DIA</h3>
-                    <div class="signs-grid">
-                        <div class="sign-badge" onclick="verHoroscopo('Áries')">ÁRIES</div>
-                        <div class="sign-badge" onclick="verHoroscopo('Touro')">TOURO</div>
-                        <div class="sign-badge" onclick="verHoroscopo('Gêmeos')">GÊMEOS</div>
-                        <div class="sign-badge" onclick="verHoroscopo('Câncer')">CÂNCER</div>
-                        <div class="sign-badge" onclick="verHoroscopo('Leão')">LEÃO</div>
-                        <div class="sign-badge" onclick="verHoroscopo('Virgem')">VIRGEM</div>
-                        <div class="sign-badge" onclick="verHoroscopo('Libra')">LIBRA</div>
-                        <div class="sign-badge" onclick="verHoroscopo('Escorpião')">ESCORP</div>
-                        <div class="sign-badge" onclick="verHoroscopo('Sagitário')">SAGIT</div>
-                        <div class="sign-badge" onclick="verHoroscopo('Capricórnio')">CAPRIC</div>
-                        <div class="sign-badge" onclick="verHoroscopo('Aquário')">AQUÁR</div>
-                        <div class="sign-badge" onclick="verHoroscopo('Peixes')">PEIXES</div>
+                <div class="bible-card">
+                    <h3>📖 PALAVRA DO DIA</h3>
+                    <div class="bible-options-grid">
+                        <button class="bible-btn" onclick="abrirSalmoDoDia()">🙏 Salmo do Dia</button>
+                        <button class="bible-btn" onclick="abrirLeitorBiblia()">📚 Ler a Bíblia</button>
                     </div>
-                    <div class="horoscope-result" id="horoscopeResultText">Clique em um signo acima para ver a previsão astral! ✨</div>
+                    <div class="bible-daily-verse" id="bibleDailyText">
+                        "O Senhor é o meu pastor; nada me faltará." — Salmo 23:1 ✨
+                    </div>
                 </div>
 
                 <div class="message-card">
@@ -568,6 +587,50 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+
+    <!-- MODAL DO SALMO DO DIA -->
+    <div id="modalSalmoDia" class="customizer-modal hidden">
+        <div class="bible-modal-content">
+            <h3 style="color: #f472b6; margin-bottom: 10px;">🙏 Salmo do Dia (Salmo 23)</h3>
+            <div class="bible-text-display">
+                "O Senhor é o meu pastor; nada me faltará.<br>
+                Deitar-me faz em verdes pastos, conduz-me restritamente às águas quietas.<br>
+                Refrigera a minha alma; guia-me pelas veredas da justiça, por amor do seu nome.<br>
+                Ainda que eu ande pelo vale da sombra da morte, não temerei mal algum, porque tu estás comigo; a tua vara e o teu cajado me consolam."
+            </div>
+            <button type="button" onclick="fecharModaisBiblia()" class="btn-send-msg" style="margin-top: 20px; background: #7c3aed;">FECHAR</button>
+        </div>
+    </div>
+
+    <!-- MODAL LEITOR BÍBLICO -->
+    <div id="modalLeitorBiblia" class="customizer-modal hidden">
+        <div class="bible-modal-content">
+            <h3 style="color: #f472b6; margin-bottom: 10px;">📚 Consulta Bíblica Rápida</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                <div>
+                    <label style="font-size: 11px; font-weight: 700; color: #94a3b8; display: block; margin-bottom: 5px;">ESCOLHA O LIVRO</label>
+                    <select id="selectLivroBiblia" style="width: 100%; padding: 8px; background: #0f172a; color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; outline: none;">
+                        <option value="Gênesis">Gênesis</option>
+                        <option value="Salmos">Salmos</option>
+                        <option value="Provérbios">Provérbios</option>
+                        <option value="Isaías">Isaías</option>
+                        <option value="Mateus">Mateus</option>
+                        <option value="João">João</option>
+                        <option value="Romanos">Romanos</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size: 11px; font-weight: 700; color: #94a3b8; display: block; margin-bottom: 5px;">CAPÍTULO</label>
+                    <input type="number" id="inputCapituloBiblia" value="1" min="1" max="150" style="width: 100%; padding: 8px; background: #0f172a; color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; outline: none;">
+                </div>
+            </div>
+            <button type="button" id="btnConsultarBiblia" class="btn-send-msg" style="background: #2563eb; margin-bottom: 15px;">CONSULTAR VERSÍCULO</button>
+            <div class="bible-text-display" id="resultadoLeituraBiblia">
+                Selecione o livro e o capítulo acima para meditar na palavra.
+            </div>
+            <button type="button" onclick="fecharModaisBiblia()" class="btn-send-msg" style="margin-top: 20px; background: #475569;">FECHAR</button>
         </div>
     </div>
 
@@ -659,24 +722,37 @@
             document.getElementById('relogioDigital').innerText = agora.toLocaleTimeString();
         }, 1000);
 
-        const previsoes = {
-            'Áries': 'Sua energia estará em alta hoje! Aproveite para iniciar novos projetos.',
-            'Touro': 'Momento de foco financeiro e estabilidade emocional. Confie no seu instinto.',
-            'Gêmeos': 'Sua comunicação será sua maior aliada hoje. Excelentes diálogos à vista.',
-            'Câncer': 'Dia propício para cuidar do lar e das relações familiares mais próximas.',
-            'Leão': 'O seu brilho pessoal vai se destacar em qualquer ambiente que você pisar.',
-            'Virgem': 'Organização e clareza mental trarão resultados surpreendentes no trabalho.',
-            'Libra': 'Busque o equilíbrio nas decisões. Parcerias produtivas estão surgindo.',
-            'Escorpião': 'Intuição muito forte hoje. Suas escolhas trarão grandes transformações.',
-            'Sagitário': 'Otimismo e vontade de expandir horizontes. Ótimo dia para novos ares!',
-            'Capricórnio': 'Dedicação aos objetivos trará o reconhecimento que você tanto espera.',
-            'Aquário': 'Ideias inovadoras e criativas vão contagiar as pessoas ao seu redor.',
-            'Peixes': 'Sensibilidade e inspiração artística em evidência. Siga sua intuição!'
+        window.abrirSalmoDoDia = function() {
+            document.getElementById('modalSalmoDia').classList.remove('hidden');
         };
 
-        window.verHoroscopo = function(signo) {
-            document.getElementById('horoscopeResultText').innerText = `${signo}: ${previsoes[signo]}`;
+        window.abrirLeitorBiblia = function() {
+            document.getElementById('modalLeitorBiblia').classList.remove('hidden');
         };
+
+        window.fecharModaisBiblia = function() {
+            document.getElementById('modalSalmoDia').classList.add('hidden');
+            document.getElementById('modalLeitorBiblia').classList.add('hidden');
+        };
+
+        document.getElementById('btnConsultarBiblia').addEventListener('click', () => {
+            const livro = document.getElementById('selectLivroBiblia').value;
+            const cap = document.getElementById('inputCapituloBiblia').value;
+            const display = document.getElementById('resultadoLeituraBiblia');
+
+            // Textos de exemplo estruturados internos (100% gratuito e rápido)
+            const acervoBiblico = {
+                "Gênesis": "No princípio criou Deus os céus e a terra. A terra era sem forma e vazia; e havia trevas sobre a face do abismo...",
+                "Salmos": `Salmo ${cap}: O Senhor é o meu pastor; nada me faltará. Deleita-te também no Senhor, e ele te concederá os desejos do teu coração.`,
+                "Provérbios": `Provérbios ${cap}: Confia no Senhor de todo o teu coração, e não te estribes no teu próprio entendimento. Em todas as tuas maneiras reconhece-o, e ele endireitará as tuas veredas.`,
+                "Isaías": `Isaías ${cap}: Mas os que esperam no Senhor renovarão as forças; subirão com asas como águias; correrão, e não se cansarão; caminharão, e não se fatigarão.`,
+                "Mateus": `Mateus ${cap}: Buscai primeiro o reino de Deus, e a sua justiça, e todas estas coisas vos serão acrescentadas.`,
+                "João": `João ${cap}: Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo o aquele que nele crê não pereça, mas tenha a vida eterna.`,
+                "Romanos": `Romanos ${cap}: E sabemos que todas as coisas trabalham juntamente para o bem daqueles que amam a Deus, daqueles que são chamados segundo o seu propósito.`
+            };
+
+            display.innerHTML = `<strong>${livro} Capítulo ${cap}:</strong><br><br>${acervoBiblico[livro] || "Palavra inspiradora guardada no coração. Continue firme na fé!"}`;
+        });
     </script>
 
     <script type="module">
@@ -706,7 +782,6 @@
             }
         }
 
-        // Evento para fechar o balão ao clicar em qualquer lugar da tela
         document.addEventListener('click', (e) => {
             if (balaoAviso.style.display === 'block') {
                 balaoAviso.style.display = 'none';
@@ -888,7 +963,6 @@
                     abrirModalPincelOuvinte(radio.id, corCard, iconeCard);
                 });
 
-                // LÓGICA DE ARRASTAR E SOLTAR COM TROCA DIRETA DE POSIÇÃO (FLEXÍVEL)
                 card.addEventListener('dragstart', (e) => {
                     e.dataTransfer.setData('text/plain', radio.id);
                     card.classList.add('dragging');
@@ -919,7 +993,6 @@
                         const newIndex = radiosFavoritasIds.indexOf(targetId);
 
                         if (oldIndex !== -1 && newIndex !== -1) {
-                            // Troca de posições exata (qualquer card para qualquer lugar)
                             radiosFavoritasIds.splice(oldIndex, 1);
                             radiosFavoritasIds.splice(newIndex, 0, draggedId);
                             salvarPreferenciasNoFirebase();
