@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Administrativo - Gerenciador de Rádios</title>
+
     <style>
         * {
             box-sizing: border-box;
@@ -11,6 +12,7 @@
             padding: 0;
             font-family: Arial, sans-serif;
         }
+
         body {
             background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
             color: #f8fafc;
@@ -18,10 +20,12 @@
             padding: 20px;
             padding-bottom: 120px;
         }
+
         .container {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
         }
+
         header {
             display: flex;
             justify-content: space-between;
@@ -32,10 +36,12 @@
             margin-bottom: 25px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
+
         header h1 {
             font-size: 20px;
             color: #f8fafc;
         }
+
         .btn-sair {
             background: #ef4444;
             color: white;
@@ -46,9 +52,15 @@
             font-weight: bold;
             font-size: 13px;
         }
+
         .btn-sair:hover {
             background: #dc2626;
         }
+
+        /* ==============================
+           FORMULÁRIOS
+        ============================== */
+
         .card-form {
             background: rgba(30, 41, 59, 0.85);
             padding: 25px;
@@ -56,14 +68,17 @@
             margin-bottom: 30px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
+
         .card-form h2 {
             font-size: 18px;
             margin-bottom: 15px;
             color: #a78bfa;
         }
+
         .form-group {
             margin-bottom: 15px;
         }
+
         .form-group label {
             display: block;
             font-size: 11px;
@@ -72,7 +87,10 @@
             margin-bottom: 5px;
             letter-spacing: 1px;
         }
-        .form-group input {
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
             width: 100%;
             padding: 11px;
             background: #0f172a;
@@ -82,9 +100,20 @@
             color: #f8fafc;
             outline: none;
         }
-        .form-group input:focus {
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
             border-color: #8b5cf6;
         }
+
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            color: #64748b;
+            font-size: 10px;
+        }
+
         .btn-salvar {
             background: #7c3aed;
             color: white;
@@ -96,16 +125,22 @@
             font-size: 14px;
             transition: background 0.2s;
         }
+
         .btn-salvar:hover {
             background: #6d28d9;
         }
+
+        /* ==============================
+           RÁDIOS
+        ============================== */
+
         .radios-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 20px;
+            margin-bottom: 40px;
         }
 
-        /* Estilo Moderno dos Cards Inspirado no seu Painel */
         .radio-card {
             background-color: var(--card-bg, #64748b);
             border-radius: 16px;
@@ -121,14 +156,18 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             border: 2px solid transparent;
         }
+
         .radio-card:hover {
             transform: translateY(-4px);
         }
-        /* Neon ao redor quando ativo */
+
         .radio-card.active-neon {
             border-color: #ffffff;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.3);
+            box-shadow:
+                0 0 20px rgba(255, 255, 255, 0.6),
+                inset 0 0 15px rgba(255, 255, 255, 0.3);
         }
+
         .radio-card-top {
             display: flex;
             flex-direction: column;
@@ -136,10 +175,12 @@
             text-align: center;
             width: 100%;
         }
+
         .radio-icon-display {
             font-size: 36px;
             margin-bottom: 8px;
         }
+
         .radio-card h3 {
             font-size: 13px;
             color: #0f172a;
@@ -150,6 +191,7 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
+
         .card-actions {
             display: flex;
             justify-content: space-between;
@@ -157,6 +199,7 @@
             border-top: 1px solid rgba(0, 0, 0, 0.15);
             padding-top: 8px;
         }
+
         .action-btn {
             background: transparent;
             border: none;
@@ -164,24 +207,387 @@
             font-size: 14px;
             transition: transform 0.1s;
         }
+
         .action-btn:hover {
             transform: scale(1.2);
         }
+
         .card-tools-right {
             display: flex;
             gap: 8px;
         }
 
-        /* Modal de Personalização (20 Cores + 20 Ícones) */
+        /* ==============================
+           ÁREA COMERCIAIS
+        ============================== */
+
+        .commercial-section {
+            margin-top: 35px;
+        }
+
+        .commercial-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .commercial-header h2 {
+            color: #f472b6;
+            font-size: 20px;
+        }
+
+        .commercial-header span {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .commercial-form {
+            background: rgba(30, 41, 59, 0.92);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(167, 139, 250, 0.18);
+            box-shadow: 0 10px 35px rgba(0,0,0,0.25);
+        }
+
+        .commercial-grid-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .media-type {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .media-type label {
+            flex: 1;
+            min-width: 130px;
+        }
+
+        .media-type input {
+            display: none;
+        }
+
+        .media-type-box {
+            display: block;
+            padding: 13px;
+            text-align: center;
+            border-radius: 9px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            cursor: pointer;
+            color: #cbd5e1;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .media-type input:checked + .media-type-box {
+            background: #7c3aed;
+            border-color: #a78bfa;
+            color: white;
+        }
+
+        .upload-box {
+            background: #0f172a;
+            border: 1px dashed #475569;
+            padding: 18px;
+            border-radius: 10px;
+        }
+
+        .upload-box input {
+            margin-top: 8px;
+        }
+
+        .upload-info {
+            font-size: 10px;
+            color: #64748b;
+            margin-top: 7px;
+        }
+
+        /* ==============================
+           DESTINO
+        ============================== */
+
+        .target-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .target-option {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #cbd5e1;
+            transition: 0.2s;
+        }
+
+        .target-option.active {
+            background: linear-gradient(135deg, #7c3aed, #5b21b6);
+            border-color: #a78bfa;
+            color: white;
+        }
+
+        .clients-panel {
+            margin-top: 15px;
+            background: #0b1120;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 15px;
+            display: none;
+        }
+
+        .clients-panel.show {
+            display: block;
+        }
+
+        .clients-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .clients-top strong {
+            font-size: 12px;
+        }
+
+        .clients-search {
+            width: 200px;
+            max-width: 50%;
+            background: #0f172a;
+            color: white;
+            border: 1px solid #334155;
+            padding: 7px;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .clients-list {
+            max-height: 220px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .client-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px;
+            background: rgba(30,41,59,0.8);
+            border-radius: 7px;
+            font-size: 11px;
+            color: #e2e8f0;
+        }
+
+        .client-item input {
+            accent-color: #8b5cf6;
+        }
+
+        /* ==============================
+           BOTÕES
+        ============================== */
+
+        .commercial-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-secondary {
+            background: #475569;
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: #7c3aed;
+        }
+
+        /* ==============================
+           CAMPANHAS
+        ============================== */
+
+        .campaign-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .campaign-card {
+            background: rgba(15,23,42,0.92);
+            border: 1px solid #334155;
+            border-left: 5px solid #22c55e;
+            border-radius: 10px;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px;
+            align-items: center;
+            transition: 0.2s;
+        }
+
+        .campaign-card:hover {
+            transform: translateY(-2px);
+            border-color: #475569;
+        }
+
+        .campaign-card.yellow {
+            border-left-color: #facc15;
+        }
+
+        .campaign-card.red {
+            border-left-color: #ef4444;
+            opacity: 0.85;
+        }
+
+        .campaign-main {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .campaign-media-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .campaign-info h3 {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .campaign-info p {
+            color: #94a3b8;
+            font-size: 10px;
+            line-height: 1.6;
+        }
+
+        .campaign-status {
+            display: inline-block;
+            padding: 4px 7px;
+            border-radius: 5px;
+            font-size: 9px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .status-active {
+            background: rgba(34,197,94,0.15);
+            color: #4ade80;
+        }
+
+        .status-yellow {
+            background: rgba(250,204,21,0.15);
+            color: #fde047;
+        }
+
+        .status-expired {
+            background: rgba(239,68,68,0.15);
+            color: #f87171;
+        }
+
+        .status-paused {
+            background: rgba(148,163,184,0.15);
+            color: #cbd5e1;
+        }
+
+        .campaign-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .campaign-action {
+            width: 34px;
+            height: 34px;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: 0.2s;
+        }
+
+        .campaign-action:hover {
+            transform: scale(1.08);
+        }
+
+        .btn-edit-campaign {
+            background: #7c3aed;
+            color: white;
+        }
+
+        .btn-delete-campaign {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-preview-campaign {
+            background: #2563eb;
+            color: white;
+        }
+
+        .empty-campaigns {
+            background: rgba(15,23,42,0.7);
+            border: 1px dashed #334155;
+            padding: 35px;
+            border-radius: 10px;
+            text-align: center;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        /* ==============================
+           MODAL PERSONALIZAÇÃO
+        ============================== */
+
         .customizer-modal {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(0, 0, 0, 0.7);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            padding: 20px;
         }
+
         .customizer-content {
             background: #1e293b;
             padding: 25px;
@@ -189,27 +595,41 @@
             width: 100%;
             max-width: 480px;
             border: 1px solid #475569;
+            max-height: 90vh;
+            overflow-y: auto;
         }
+
         .customizer-content h3 {
             margin-bottom: 12px;
             color: #a78bfa;
             font-size: 18px;
         }
+
         .color-picker-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 8px;
             margin-bottom: 15px;
         }
+
         .color-dot {
-            width: 36px; height: 36px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             cursor: pointer;
             border: 2px solid transparent;
             transition: transform 0.1s;
         }
-        .color-dot:hover { transform: scale(1.1); }
-        .color-dot.selected { border-color: #fff; transform: scale(1.15); box-shadow: 0 0 10px #fff; }
+
+        .color-dot:hover {
+            transform: scale(1.1);
+        }
+
+        .color-dot.selected {
+            border-color: #fff;
+            transform: scale(1.15);
+            box-shadow: 0 0 10px #fff;
+        }
 
         .icons-grid-picker {
             display: grid;
@@ -222,6 +642,7 @@
             background: #0f172a;
             border-radius: 8px;
         }
+
         .icon-option {
             font-size: 22px;
             text-align: center;
@@ -230,13 +651,25 @@
             border-radius: 6px;
             border: 1px solid transparent;
         }
-        .icon-option:hover { background: #334155; }
-        .icon-option.selected { background: #7c3aed; border-color: #c4b5fd; }
 
-        /* Player Estilo Rádio de Carro na Base */
+        .icon-option:hover {
+            background: #334155;
+        }
+
+        .icon-option.selected {
+            background: #7c3aed;
+            border-color: #c4b5fd;
+        }
+
+        /* ==============================
+           PLAYER
+        ============================== */
+
         .car-player-bar {
             position: fixed;
-            bottom: 0; left: 0; width: 100%;
+            bottom: 0;
+            left: 0;
+            width: 100%;
             background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(10px);
             border-top: 1px solid #334155;
@@ -247,22 +680,30 @@
             z-index: 900;
             box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
         }
+
         .player-info {
             display: flex;
             align-items: center;
             gap: 15px;
         }
-        .player-info h4 { font-size: 15px; color: #f8fafc; }
+
+        .player-info h4 {
+            font-size: 15px;
+            color: #f8fafc;
+        }
+
         .player-controls {
             display: flex;
             align-items: center;
             gap: 20px;
         }
+
         .control-btn {
             background: #334155;
             color: white;
             border: none;
-            width: 42px; height: 42px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
             font-size: 16px;
             cursor: pointer;
@@ -271,395 +712,3750 @@
             align-items: center;
             transition: background 0.2s;
         }
-        .control-btn:hover { background: #7c3aed; }
-        .control-btn.main-play { width: 50px; height: 50px; background: #7c3aed; font-size: 20px; }
-        .control-btn.main-play:hover { background: #6d28d9; }
-        .hidden { display: none !important; }
+
+        .control-btn:hover {
+            background: #7c3aed;
+        }
+
+        .control-btn.main-play {
+            width: 50px;
+            height: 50px;
+            background: #7c3aed;
+            font-size: 20px;
+        }
+
+        .control-btn.main-play:hover {
+            background: #6d28d9;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ==============================
+           RESPONSIVO
+        ============================== */
+
+        @media(max-width: 800px) {
+
+            .commercial-grid-form {
+                grid-template-columns: 1fr;
+            }
+
+            .full-width {
+                grid-column: auto;
+            }
+
+            .target-selector {
+                grid-template-columns: 1fr;
+            }
+
+            .clients-list {
+                grid-template-columns: 1fr;
+            }
+
+            .campaign-card {
+                grid-template-columns: 1fr;
+            }
+
+            .campaign-actions {
+                justify-content: flex-end;
+            }
+
+            header {
+                padding: 15px;
+            }
+        }
     </style>
 </head>
+
 <body>
 
-    <div class="container">
-        <header>
-            <h1>Painel do Administrador (Rádios)</h1>
-            <button class="btn-sair" id="btnSair">Sair</button>
-        </header>
+<div class="container">
 
-        <div class="card-form">
-            <h2 id="formTitulo">Adicionar Nova Rádio</h2>
-            <input type="hidden" id="radioIdEditando">
-            <div class="form-group">
-                <label>NOME DA RÁDIO</label>
-                <input type="text" id="nomeRadio" placeholder="Ex: Rádio Hits FM" autocomplete="off">
-            </div>
-            <div class="form-group">
-                <label>URL / LINK DE STREAMING</label>
-                <input type="text" id="urlRadio" placeholder="https://exemplo.com/stream" autocomplete="off">
-            </div>
-            <button type="button" id="btnSalvarRadio" class="btn-salvar">CADASTRAR RÁDIO</button>
-            <button type="button" id="btnCancelarEdicao" class="btn-salvar hidden" style="background: #475569; margin-left: 10px;">CANCELAR</button>
+    <!-- ==============================
+         CABEÇALHO
+    ============================== -->
+
+    <header>
+
+        <h1>Painel do Administrador</h1>
+
+        <button class="btn-sair" id="btnSair">
+            Sair
+        </button>
+
+    </header>
+
+
+    <!-- ==============================
+         CADASTRO DE RÁDIO
+    ============================== -->
+
+    <div class="card-form">
+
+        <h2 id="formTitulo">
+            Adicionar Nova Rádio
+        </h2>
+
+        <input
+            type="hidden"
+            id="radioIdEditando"
+        >
+
+        <div class="form-group">
+
+            <label>
+                NOME DA RÁDIO
+            </label>
+
+            <input
+                type="text"
+                id="nomeRadio"
+                placeholder="Ex: Rádio Hits FM"
+                autocomplete="off"
+            >
+
         </div>
 
-        <h2>Rádios Cadastradas</h2>
-        <div class="radios-grid" id="gridRadios"></div>
-    </div>
+        <div class="form-group">
 
-    <!-- MODAL DE PERSONALIZAÇÃO (20 CORES E 20 ÍCONES) -->
-    <div id="modalPersonalizacao" class="customizer-modal hidden">
-        <div class="customizer-content">
-            <h3>Personalizar Card da Rádio</h3>
-            <input type="hidden" id="customRadioId">
-            
-            <label style="font-size: 11px; font-weight: bold; color: #94a3b8; margin-bottom: 6px; display: block;">ESCOLHA A COR DO CARD (20 OPÇÕES)</label>
-            <div class="color-picker-grid" id="colorPickerGrid">
-                <!-- 20 Cores Suaves / Pastéis idênticas ao estilo da foto -->
-                <div class="color-dot" style="background: #a3e635;" data-color="#a3e635"></div>
-                <div class="color-dot" style="background: #bef264;" data-color="#bef264"></div>
-                <div class="color-dot" style="background: #86efac;" data-color="#86efac"></div>
-                <div class="color-dot" style="background: #6ee7b7;" data-color="#6ee7b7"></div>
-                <div class="color-dot" style="background: #5eead4;" data-color="#5eead4"></div>
-                <div class="color-dot" style="background: #7dd3fc;" data-color="#7dd3fc"></div>
-                <div class="color-dot" style="background: #93c5fd;" data-color="#93c5fd"></div>
-                <div class="color-dot" style="background: #c4b5fd;" data-color="#c4b5fd"></div>
-                <div class="color-dot" style="background: #f472b6;" data-color="#f472b6"></div>
-                <div class="color-dot" style="background: #fda4af;" data-color="#fda4af"></div>
-                <div class="color-dot" style="background: #fcd34d;" data-color="#fcd34d"></div>
-                <div class="color-dot" style="background: #fde047;" data-color="#fde047"></div>
-                <div class="color-dot" style="background: #fb923c;" data-color="#fb923c"></div>
-                <div class="color-dot" style="background: #d8b4fe;" data-color="#d8b4fe"></div>
-                <div class="color-dot" style="background: #a5b4fc;" data-color="#a5b4fc"></div>
-                <div class="color-dot" style="background: #cbd5e1;" data-color="#cbd5e1"></div>
-                <div class="color-dot" style="background: #94a3b8;" data-color="#94a3b8"></div>
-                <div class="color-dot" style="background: #64748b;" data-color="#64748b"></div>
-                <div class="color-dot" style="background: #e2e8f0;" data-color="#e2e8f0"></div>
-                <div class="color-dot" style="background: #fbcfe8;" data-color="#fbcfe8"></div>
-            </div>
+            <label>
+                URL / LINK DE STREAMING
+            </label>
 
-            <label style="font-size: 11px; font-weight: bold; color: #94a3b8; margin-bottom: 6px; display: block;">ESCOLHA UM ÍCONE</label>
-            <div class="icons-grid-picker" id="iconsGridPicker">
-                <div class="icon-option" data-icon="📻">📻</div>
-                <div class="icon-option" data-icon="🎵">🎵</div>
-                <div class="icon-option" data-icon="🎶">🎶</div>
-                <div class="icon-option" data-icon="🎧">🎧</div>
-                <div class="icon-option" data-icon="🎙️">🎙️</div>
-                <div class="icon-option" data-icon="🎸">🎸</div>
-                <div class="icon-option" data-icon="🎷">🎷</div>
-                <div class="icon-option" data-icon="🎺">🎺</div>
-                <div class="icon-option" data-icon="🎻">🎻</div>
-                <div class="icon-option" data-icon="🎹">🎹</div>
-                <div class="icon-option" data-icon="🎤">🎤</div>
-                <div class="icon-option" data-icon="⚡">⚡</div>
-                <div class="icon-option" data-icon="🔥">🔥</div>
-                <div class="icon-option" data-icon="⭐">⭐</div>
-                <div class="icon-option" data-icon="🚀">🚀</div>
-                <div class="icon-option" data-icon="💎">💎</div>
-                <div class="icon-option" data-icon="🌍">🌍</div>
-                <div class="icon-option" data-icon="🎯">🎯</div>
-                <div class="icon-option" data-icon="💡">💡</div>
-                <div class="icon-option" data-icon="🔊">🔊</div>
-            </div>
+            <input
+                type="text"
+                id="urlRadio"
+                placeholder="https://exemplo.com/stream"
+                autocomplete="off"
+            >
 
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button type="button" id="btnSalvarPersonalizacao" class="btn-salvar" style="flex: 1;">SALVAR</button>
-                <button type="button" id="btnFecharModal" class="btn-salvar" style="background: #475569; flex: 1;">CANCELAR</button>
-            </div>
         </div>
+
+        <button
+            type="button"
+            id="btnSalvarRadio"
+            class="btn-salvar"
+        >
+            CADASTRAR RÁDIO
+        </button>
+
+        <button
+            type="button"
+            id="btnCancelarEdicao"
+            class="btn-salvar hidden"
+            style="background:#475569;margin-left:10px;"
+        >
+            CANCELAR
+        </button>
+
     </div>
 
-    <!-- PLAYER FIXO INFERIOR -->
-    <div class="car-player-bar hidden" id="carPlayerBar">
-        <div class="player-info">
-            <span id="playerIconDisplay" style="font-size: 26px;">📻</span>
+
+    <h2 style="margin-bottom:15px;">
+        Rádios Cadastradas
+    </h2>
+
+    <div
+        class="radios-grid"
+        id="gridRadios"
+    ></div>
+
+
+    <!-- ======================================================
+         NOVA ÁREA DE COMERCIAIS
+    ======================================================= -->
+
+    <section class="commercial-section">
+
+        <div class="commercial-header">
+
             <div>
-                <h4 id="playerNameDisplay">Selecione uma Rádio</h4>
+
+                <h2>
+                    📢 Comerciais e Mídias
+                </h2>
+
+                <span>
+                    Gerencie campanhas comerciais exibidas aos ouvintes.
+                </span>
+
             </div>
+
         </div>
-        <div class="player-controls">
-            <button class="control-btn" id="btnAnterior" title="Rádio Anterior">⏮️</button>
-            <button class="control-btn main-play" id="btnPlayPause" title="Tocar / Pausar">▶️</button>
-            <button class="control-btn" id="btnProximo" title="Próxima Rádio">⏭️</button>
+
+
+        <!-- ==============================
+             FORMULÁRIO
+        ============================== -->
+
+        <div class="commercial-form">
+
+            <h3
+                id="commercialFormTitle"
+                style="margin-bottom:20px;color:#c4b5fd;"
+            >
+                Cadastrar Novo Comercial
+            </h3>
+
+            <input
+                type="hidden"
+                id="commercialIdEditando"
+            >
+
+            <div class="commercial-grid-form">
+
+
+                <!-- NOME -->
+
+                <div class="form-group">
+
+                    <label>
+                        NOME DO COMERCIAL / CAMPANHA
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nomeComercial"
+                        placeholder="Ex: Supermercado ABC - Oferta de Agosto"
+                    >
+
+                </div>
+
+
+                <!-- CLIENTE -->
+
+                <div class="form-group">
+
+                    <label>
+                        CLIENTE / ANUNCIANTE
+                    </label>
+
+                    <input
+                        type="text"
+                        id="clienteComercial"
+                        placeholder="Ex: Supermercado ABC"
+                    >
+
+                </div>
+
+
+                <!-- TIPO -->
+
+                <div class="form-group full-width">
+
+                    <label>
+                        TIPO DA MÍDIA
+                    </label>
+
+                    <div class="media-type">
+
+                        <label>
+
+                            <input
+                                type="radio"
+                                name="tipoMidia"
+                                value="audio"
+                                checked
+                            >
+
+                            <span class="media-type-box">
+                                🎧 ÁUDIO / SPOT
+                            </span>
+
+                        </label>
+
+
+                        <label>
+
+                            <input
+                                type="radio"
+                                name="tipoMidia"
+                                value="video"
+                            >
+
+                            <span class="media-type-box">
+                                🎬 VÍDEO
+                            </span>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ARQUIVO -->
+
+                <div class="form-group full-width">
+
+                    <label>
+                        ARQUIVO DA MÍDIA
+                    </label>
+
+                    <div class="upload-box">
+
+                        <input
+                            type="file"
+                            id="arquivoComercial"
+                            accept="audio/*"
+                        >
+
+                        <div class="upload-info">
+                            O arquivo será armazenado no Firebase Cloud Storage.
+                        </div>
+
+                        <div
+                            id="arquivoAtualInfo"
+                            style="margin-top:8px;color:#a78bfa;font-size:11px;"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- INÍCIO -->
+
+                <div class="form-group">
+
+                    <label>
+                        INÍCIO DA CAMPANHA
+                    </label>
+
+                    <input
+                        type="datetime-local"
+                        id="inicioCampanha"
+                    >
+
+                </div>
+
+
+                <!-- FIM -->
+
+                <div class="form-group">
+
+                    <label>
+                        TÉRMINO DA CAMPANHA
+                    </label>
+
+                    <input
+                        type="datetime-local"
+                        id="fimCampanha"
+                    >
+
+                </div>
+
+
+                <!-- FREQUÊNCIA -->
+
+                <div class="form-group full-width">
+
+                    <label>
+                        INTERVALO ENTRE INSERÇÕES
+                    </label>
+
+                    <select id="frequenciaCampanha">
+
+                        <option value="5">
+                            A cada 5 minutos
+                        </option>
+
+                        <option value="10" selected>
+                            A cada 10 minutos
+                        </option>
+
+                        <option value="20">
+                            A cada 20 minutos
+                        </option>
+
+                        <option value="30">
+                            A cada 30 minutos
+                        </option>
+
+                    </select>
+
+                    <small>
+                        O painel do ouvinte utilizará este intervalo para controlar as inserções.
+                    </small>
+
+                </div>
+
+
+                <!-- DESTINO -->
+
+                <div class="form-group full-width">
+
+                    <label>
+                        QUEM DEVE RECEBER ESTA CAMPANHA?
+                    </label>
+
+                    <div class="target-selector">
+
+                        <div
+                            class="target-option active"
+                            id="targetTodos"
+                            data-target="todos"
+                        >
+                            🌎 TODOS OS OUVINTES
+                        </div>
+
+
+                        <div
+                            class="target-option"
+                            id="targetClientes"
+                            data-target="clientes"
+                        >
+                            👥 CLIENTES SELECIONADOS
+                        </div>
+
+                    </div>
+
+
+                    <!-- CLIENTES -->
+
+                    <div
+                        class="clients-panel"
+                        id="clientsPanel"
+                    >
+
+                        <div class="clients-top">
+
+                            <strong>
+                                SELECIONE OS CLIENTES
+                            </strong>
+
+                            <input
+                                type="text"
+                                id="buscaCliente"
+                                class="clients-search"
+                                placeholder="Pesquisar..."
+                            >
+
+                        </div>
+
+                        <div
+                            id="clientsList"
+                            class="clients-list"
+                        >
+
+                            <div
+                                style="font-size:11px;color:#64748b;"
+                            >
+                                Carregando clientes...
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- BOTÕES -->
+
+            <div class="commercial-buttons">
+
+                <button
+                    type="button"
+                    id="btnSalvarComercial"
+                    class="btn-primary"
+                >
+                    📢 CADASTRAR CAMPANHA
+                </button>
+
+                <button
+                    type="button"
+                    id="btnCancelarComercial"
+                    class="btn-secondary hidden"
+                >
+                    CANCELAR
+                </button>
+
+            </div>
+
+
+            <div
+                id="uploadProgress"
+                style="
+                    display:none;
+                    margin-top:15px;
+                    background:#0f172a;
+                    border-radius:8px;
+                    overflow:hidden;
+                "
+            >
+
+                <div
+                    id="uploadProgressBar"
+                    style="
+                        width:0%;
+                        height:8px;
+                        background:#8b5cf6;
+                        transition:width .2s;
+                    "
+                ></div>
+
+            </div>
+
+            <div
+                id="uploadProgressText"
+                style="
+                    margin-top:6px;
+                    font-size:10px;
+                    color:#94a3b8;
+                "
+            ></div>
+
         </div>
+
+
+        <!-- ==============================
+             LISTA DAS CAMPANHAS
+        ============================== -->
+
+        <div
+            style="
+                margin-top:30px;
+                margin-bottom:15px;
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+            "
+        >
+
+            <div>
+
+                <h2 style="font-size:18px;color:#f8fafc;">
+                    📋 Conteúdos de Mídia
+                </h2>
+
+                <span
+                    style="
+                        font-size:10px;
+                        color:#64748b;
+                    "
+                >
+                    Ordenados pelo vencimento das campanhas.
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="campaignList"
+            class="campaign-list"
+        ></div>
+
+    </section>
+
+</div>
+
+
+<!-- ======================================================
+     MODAL PERSONALIZAÇÃO DAS RÁDIOS
+======================================================= -->
+
+<div
+    id="modalPersonalizacao"
+    class="customizer-modal hidden"
+>
+
+    <div class="customizer-content">
+
+        <h3>
+            Personalizar Card da Rádio
+        </h3>
+
+        <input
+            type="hidden"
+            id="customRadioId"
+        >
+
+        <label
+            style="
+                font-size:11px;
+                font-weight:bold;
+                color:#94a3b8;
+                margin-bottom:6px;
+                display:block;
+            "
+        >
+            ESCOLHA A COR DO CARD
+        </label>
+
+        <div
+            class="color-picker-grid"
+            id="colorPickerGrid"
+        >
+
+            <div class="color-dot" style="background:#a3e635;" data-color="#a3e635"></div>
+            <div class="color-dot" style="background:#bef264;" data-color="#bef264"></div>
+            <div class="color-dot" style="background:#86efac;" data-color="#86efac"></div>
+            <div class="color-dot" style="background:#6ee7b7;" data-color="#6ee7b7"></div>
+            <div class="color-dot" style="background:#5eead4;" data-color="#5eead4"></div>
+            <div class="color-dot" style="background:#7dd3fc;" data-color="#7dd3fc"></div>
+            <div class="color-dot" style="background:#93c5fd;" data-color="#93c5fd"></div>
+            <div class="color-dot" style="background:#c4b5fd;" data-color="#c4b5fd"></div>
+            <div class="color-dot" style="background:#f472b6;" data-color="#f472b6"></div>
+            <div class="color-dot" style="background:#fda4af;" data-color="#fda4af"></div>
+            <div class="color-dot" style="background:#fcd34d;" data-color="#fcd34d"></div>
+            <div class="color-dot" style="background:#fde047;" data-color="#fde047"></div>
+            <div class="color-dot" style="background:#fb923c;" data-color="#fb923c"></div>
+            <div class="color-dot" style="background:#d8b4fe;" data-color="#d8b4fe"></div>
+            <div class="color-dot" style="background:#a5b4fc;" data-color="#a5b4fc"></div>
+            <div class="color-dot" style="background:#cbd5e1;" data-color="#cbd5e1"></div>
+            <div class="color-dot" style="background:#94a3b8;" data-color="#94a3b8"></div>
+            <div class="color-dot" style="background:#64748b;" data-color="#64748b"></div>
+            <div class="color-dot" style="background:#e2e8f0;" data-color="#e2e8f0"></div>
+            <div class="color-dot" style="background:#fbcfe8;" data-color="#fbcfe8"></div>
+
+        </div>
+
+
+        <label
+            style="
+                font-size:11px;
+                font-weight:bold;
+                color:#94a3b8;
+                margin-bottom:6px;
+                display:block;
+            "
+        >
+            ESCOLHA UM ÍCONE
+        </label>
+
+        <div
+            class="icons-grid-picker"
+            id="iconsGridPicker"
+        >
+
+            <div class="icon-option" data-icon="📻">📻</div>
+            <div class="icon-option" data-icon="🎵">🎵</div>
+            <div class="icon-option" data-icon="🎶">🎶</div>
+            <div class="icon-option" data-icon="🎧">🎧</div>
+            <div class="icon-option" data-icon="🎙️">🎙️</div>
+            <div class="icon-option" data-icon="🎸">🎸</div>
+            <div class="icon-option" data-icon="🎷">🎷</div>
+            <div class="icon-option" data-icon="🎺">🎺</div>
+            <div class="icon-option" data-icon="🎻">🎻</div>
+            <div class="icon-option" data-icon="🎹">🎹</div>
+            <div class="icon-option" data-icon="🎤">🎤</div>
+            <div class="icon-option" data-icon="⚡">⚡</div>
+            <div class="icon-option" data-icon="🔥">🔥</div>
+            <div class="icon-option" data-icon="⭐">⭐</div>
+            <div class="icon-option" data-icon="🚀">🚀</div>
+            <div class="icon-option" data-icon="💎">💎</div>
+            <div class="icon-option" data-icon="🌍">🌍</div>
+            <div class="icon-option" data-icon="🎯">🎯</div>
+            <div class="icon-option" data-icon="💡">💡</div>
+            <div class="icon-option" data-icon="🔊">🔊</div>
+
+        </div>
+
+
+        <div
+            style="
+                display:flex;
+                gap:10px;
+                margin-top:15px;
+            "
+        >
+
+            <button
+                type="button"
+                id="btnSalvarPersonalizacao"
+                class="btn-salvar"
+                style="flex:1;"
+            >
+                SALVAR
+            </button>
+
+            <button
+                type="button"
+                id="btnFecharModal"
+                class="btn-salvar"
+                style="
+                    background:#475569;
+                    flex:1;
+                "
+            >
+                CANCELAR
+            </button>
+
+        </div>
+
     </div>
 
-    <audio id="audioStreaming" preload="none"></audio>
+</div>
 
-    <script type="module">
-        import { db } from '../firebase-config.js';
-        import { ref, set, push, get, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        window.addEventListener('DOMContentLoaded', () => {
-            const adminLogado = localStorage.getItem('adminLogado');
-            if (adminLogado !== 'true') {
-                alert("Acesso restrito! Faça login com a conta de Administrador.");
-                window.location.href = "../index.html";
-            }
-            carregarRadios();
-        });
+<!-- ======================================================
+     PLAYER
+======================================================= -->
 
-        document.getElementById('btnSair').addEventListener('click', () => {
-            audioElement.pause();
-            localStorage.removeItem('adminLogado');
+<div
+    class="car-player-bar hidden"
+    id="carPlayerBar"
+>
+
+    <div class="player-info">
+
+        <span
+            id="playerIconDisplay"
+            style="font-size:26px;"
+        >
+            📻
+        </span>
+
+        <div>
+
+            <h4 id="playerNameDisplay">
+                Selecione uma Rádio
+            </h4>
+
+        </div>
+
+    </div>
+
+
+    <div class="player-controls">
+
+        <button
+            class="control-btn"
+            id="btnAnterior"
+            title="Rádio Anterior"
+        >
+            ⏮️
+        </button>
+
+        <button
+            class="control-btn main-play"
+            id="btnPlayPause"
+            title="Tocar / Pausar"
+        >
+            ▶️
+        </button>
+
+        <button
+            class="control-btn"
+            id="btnProximo"
+            title="Próxima Rádio"
+        >
+            ⏭️
+        </button>
+
+    </div>
+
+</div>
+
+
+<audio
+    id="audioStreaming"
+    preload="none"
+></audio>
+
+
+<script type="module">
+
+    /* =====================================================
+       FIREBASE
+    ====================================================== */
+
+    import { db } from '../firebase-config.js';
+
+    import {
+        ref,
+        set,
+        push,
+        get,
+        remove,
+        update
+    }
+    from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+
+    import {
+        getApp
+    }
+    from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+
+
+    import {
+        getStorage,
+        ref as storageRef,
+        uploadBytesResumable,
+        getDownloadURL,
+        deleteObject
+    }
+    from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+
+
+    const app = getApp();
+
+    const storage = getStorage(app);
+
+
+    /* =====================================================
+       LOGIN
+    ====================================================== */
+
+    window.addEventListener('DOMContentLoaded', () => {
+
+        const adminLogado =
+            localStorage.getItem('adminLogado');
+
+        if (adminLogado !== 'true') {
+
+            alert(
+                "Acesso restrito! Faça login com a conta de Administrador."
+            );
+
             window.location.href = "../index.html";
-        });
 
-        const nomeRadioInput = document.getElementById('nomeRadio');
-        const urlRadioInput = document.getElementById('urlRadio');
-        const btnSalvarRadio = document.getElementById('btnSalvarRadio');
-        const btnCancelarEdicao = document.getElementById('btnCancelarEdicao');
-        const radioIdEditandoInput = document.getElementById('radioIdEditando');
-        const formTitulo = document.getElementById('formTitulo');
-        const gridRadios = document.getElementById('gridRadios');
-
-        let listaRadiosObj = [];
-        let indiceRadioAtual = -1;
-        const audioElement = document.getElementById('audioStreaming');
-        const carPlayerBar = document.getElementById('carPlayerBar');
-        const playerNameDisplay = document.getElementById('playerNameDisplay');
-        const playerIconDisplay = document.getElementById('playerIconDisplay');
-        const btnPlayPause = document.getElementById('btnPlayPause');
-
-        let corSelecionada = "#86efac";
-        let iconeSelecionado = "📻";
-
-        document.querySelectorAll('.color-dot').forEach(dot => {
-            dot.addEventListener('click', (e) => {
-                document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
-                e.target.classList.add('selected');
-                corSelecionada = e.target.getAttribute('data-color');
-            });
-        });
-
-        document.querySelectorAll('.icon-option').forEach(opt => {
-            opt.addEventListener('click', (e) => {
-                document.querySelectorAll('.icon-option').forEach(o => o.classList.remove('selected'));
-                e.target.classList.add('selected');
-                iconeSelecionado = e.target.getAttribute('data-icon');
-            });
-        });
-
-        async function salvarRadio() {
-            const nome = nomeRadioInput.value.trim();
-            const url = urlRadioInput.value.trim();
-            const idEdicao = radioIdEditandoInput.value;
-
-            if (!nome || !url) {
-                alert("Por favor, preencha o nome e o link da rádio.");
-                return;
-            }
-
-            try {
-                if (idEdicao) {
-                    const radioRef = ref(db, 'radios_cadastradas/' + idEdicao);
-                    await update(radioRef, { nome: nome, url: url });
-                } else {
-                    const radiosRef = ref(db, 'radios_cadastradas');
-                    const novaRadioRef = push(radiosRef);
-                    await set(novaRadioRef, { 
-                        nome: nome, 
-                        url: url, 
-                        cor: "#86efac", 
-                        icone: "📻" 
-                    });
-                }
-                limparFormulario();
-                carregarRadios();
-            } catch (erro) {
-                console.error("Erro ao salvar rádio:", erro);
-            }
+            return;
         }
 
-        async function carregarRadios() {
-            try {
-                const radiosRef = ref(db, 'radios_cadastradas');
-                const snapshot = await get(radiosRef);
+        carregarRadios();
 
-                gridRadios.innerHTML = "";
-                listaRadiosObj = [];
+        carregarClientes();
 
-                if (snapshot.exists()) {
-                    snapshot.forEach((childSnapshot) => {
-                        const id = childSnapshot.key;
-                        const dados = childSnapshot.val();
-                        listaRadiosObj.push({ id, ...dados });
-                    });
+        carregarCampanhas();
 
-                    listaRadiosObj.forEach((radio, index) => {
-                        const corCard = radio.cor || "#86efac";
-                        const iconeCard = radio.icone || "📻";
+    });
 
-                        const card = document.createElement('div');
-                        card.className = 'radio-card';
-                        card.id = `card-radio-${index}`;
-                        card.style.setProperty('--card-bg', corCard);
-                        
+
+    /* =====================================================
+       SAIR
+    ====================================================== */
+
+    document
+        .getElementById('btnSair')
+        .addEventListener('click', () => {
+
+            audioElement.pause();
+
+            localStorage.removeItem('adminLogado');
+
+            window.location.href = "../index.html";
+
+        });
+
+
+    /* =====================================================
+       RÁDIOS
+    ====================================================== */
+
+    const nomeRadioInput =
+        document.getElementById('nomeRadio');
+
+    const urlRadioInput =
+        document.getElementById('urlRadio');
+
+    const btnSalvarRadio =
+        document.getElementById('btnSalvarRadio');
+
+    const btnCancelarEdicao =
+        document.getElementById('btnCancelarEdicao');
+
+    const radioIdEditandoInput =
+        document.getElementById('radioIdEditando');
+
+    const formTitulo =
+        document.getElementById('formTitulo');
+
+    const gridRadios =
+        document.getElementById('gridRadios');
+
+
+    let listaRadiosObj = [];
+
+    let indiceRadioAtual = -1;
+
+
+    const audioElement =
+        document.getElementById('audioStreaming');
+
+    const carPlayerBar =
+        document.getElementById('carPlayerBar');
+
+    const playerNameDisplay =
+        document.getElementById('playerNameDisplay');
+
+    const playerIconDisplay =
+        document.getElementById('playerIconDisplay');
+
+    const btnPlayPause =
+        document.getElementById('btnPlayPause');
+
+
+    let corSelecionada = "#86efac";
+
+    let iconeSelecionado = "📻";
+
+
+    /* =====================================================
+       CORES
+    ====================================================== */
+
+    document
+        .querySelectorAll('.color-dot')
+        .forEach(dot => {
+
+            dot.addEventListener('click', e => {
+
+                document
+                    .querySelectorAll('.color-dot')
+                    .forEach(d =>
+                        d.classList.remove('selected')
+                    );
+
+                e.target.classList.add('selected');
+
+                corSelecionada =
+                    e.target.getAttribute('data-color');
+
+            });
+
+        });
+
+
+    /* =====================================================
+       ÍCONES
+    ====================================================== */
+
+    document
+        .querySelectorAll('.icon-option')
+        .forEach(opt => {
+
+            opt.addEventListener('click', e => {
+
+                document
+                    .querySelectorAll('.icon-option')
+                    .forEach(o =>
+                        o.classList.remove('selected')
+                    );
+
+                e.target.classList.add('selected');
+
+                iconeSelecionado =
+                    e.target.getAttribute('data-icon');
+
+            });
+
+        });
+
+
+    /* =====================================================
+       SALVAR RÁDIO
+    ====================================================== */
+
+    async function salvarRadio() {
+
+        const nome =
+            nomeRadioInput.value.trim();
+
+        const url =
+            urlRadioInput.value.trim();
+
+        const idEdicao =
+            radioIdEditandoInput.value;
+
+
+        if (!nome || !url) {
+
+            alert(
+                "Por favor, preencha o nome e o link da rádio."
+            );
+
+            return;
+        }
+
+
+        try {
+
+            if (idEdicao) {
+
+                const radioRef =
+                    ref(
+                        db,
+                        'radios_cadastradas/' +
+                        idEdicao
+                    );
+
+                await update(
+                    radioRef,
+                    {
+                        nome: nome,
+                        url: url
+                    }
+                );
+
+            } else {
+
+                const radiosRef =
+                    ref(
+                        db,
+                        'radios_cadastradas'
+                    );
+
+                const novaRadioRef =
+                    push(radiosRef);
+
+                await set(
+                    novaRadioRef,
+                    {
+                        nome: nome,
+                        url: url,
+                        cor: "#86efac",
+                        icone: "📻"
+                    }
+                );
+
+            }
+
+
+            limparFormulario();
+
+            carregarRadios();
+
+        }
+        catch (erro) {
+
+            console.error(
+                "Erro ao salvar rádio:",
+                erro
+            );
+
+            alert(
+                "Não foi possível salvar a rádio."
+            );
+
+        }
+
+    }
+
+
+    /* =====================================================
+       CARREGAR RÁDIOS
+    ====================================================== */
+
+    async function carregarRadios() {
+
+        try {
+
+            const radiosRef =
+                ref(
+                    db,
+                    'radios_cadastradas'
+                );
+
+            const snapshot =
+                await get(radiosRef);
+
+
+            gridRadios.innerHTML = "";
+
+            listaRadiosObj = [];
+
+
+            if (snapshot.exists()) {
+
+                snapshot.forEach(
+                    childSnapshot => {
+
+                        const id =
+                            childSnapshot.key;
+
+                        const dados =
+                            childSnapshot.val();
+
+                        listaRadiosObj.push({
+                            id,
+                            ...dados
+                        });
+
+                    }
+                );
+
+
+                listaRadiosObj.forEach(
+                    (radio, index) => {
+
+                        const corCard =
+                            radio.cor ||
+                            "#86efac";
+
+                        const iconeCard =
+                            radio.icone ||
+                            "📻";
+
+
+                        const card =
+                            document.createElement('div');
+
+                        card.className =
+                            'radio-card';
+
+                        card.id =
+                            `card-radio-${index}`;
+
+                        card.style.setProperty(
+                            '--card-bg',
+                            corCard
+                        );
+
+
                         card.innerHTML = `
+
                             <div class="radio-card-top">
-                                <span class="radio-icon-display">${iconeCard}</span>
-                                <h3 title="${radio.nome}">${radio.nome}</h3>
+
+                                <span
+                                    class="radio-icon-display"
+                                >
+                                    ${iconeCard}
+                                </span>
+
+                                <h3
+                                    title="${escapeHtml(radio.nome)}"
+                                >
+                                    ${escapeHtml(radio.nome)}
+                                </h3>
+
                             </div>
+
                             <div class="card-actions">
-                                <button class="action-btn btn-deletar" title="Deletar" data-id="${radio.id}">🗑️</button>
+
+                                <button
+                                    class="action-btn btn-deletar"
+                                    title="Deletar"
+                                    data-id="${radio.id}"
+                                >
+                                    🗑️
+                                </button>
+
                                 <div class="card-tools-right">
-                                    <button class="action-btn btn-personalizar" title="Personalizar" data-id="${radio.id}" data-cor="${corCard}" data-icone="${iconeCard}">🎨</button>
-                                    <button class="action-btn btn-editar" title="Editar" data-id="${radio.id}" data-nome="${radio.nome}" data-url="${radio.url}">✏️</button>
+
+                                    <button
+                                        class="action-btn btn-personalizar"
+                                        title="Personalizar"
+                                        data-id="${radio.id}"
+                                        data-cor="${corCard}"
+                                        data-icone="${iconeCard}"
+                                    >
+                                        🎨
+                                    </button>
+
+                                    <button
+                                        class="action-btn btn-editar"
+                                        title="Editar"
+                                        data-id="${radio.id}"
+                                        data-nome="${escapeAttribute(radio.nome)}"
+                                        data-url="${escapeAttribute(radio.url)}"
+                                    >
+                                        ✏️
+                                    </button>
+
                                 </div>
+
                             </div>
+
                         `;
 
-                        // Ao clicar no card, toca imediatamente sem mensagens na tela
-                        card.addEventListener('click', (e) => {
-                            if (e.target.closest('button')) return;
-                            tocarRadioPorIndice(index);
-                        });
+
+                        card.addEventListener(
+                            'click',
+                            e => {
+
+                                if (
+                                    e.target.closest('button')
+                                ) return;
+
+                                tocarRadioPorIndice(index);
+
+                            }
+                        );
+
 
                         gridRadios.appendChild(card);
+
+                    }
+                );
+
+
+                document
+                    .querySelectorAll('.btn-deletar')
+                    .forEach(btn => {
+
+                        btn.addEventListener(
+                            'click',
+                            e =>
+                                deletarRadio(
+                                    e.target.getAttribute('data-id')
+                                )
+                        );
+
                     });
 
-                    document.querySelectorAll('.btn-deletar').forEach(btn => {
-                        btn.addEventListener('click', (e) => deletarRadio(e.target.getAttribute('data-id')));
+
+                document
+                    .querySelectorAll('.btn-editar')
+                    .forEach(btn => {
+
+                        btn.addEventListener(
+                            'click',
+                            e =>
+                                prepararEdicao(
+                                    e.target.getAttribute('data-id'),
+                                    e.target.getAttribute('data-nome'),
+                                    e.target.getAttribute('data-url')
+                                )
+                        );
+
                     });
 
-                    document.querySelectorAll('.btn-editar').forEach(btn => {
-                        btn.addEventListener('click', (e) => {
-                            prepararEdicao(e.target.getAttribute('data-id'), e.target.getAttribute('data-nome'), e.target.getAttribute('data-url'));
-                        });
+
+                document
+                    .querySelectorAll('.btn-personalizar')
+                    .forEach(btn => {
+
+                        btn.addEventListener(
+                            'click',
+                            e =>
+                                abrirModalPersonalizacao(
+                                    e.target.getAttribute('data-id'),
+                                    e.target.getAttribute('data-cor'),
+                                    e.target.getAttribute('data-icone')
+                                )
+                        );
+
                     });
 
-                    document.querySelectorAll('.btn-personalizar').forEach(btn => {
-                        btn.addEventListener('click', (e) => {
-                            abrirModalPersonalizacao(e.target.getAttribute('data-id'), e.target.getAttribute('data-cor'), e.target.getAttribute('data-icone'));
-                        });
-                    });
 
-                } else {
-                    gridRadios.innerHTML = "<p style='color: #94a3b8;'>Nenhuma rádio cadastrada ainda.</p>";
-                    carPlayerBar.classList.add('hidden');
-                }
-            } catch (erro) {
-                console.error("Erro ao carregar rádios:", erro);
-            }
-        }
-
-        // Tocar rádio imediatamente sem alertas
-        function tocarRadioPorIndice(index) {
-            if (index < 0 || index >= listaRadiosObj.length) return;
-            indiceRadioAtual = index;
-            const radio = listaRadiosObj[indiceRadioAtual];
-
-            document.querySelectorAll('.radio-card').forEach((c, idx) => {
-                if (idx === indiceRadioAtual) {
-                    c.classList.add('active-neon');
-                } else {
-                    c.classList.remove('active-neon');
-                }
-            });
-
-            carPlayerBar.classList.remove('hidden');
-            playerNameDisplay.innerText = radio.nome;
-            playerIconDisplay.innerText = radio.icone || "📻";
-            btnPlayPause.innerText = "⏸️";
-
-            audioElement.src = radio.url;
-            audioElement.play().catch(err => console.error("Erro no stream:", err));
-        }
-
-        document.getElementById('btnProximo').addEventListener('click', () => {
-            if (listaRadiosObj.length === 0) return;
-            let proximo = indiceRadioAtual + 1;
-            if (proximo >= listaRadiosObj.length) proximo = 0;
-            tocarRadioPorIndice(proximo);
-        });
-
-        document.getElementById('btnAnterior').addEventListener('click', () => {
-            if (listaRadiosObj.length === 0) return;
-            let anterior = indiceRadioAtual - 1;
-            if (anterior < 0) anterior = listaRadiosObj.length - 1;
-            tocarRadioPorIndice(anterior);
-        });
-
-        btnPlayPause.addEventListener('click', () => {
-            if (audioElement.paused) {
-                if (indiceRadioAtual === -1 && listaRadiosObj.length > 0) {
-                    tocarRadioPorIndice(0);
-                } else if (indiceRadioAtual !== -1) {
-                    audioElement.play();
-                    btnPlayPause.innerText = "⏸️";
-                }
             } else {
-                audioElement.pause();
-                btnPlayPause.innerText = "▶️";
+
+                gridRadios.innerHTML =
+                    "<p style='color:#94a3b8;'>Nenhuma rádio cadastrada ainda.</p>";
+
+                carPlayerBar.classList.add('hidden');
+
             }
-        });
 
-        const modalPersonalizacao = document.getElementById('modalPersonalizacao');
-        const customRadioIdInput = document.getElementById('customRadioId');
+        }
+        catch (erro) {
 
-        function abrirModalPersonalizacao(id, corAtual, iconeAtual) {
-            customRadioIdInput.value = id;
-            corSelecionada = corAtual || "#86efac";
-            iconeSelecionado = iconeAtual || "📻";
+            console.error(
+                "Erro ao carregar rádios:",
+                erro
+            );
 
-            document.querySelectorAll('.color-dot').forEach(dot => {
-                if (dot.getAttribute('data-color') === corSelecionada) dot.classList.add('selected');
-                else dot.classList.remove('selected');
-            });
-
-            document.querySelectorAll('.icon-option').forEach(opt => {
-                if (opt.getAttribute('data-icon') === iconeSelecionado) opt.classList.add('selected');
-                else opt.classList.remove('selected');
-            });
-
-            modalPersonalizacao.classList.remove('hidden');
         }
 
-        document.getElementById('btnFecharModal').addEventListener('click', () => {
-            modalPersonalizacao.classList.add('hidden');
-        });
+    }
 
-        document.getElementById('btnSalvarPersonalizacao').addEventListener('click', async () => {
-            const id = customRadioIdInput.value;
-            try {
-                const radioRef = ref(db, 'radios_cadastradas/' + id);
-                await update(radioRef, { cor: corSelecionada, icone: iconeSelecionado });
-                modalPersonalizacao.classList.add('hidden');
-                carregarRadios();
-            } catch (err) {
-                console.error("Erro ao salvar customização:", err);
-            }
-        });
 
-        async function deletarRadio(id) {
-            if (confirm("Tem certeza que deseja excluir esta rádio?")) {
-                try {
-                    await remove(ref(db, 'radios_cadastradas/' + id));
-                    carregarRadios();
-                } catch (erro) {
-                    console.error("Erro ao remover rádio:", erro);
+    /* =====================================================
+       TOCAR RÁDIO
+    ====================================================== */
+
+    function tocarRadioPorIndice(index) {
+
+        if (
+            index < 0 ||
+            index >= listaRadiosObj.length
+        ) return;
+
+
+        indiceRadioAtual = index;
+
+        const radio =
+            listaRadiosObj[indiceRadioAtual];
+
+
+        document
+            .querySelectorAll('.radio-card')
+            .forEach((c, idx) => {
+
+                if (idx === indiceRadioAtual) {
+
+                    c.classList.add(
+                        'active-neon'
+                    );
+
+                } else {
+
+                    c.classList.remove(
+                        'active-neon'
+                    );
+
                 }
+
+            });
+
+
+        carPlayerBar.classList.remove(
+            'hidden'
+        );
+
+
+        playerNameDisplay.innerText =
+            radio.nome;
+
+        playerIconDisplay.innerText =
+            radio.icone || "📻";
+
+
+        btnPlayPause.innerText =
+            "⏸️";
+
+
+        audioElement.src =
+            radio.url;
+
+
+        audioElement.play()
+            .catch(
+                err =>
+                    console.error(
+                        "Erro no stream:",
+                        err
+                    )
+            );
+
+    }
+
+
+    /* =====================================================
+       PRÓXIMA RÁDIO
+    ====================================================== */
+
+    document
+        .getElementById('btnProximo')
+        .addEventListener(
+            'click',
+            () => {
+
+                if (
+                    listaRadiosObj.length === 0
+                ) return;
+
+
+                let proximo =
+                    indiceRadioAtual + 1;
+
+
+                if (
+                    proximo >=
+                    listaRadiosObj.length
+                ) {
+
+                    proximo = 0;
+
+                }
+
+
+                tocarRadioPorIndice(
+                    proximo
+                );
+
             }
+        );
+
+
+    /* =====================================================
+       RÁDIO ANTERIOR
+    ====================================================== */
+
+    document
+        .getElementById('btnAnterior')
+        .addEventListener(
+            'click',
+            () => {
+
+                if (
+                    listaRadiosObj.length === 0
+                ) return;
+
+
+                let anterior =
+                    indiceRadioAtual - 1;
+
+
+                if (anterior < 0) {
+
+                    anterior =
+                        listaRadiosObj.length - 1;
+
+                }
+
+
+                tocarRadioPorIndice(
+                    anterior
+                );
+
+            }
+        );
+
+
+    /* =====================================================
+       PLAY / PAUSE
+    ====================================================== */
+
+    btnPlayPause.addEventListener(
+        'click',
+        () => {
+
+            if (audioElement.paused) {
+
+                if (
+                    indiceRadioAtual === -1 &&
+                    listaRadiosObj.length > 0
+                ) {
+
+                    tocarRadioPorIndice(0);
+
+                }
+                else if (
+                    indiceRadioAtual !== -1
+                ) {
+
+                    audioElement.play();
+
+                    btnPlayPause.innerText =
+                        "⏸️";
+
+                }
+
+            }
+            else {
+
+                audioElement.pause();
+
+                btnPlayPause.innerText =
+                    "▶️";
+
+            }
+
+        }
+    );
+
+
+    /* =====================================================
+       PERSONALIZAÇÃO
+    ====================================================== */
+
+    const modalPersonalizacao =
+        document.getElementById(
+            'modalPersonalizacao'
+        );
+
+    const customRadioIdInput =
+        document.getElementById(
+            'customRadioId'
+        );
+
+
+    function abrirModalPersonalizacao(
+        id,
+        corAtual,
+        iconeAtual
+    ) {
+
+        customRadioIdInput.value =
+            id;
+
+
+        corSelecionada =
+            corAtual || "#86efac";
+
+
+        iconeSelecionado =
+            iconeAtual || "📻";
+
+
+        document
+            .querySelectorAll('.color-dot')
+            .forEach(dot => {
+
+                if (
+                    dot.getAttribute(
+                        'data-color'
+                    ) === corSelecionada
+                ) {
+
+                    dot.classList.add(
+                        'selected'
+                    );
+
+                } else {
+
+                    dot.classList.remove(
+                        'selected'
+                    );
+
+                }
+
+            });
+
+
+        document
+            .querySelectorAll('.icon-option')
+            .forEach(opt => {
+
+                if (
+                    opt.getAttribute(
+                        'data-icon'
+                    ) === iconeSelecionado
+                ) {
+
+                    opt.classList.add(
+                        'selected'
+                    );
+
+                } else {
+
+                    opt.classList.remove(
+                        'selected'
+                    );
+
+                }
+
+            });
+
+
+        modalPersonalizacao.classList.remove(
+            'hidden'
+        );
+
+    }
+
+
+    document
+        .getElementById('btnFecharModal')
+        .addEventListener(
+            'click',
+            () => {
+
+                modalPersonalizacao.classList.add(
+                    'hidden'
+                );
+
+            }
+        );
+
+
+    document
+        .getElementById(
+            'btnSalvarPersonalizacao'
+        )
+        .addEventListener(
+            'click',
+            async () => {
+
+                const id =
+                    customRadioIdInput.value;
+
+
+                try {
+
+                    const radioRef =
+                        ref(
+                            db,
+                            'radios_cadastradas/' +
+                            id
+                        );
+
+
+                    await update(
+                        radioRef,
+                        {
+                            cor: corSelecionada,
+                            icone: iconeSelecionado
+                        }
+                    );
+
+
+                    modalPersonalizacao.classList.add(
+                        'hidden'
+                    );
+
+
+                    carregarRadios();
+
+                }
+                catch (err) {
+
+                    console.error(err);
+
+                    alert(
+                        "Erro ao salvar personalização."
+                    );
+
+                }
+
+            }
+        );
+
+
+    /* =====================================================
+       DELETAR RÁDIO
+    ====================================================== */
+
+    async function deletarRadio(id) {
+
+        if (
+            !confirm(
+                "Tem certeza que deseja excluir esta rádio?"
+            )
+        ) return;
+
+
+        try {
+
+            await remove(
+                ref(
+                    db,
+                    'radios_cadastradas/' +
+                    id
+                )
+            );
+
+
+            carregarRadios();
+
+        }
+        catch (erro) {
+
+            console.error(
+                "Erro ao remover rádio:",
+                erro
+            );
+
         }
 
-        function prepararEdicao(id, nome, url) {
-            radioIdEditandoInput.value = id;
-            nomeRadioInput.value = nome;
-            urlRadioInput.value = url;
-            formTitulo.innerText = "Editar Rádio";
-            btnSalvarRadio.innerText = "ATUALIZAR RÁDIO";
-            btnCancelarEdicao.classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+
+    /* =====================================================
+       EDITAR RÁDIO
+    ====================================================== */
+
+    function prepararEdicao(
+        id,
+        nome,
+        url
+    ) {
+
+        radioIdEditandoInput.value =
+            id;
+
+        nomeRadioInput.value =
+            nome;
+
+        urlRadioInput.value =
+            url;
+
+        formTitulo.innerText =
+            "Editar Rádio";
+
+        btnSalvarRadio.innerText =
+            "ATUALIZAR RÁDIO";
+
+        btnCancelarEdicao.classList.remove(
+            'hidden'
+        );
+
+
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+
+    }
+
+
+    function limparFormulario() {
+
+        radioIdEditandoInput.value =
+            "";
+
+        nomeRadioInput.value =
+            "";
+
+        urlRadioInput.value =
+            "";
+
+        formTitulo.innerText =
+            "Adicionar Nova Rádio";
+
+        btnSalvarRadio.innerText =
+            "CADASTRAR RÁDIO";
+
+        btnCancelarEdicao.classList.add(
+            'hidden'
+        );
+
+    }
+
+
+    btnCancelarEdicao.addEventListener(
+        'click',
+        limparFormulario
+    );
+
+
+    btnSalvarRadio.addEventListener(
+        'click',
+        salvarRadio
+    );
+
+
+    /* =====================================================
+       COMERCIAIS
+    ====================================================== */
+
+    const nomeComercial =
+        document.getElementById(
+            'nomeComercial'
+        );
+
+    const clienteComercial =
+        document.getElementById(
+            'clienteComercial'
+        );
+
+    const arquivoComercial =
+        document.getElementById(
+            'arquivoComercial'
+        );
+
+    const inicioCampanha =
+        document.getElementById(
+            'inicioCampanha'
+        );
+
+    const fimCampanha =
+        document.getElementById(
+            'fimCampanha'
+        );
+
+    const frequenciaCampanha =
+        document.getElementById(
+            'frequenciaCampanha'
+        );
+
+    const campaignList =
+        document.getElementById(
+            'campaignList'
+        );
+
+    const commercialIdEditando =
+        document.getElementById(
+            'commercialIdEditando'
+        );
+
+    const commercialFormTitle =
+        document.getElementById(
+            'commercialFormTitle'
+        );
+
+    const btnSalvarComercial =
+        document.getElementById(
+            'btnSalvarComercial'
+        );
+
+    const btnCancelarComercial =
+        document.getElementById(
+            'btnCancelarComercial'
+        );
+
+    const arquivoAtualInfo =
+        document.getElementById(
+            'arquivoAtualInfo'
+        );
+
+    const uploadProgress =
+        document.getElementById(
+            'uploadProgress'
+        );
+
+    const uploadProgressBar =
+        document.getElementById(
+            'uploadProgressBar'
+        );
+
+    const uploadProgressText =
+        document.getElementById(
+            'uploadProgressText'
+        );
+
+
+    let campanhasGlobal = [];
+
+    let clientesGlobal = [];
+
+    let destinoCampanha = "todos";
+
+    let arquivoAtualUrl = "";
+
+    let arquivoAtualStoragePath = "";
+
+    let tipoMidiaAtual = "audio";
+
+
+    /* =====================================================
+       TIPO DA MÍDIA
+    ====================================================== */
+
+    document
+        .querySelectorAll(
+            'input[name="tipoMidia"]'
+        )
+        .forEach(input => {
+
+            input.addEventListener(
+                'change',
+                () => {
+
+                    tipoMidiaAtual =
+                        input.value;
+
+
+                    if (
+                        tipoMidiaAtual ===
+                        'video'
+                    ) {
+
+                        arquivoComercial.accept =
+                            "video/*";
+
+                    } else {
+
+                        arquivoComercial.accept =
+                            "audio/*";
+
+                    }
+
+                }
+            );
+
+        });
+
+
+    /* =====================================================
+       DESTINO
+    ====================================================== */
+
+    const targetTodos =
+        document.getElementById(
+            'targetTodos'
+        );
+
+    const targetClientes =
+        document.getElementById(
+            'targetClientes'
+        );
+
+    const clientsPanel =
+        document.getElementById(
+            'clientsPanel'
+        );
+
+
+    targetTodos.addEventListener(
+        'click',
+        () => {
+
+            destinoCampanha =
+                "todos";
+
+            targetTodos.classList.add(
+                'active'
+            );
+
+            targetClientes.classList.remove(
+                'active'
+            );
+
+            clientsPanel.classList.remove(
+                'show'
+            );
+
+        }
+    );
+
+
+    targetClientes.addEventListener(
+        'click',
+        () => {
+
+            destinoCampanha =
+                "clientes";
+
+            targetClientes.classList.add(
+                'active'
+            );
+
+            targetTodos.classList.remove(
+                'active'
+            );
+
+            clientsPanel.classList.add(
+                'show'
+            );
+
+            carregarClientes();
+
+        }
+    );
+
+
+    /* =====================================================
+       CLIENTES
+    ====================================================== */
+
+    async function carregarClientes() {
+
+        const clientsList =
+            document.getElementById(
+                'clientsList'
+            );
+
+
+        clientsList.innerHTML =
+            `
+                <div
+                    style="
+                        font-size:11px;
+                        color:#64748b;
+                    "
+                >
+                    Carregando clientes...
+                </div>
+            `;
+
+
+        const caminhos = [
+
+            'ouvintes',
+
+            'ouvintes_cadastrados',
+
+            'usuarios',
+
+            'usuarios_cadastrados',
+
+            'clientes',
+
+            'ouvintes_preferencias'
+
+        ];
+
+
+        const mapaClientes =
+            new Map();
+
+
+        try {
+
+            for (
+                const caminho of caminhos
+            ) {
+
+                try {
+
+                    const snapshot =
+                        await get(
+                            ref(
+                                db,
+                                caminho
+                            )
+                        );
+
+
+                    if (
+                        snapshot.exists()
+                    ) {
+
+                        snapshot.forEach(
+                            child => {
+
+                                const dados =
+                                    child.val();
+
+
+                                const id =
+                                    child.key;
+
+
+                                let nome =
+                                    id;
+
+
+                                if (
+                                    typeof dados ===
+                                    'object' &&
+                                    dados !== null
+                                ) {
+
+                                    nome =
+                                        dados.nome ||
+                                        dados.nomeUsuario ||
+                                        dados.usuario ||
+                                        dados.username ||
+                                        dados.email ||
+                                        id;
+
+                                }
+
+
+                                mapaClientes.set(
+                                    id,
+                                    {
+                                        id,
+                                        nome
+                                    }
+                                );
+
+                            }
+                        );
+
+                    }
+
+                }
+                catch (erroInterno) {
+
+                    console.warn(
+                        "Não foi possível ler:",
+                        caminho
+                    );
+
+                }
+
+            }
+
+
+            clientesGlobal =
+                Array.from(
+                    mapaClientes.values()
+                );
+
+
+            renderizarClientes();
+
+
+        }
+        catch (erro) {
+
+            console.error(
+                "Erro ao carregar clientes:",
+                erro
+            );
+
+
+            clientsList.innerHTML =
+                `
+                    <div
+                        style="
+                            color:#f87171;
+                            font-size:11px;
+                        "
+                    >
+                        Não foi possível carregar os clientes.
+                    </div>
+                `;
+
         }
 
-        function limparFormulario() {
-            radioIdEditandoInput.value = "";
-            nomeRadioInput.value = "";
-            urlRadioInput.value = "";
-            formTitulo.innerText = "Adicionar Nova Rádio";
-            btnSalvarRadio.innerText = "CADASTRAR RÁDIO";
-            btnCancelarEdicao.classList.add('hidden');
+    }
+
+
+    function renderizarClientes(
+        filtro = ""
+    ) {
+
+        const clientsList =
+            document.getElementById(
+                'clientsList'
+            );
+
+
+        const termo =
+            filtro
+                .toLowerCase()
+                .trim();
+
+
+        const lista =
+            clientesGlobal.filter(
+                cliente =>
+                    cliente.nome
+                        .toLowerCase()
+                        .includes(termo)
+            );
+
+
+        if (
+            lista.length === 0
+        ) {
+
+            clientsList.innerHTML =
+                `
+                    <div
+                        style="
+                            color:#64748b;
+                            font-size:11px;
+                        "
+                    >
+                        Nenhum cliente encontrado.
+                    </div>
+                `;
+
+            return;
+
         }
 
-        btnCancelarEdicao.addEventListener('click', limparFormulario);
-        btnSalvarRadio.addEventListener('click', salvarRadio);
-    </script>
+
+        clientsList.innerHTML =
+            "";
+
+
+        lista.forEach(
+            cliente => {
+
+                const item =
+                    document.createElement(
+                        'label'
+                    );
+
+
+                item.className =
+                    'client-item';
+
+
+                item.innerHTML =
+                    `
+                        <input
+                            type="checkbox"
+                            value="${escapeAttribute(cliente.id)}"
+                            data-client-id="${escapeAttribute(cliente.id)}"
+                        >
+
+                        <span>
+                            ${escapeHtml(cliente.nome)}
+                        </span>
+                    `;
+
+
+                clientsList.appendChild(
+                    item
+                );
+
+            }
+        );
+
+    }
+
+
+    document
+        .getElementById('buscaCliente')
+        .addEventListener(
+            'input',
+            e => {
+
+                renderizarClientes(
+                    e.target.value
+                );
+
+            }
+        );
+
+
+    /* =====================================================
+       SALVAR COMERCIAL
+    ====================================================== */
+
+    btnSalvarComercial.addEventListener(
+        'click',
+        salvarComercial
+    );
+
+
+    async function salvarComercial() {
+
+        const nome =
+            nomeComercial.value.trim();
+
+        const cliente =
+            clienteComercial.value.trim();
+
+        const inicio =
+            inicioCampanha.value;
+
+        const fim =
+            fimCampanha.value;
+
+        const frequencia =
+            Number(
+                frequenciaCampanha.value
+            );
+
+
+        if (!nome) {
+
+            alert(
+                "Digite o nome do comercial."
+            );
+
+            return;
+
+        }
+
+
+        if (!cliente) {
+
+            alert(
+                "Digite o nome do cliente/anunciante."
+            );
+
+            return;
+
+        }
+
+
+        if (!inicio || !fim) {
+
+            alert(
+                "Informe a data e hora de início e término da campanha."
+            );
+
+            return;
+
+        }
+
+
+        const inicioDate =
+            new Date(inicio);
+
+        const fimDate =
+            new Date(fim);
+
+
+        if (
+            fimDate <= inicioDate
+        ) {
+
+            alert(
+                "A data de término precisa ser posterior à data de início."
+            );
+
+            return;
+
+        }
+
+
+        const idEdicao =
+            commercialIdEditando.value;
+
+
+        const arquivo =
+            arquivoComercial.files[0];
+
+
+        if (
+            !idEdicao &&
+            !arquivo
+        ) {
+
+            alert(
+                "Selecione o arquivo de áudio ou vídeo."
+            );
+
+            return;
+
+        }
+
+
+        if (
+            destinoCampanha ===
+            "clientes"
+        ) {
+
+            const selecionados =
+                Array.from(
+                    document.querySelectorAll(
+                        '#clientsList input[type="checkbox"]:checked'
+                    )
+                )
+                .map(
+                    input =>
+                        input.value
+                );
+
+
+            if (
+                selecionados.length === 0
+            ) {
+
+                alert(
+                    "Selecione pelo menos um cliente."
+                );
+
+                return;
+
+            }
+
+        }
+
+
+        try {
+
+            btnSalvarComercial.disabled =
+                true;
+
+            btnSalvarComercial.innerText =
+                "SALVANDO...";
+
+
+            let idCampanha =
+                idEdicao;
+
+
+            if (!idCampanha) {
+
+                const novaRef =
+                    push(
+                        ref(
+                            db,
+                            'comerciais'
+                        )
+                    );
+
+                idCampanha =
+                    novaRef.key;
+
+            }
+
+
+            let downloadUrl =
+                arquivoAtualUrl;
+
+            let storagePath =
+                arquivoAtualStoragePath;
+
+
+            /* ==============================
+               UPLOAD
+            ============================== */
+
+            if (arquivo) {
+
+                const extensao =
+                    arquivo.name
+                        .split('.')
+                        .pop()
+                        .toLowerCase();
+
+
+                storagePath =
+                    `comerciais/${idCampanha}/${Date.now()}_${sanitizarNomeArquivo(arquivo.name)}`;
+
+
+                const arquivoRef =
+                    storageRef(
+                        storage,
+                        storagePath
+                    );
+
+
+                uploadProgress.style.display =
+                    "block";
+
+                uploadProgressBar.style.width =
+                    "0%";
+
+                uploadProgressText.innerText =
+                    "Enviando mídia para a nuvem...";
+
+
+                const uploadTask =
+                    uploadBytesResumable(
+                        arquivoRef,
+                        arquivo,
+                        {
+                            contentType:
+                                arquivo.type
+                        }
+                    );
+
+
+                await new Promise(
+                    (
+                        resolve,
+                        reject
+                    ) => {
+
+                        uploadTask.on(
+                            'state_changed',
+
+                            snapshot => {
+
+                                const percentual =
+                                    (
+                                        snapshot.bytesTransferred /
+                                        snapshot.totalBytes
+                                    ) * 100;
+
+
+                                uploadProgressBar.style.width =
+                                    percentual + "%";
+
+
+                                uploadProgressText.innerText =
+                                    `Enviando mídia... ${Math.round(percentual)}%`;
+
+                            },
+
+                            error => {
+
+                                reject(error);
+
+                            },
+
+                            async () => {
+
+                                try {
+
+                                    downloadUrl =
+                                        await getDownloadURL(
+                                            uploadTask.snapshot.ref
+                                        );
+
+                                    resolve();
+
+                                }
+                                catch (erro) {
+
+                                    reject(
+                                        erro
+                                    );
+
+                                }
+
+                            }
+
+                        );
+
+                    }
+                );
+
+            }
+
+
+            let clientesSelecionados =
+                [];
+
+
+            if (
+                destinoCampanha ===
+                "clientes"
+            ) {
+
+                clientesSelecionados =
+                    Array.from(
+                        document.querySelectorAll(
+                            '#clientsList input[type="checkbox"]:checked'
+                        )
+                    )
+                    .map(
+                        input =>
+                            input.value
+                    );
+
+            }
+
+
+            const dadosCampanha = {
+
+                nome: nome,
+
+                cliente: cliente,
+
+                tipo: tipoMidiaAtual,
+
+                arquivoUrl: downloadUrl,
+
+                storagePath: storagePath,
+
+                inicio: inicioDate.getTime(),
+
+                fim: fimDate.getTime(),
+
+                frequenciaMinutos:
+                    frequencia,
+
+                destino:
+                    destinoCampanha,
+
+                clientes:
+                    clientesSelecionados,
+
+                ativa:
+                    true,
+
+                criadaEm:
+                    Date.now(),
+
+                atualizadaEm:
+                    Date.now()
+
+            };
+
+
+            if (
+                idEdicao
+            ) {
+
+                await update(
+                    ref(
+                        db,
+                        'comerciais/' +
+                        idCampanha
+                    ),
+                    dadosCampanha
+                );
+
+            } else {
+
+                await set(
+                    ref(
+                        db,
+                        'comerciais/' +
+                        idCampanha
+                    ),
+                    dadosCampanha
+                );
+
+            }
+
+
+            uploadProgress.style.display =
+                "none";
+
+
+            limparFormularioComercial();
+
+
+            await carregarCampanhas();
+
+
+            alert(
+                idEdicao
+                    ? "Campanha atualizada com sucesso!"
+                    : "Campanha cadastrada com sucesso!"
+            );
+
+        }
+        catch (erro) {
+
+            console.error(
+                "Erro ao salvar comercial:",
+                erro
+            );
+
+
+            alert(
+                "Não foi possível salvar a campanha.\n\nVerifique se o Firebase Storage está habilitado e se as regras permitem o upload."
+            );
+
+        }
+        finally {
+
+            btnSalvarComercial.disabled =
+                false;
+
+            btnSalvarComercial.innerText =
+                commercialIdEditando.value
+                    ? "ATUALIZAR CAMPANHA"
+                    : "📢 CADASTRAR CAMPANHA";
+
+        }
+
+    }
+
+
+    /* =====================================================
+       CARREGAR CAMPANHAS
+    ====================================================== */
+
+    async function carregarCampanhas() {
+
+        try {
+
+            const campanhasRef =
+                ref(
+                    db,
+                    'comerciais'
+                );
+
+
+            const snapshot =
+                await get(
+                    campanhasRef
+                );
+
+
+            campanhasGlobal =
+                [];
+
+
+            if (
+                snapshot.exists()
+            ) {
+
+                snapshot.forEach(
+                    child => {
+
+                        campanhasGlobal.push({
+
+                            id:
+                                child.key,
+
+                            ...child.val()
+
+                        });
+
+                    }
+                );
+
+            }
+
+
+            campanhasGlobal.sort(
+                (a, b) =>
+                    Number(a.fim || 0) -
+                    Number(b.fim || 0)
+            );
+
+
+            renderizarCampanhas();
+
+        }
+        catch (erro) {
+
+            console.error(
+                "Erro ao carregar campanhas:",
+                erro
+            );
+
+
+            campaignList.innerHTML =
+                `
+                    <div
+                        class="empty-campaigns"
+                    >
+                        Erro ao carregar campanhas.
+                    </div>
+                `;
+
+        }
+
+    }
+
+
+    /* =====================================================
+       RENDERIZAR CAMPANHAS
+    ====================================================== */
+
+    function renderizarCampanhas() {
+
+        campaignList.innerHTML =
+            "";
+
+
+        if (
+            campanhasGlobal.length === 0
+        ) {
+
+            campaignList.innerHTML =
+                `
+                    <div
+                        class="empty-campaigns"
+                    >
+                        📢 Nenhum comercial cadastrado ainda.
+                    </div>
+                `;
+
+            return;
+
+        }
+
+
+        campanhasGlobal.forEach(
+            campanha => {
+
+                atualizarStatusAutomaticamente(
+                    campanha
+                );
+
+
+                const status =
+                    obterStatusCampanha(
+                        campanha
+                    );
+
+
+                const card =
+                    document.createElement(
+                        'div'
+                    );
+
+
+                card.className =
+                    `campaign-card ${status.classeCor}`;
+
+
+                const icone =
+                    campanha.tipo ===
+                    "video"
+                        ? "🎬"
+                        : "🎧";
+
+
+                const destinoTexto =
+                    campanha.destino ===
+                    "todos"
+                        ? "Todos os ouvintes"
+                        : `${(campanha.clientes || []).length} cliente(s) selecionado(s)`;
+
+
+                const frequenciaTexto =
+                    `A cada ${campanha.frequenciaMinutos || 10} minutos`;
+
+
+                const inicioTexto =
+                    formatarDataHora(
+                        campanha.inicio
+                    );
+
+
+                const fimTexto =
+                    formatarDataHora(
+                        campanha.fim
+                    );
+
+
+                card.innerHTML =
+                    `
+
+                        <div class="campaign-main">
+
+                            <div
+                                class="campaign-media-icon"
+                            >
+                                ${icone}
+                            </div>
+
+                            <div
+                                class="campaign-info"
+                            >
+
+                                <h3>
+                                    ${escapeHtml(campanha.nome)}
+                                </h3>
+
+                                <p>
+                                    <strong>
+                                        Cliente:
+                                    </strong>
+                                    ${escapeHtml(campanha.cliente || "-")}
+                                    <br>
+
+                                    <strong>
+                                        Período:
+                                    </strong>
+                                    ${inicioTexto}
+                                    até
+                                    ${fimTexto}
+                                    <br>
+
+                                    <strong>
+                                        Frequência:
+                                    </strong>
+                                    ${frequenciaTexto}
+                                    <br>
+
+                                    <strong>
+                                        Público:
+                                    </strong>
+                                    ${destinoTexto}
+                                </p>
+
+                                <span
+                                    class="campaign-status ${status.classeStatus}"
+                                >
+                                    ${status.texto}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="campaign-actions"
+                        >
+
+                            <button
+                                class="campaign-action btn-preview-campaign"
+                                title="Ouvir / visualizar"
+                                data-id="${campanha.id}"
+                            >
+                                ▶️
+                            </button>
+
+                            <button
+                                class="campaign-action btn-edit-campaign"
+                                title="Editar / reativar"
+                                data-id="${campanha.id}"
+                            >
+                                ✏️
+                            </button>
+
+                            <button
+                                class="campaign-action btn-delete-campaign"
+                                title="Excluir campanha"
+                                data-id="${campanha.id}"
+                            >
+                                🗑️
+                            </button>
+
+                        </div>
+
+                    `;
+
+
+                campaignList.appendChild(
+                    card
+                );
+
+            }
+        );
+
+
+        document
+            .querySelectorAll(
+                '.btn-edit-campaign'
+            )
+            .forEach(btn => {
+
+                btn.addEventListener(
+                    'click',
+                    () =>
+                        editarCampanha(
+                            btn.dataset.id
+                        )
+                );
+
+            });
+
+
+        document
+            .querySelectorAll(
+                '.btn-delete-campaign'
+            )
+            .forEach(btn => {
+
+                btn.addEventListener(
+                    'click',
+                    () =>
+                        excluirCampanha(
+                            btn.dataset.id
+                        )
+                );
+
+            });
+
+
+        document
+            .querySelectorAll(
+                '.btn-preview-campaign'
+            )
+            .forEach(btn => {
+
+                btn.addEventListener(
+                    'click',
+                    () =>
+                        visualizarCampanha(
+                            btn.dataset.id
+                        )
+                );
+
+            });
+
+    }
+
+
+    /* =====================================================
+       STATUS
+    ====================================================== */
+
+    function obterStatusCampanha(
+        campanha
+    ) {
+
+        const agora =
+            Date.now();
+
+
+        if (
+            campanha.ativa === false
+        ) {
+
+            return {
+
+                classeCor:
+                    "red",
+
+                classeStatus:
+                    "status-paused",
+
+                texto:
+                    "PAUSADA MANUALMENTE"
+
+            };
+
+        }
+
+
+        if (
+            agora >
+            Number(campanha.fim)
+        ) {
+
+            return {
+
+                classeCor:
+                    "red",
+
+                classeStatus:
+                    "status-expired",
+
+                texto:
+                    "CAMPANHA ENCERRADA"
+
+            };
+
+        }
+
+
+        if (
+            agora <
+            Number(campanha.inicio)
+        ) {
+
+            return {
+
+                classeCor:
+                    "",
+
+                classeStatus:
+                    "status-paused",
+
+                texto:
+                    "AGUARDANDO INÍCIO"
+
+            };
+
+        }
+
+
+        const diasRestantes =
+            (
+                Number(campanha.fim) -
+                agora
+            ) /
+            (
+                1000 *
+                60 *
+                60 *
+                24
+            );
+
+
+        if (
+            diasRestantes < 5
+        ) {
+
+            return {
+
+                classeCor:
+                    "yellow",
+
+                classeStatus:
+                    "status-yellow",
+
+                texto:
+                    `ATIVA • ${Math.max(0, Math.ceil(diasRestantes))} DIA(S)`
+
+            };
+
+        }
+
+
+        return {
+
+            classeCor:
+                "",
+
+            classeStatus:
+                "status-active",
+
+            texto:
+                `ATIVA • ${Math.ceil(diasRestantes)} DIA(S)`
+
+        };
+
+    }
+
+
+    /* =====================================================
+       STATUS AUTOMÁTICO
+    ====================================================== */
+
+    async function atualizarStatusAutomaticamente(
+        campanha
+    ) {
+
+        if (
+            campanha.ativa === false
+        ) return;
+
+
+        if (
+            Date.now() >
+            Number(campanha.fim)
+        ) {
+
+            try {
+
+                campanha.ativa =
+                    false;
+
+
+                await update(
+                    ref(
+                        db,
+                        'comerciais/' +
+                        campanha.id
+                    ),
+                    {
+                        ativa: false,
+                        encerradaAutomaticamenteEm:
+                            Date.now()
+                    }
+                );
+
+            }
+            catch (erro) {
+
+                console.error(
+                    "Erro ao atualizar status:",
+                    erro
+                );
+
+            }
+
+        }
+
+    }
+
+
+    /* =====================================================
+       EDITAR / REATIVAR CAMPANHA
+    ====================================================== */
+
+    function editarCampanha(id) {
+
+        const campanha =
+            campanhasGlobal.find(
+                item =>
+                    item.id === id
+            );
+
+
+        if (!campanha) return;
+
+
+        commercialIdEditando.value =
+            campanha.id;
+
+
+        nomeComercial.value =
+            campanha.nome || "";
+
+
+        clienteComercial.value =
+            campanha.cliente || "";
+
+
+        inicioCampanha.value =
+            converterTimestampParaInput(
+                campanha.inicio
+            );
+
+
+        fimCampanha.value =
+            converterTimestampParaInput(
+                campanha.fim
+            );
+
+
+        frequenciaCampanha.value =
+            campanha.frequenciaMinutos ||
+            10;
+
+
+        arquivoAtualUrl =
+            campanha.arquivoUrl ||
+            "";
+
+
+        arquivoAtualStoragePath =
+            campanha.storagePath ||
+            "";
+
+
+        arquivoAtualInfo.innerText =
+            campanha.arquivoUrl
+                ? "Arquivo atual mantido. Selecione outro arquivo apenas se quiser substituí-lo."
+                : "";
+
+
+        tipoMidiaAtual =
+            campanha.tipo ||
+            "audio";
+
+
+        document
+            .querySelectorAll(
+                'input[name="tipoMidia"]'
+            )
+            .forEach(
+                input => {
+
+                    input.checked =
+                        input.value ===
+                        tipoMidiaAtual;
+
+                }
+            );
+
+
+        arquivoComercial.accept =
+            tipoMidiaAtual ===
+            "video"
+                ? "video/*"
+                : "audio/*";
+
+
+        destinoCampanha =
+            campanha.destino ||
+            "todos";
+
+
+        if (
+            destinoCampanha ===
+            "clientes"
+        ) {
+
+            targetClientes.classList.add(
+                'active'
+            );
+
+            targetTodos.classList.remove(
+                'active'
+            );
+
+            clientsPanel.classList.add(
+                'show'
+            );
+
+            carregarClientes()
+                .then(() => {
+
+                    marcarClientesSelecionados(
+                        campanha.clientes ||
+                        []
+                    );
+
+                });
+
+        } else {
+
+            targetTodos.classList.add(
+                'active'
+            );
+
+            targetClientes.classList.remove(
+                'active'
+            );
+
+            clientsPanel.classList.remove(
+                'show'
+            );
+
+        }
+
+
+        commercialFormTitle.innerText =
+            "Editar / Reativar Campanha";
+
+
+        btnSalvarComercial.innerText =
+            "ATUALIZAR CAMPANHA";
+
+
+        btnCancelarComercial.classList.remove(
+            'hidden'
+        );
+
+
+        document
+            .querySelector('.commercial-section')
+            .scrollIntoView({
+                behavior: 'smooth'
+            });
+
+    }
+
+
+    function marcarClientesSelecionados(
+        ids
+    ) {
+
+        document
+            .querySelectorAll(
+                '#clientsList input[type="checkbox"]'
+            )
+            .forEach(
+                checkbox => {
+
+                    checkbox.checked =
+                        ids.includes(
+                            checkbox.value
+                        );
+
+                }
+            );
+
+    }
+
+
+    /* =====================================================
+       EXCLUIR CAMPANHA
+    ====================================================== */
+
+    async function excluirCampanha(
+        id
+    ) {
+
+        const campanha =
+            campanhasGlobal.find(
+                item =>
+                    item.id === id
+            );
+
+
+        if (!campanha) return;
+
+
+        const confirmou =
+            confirm(
+                `Tem certeza que deseja excluir a campanha "${campanha.nome}"?\n\nO arquivo de mídia também poderá ser removido do Firebase Storage.`
+            );
+
+
+        if (!confirmou) return;
+
+
+        try {
+
+            if (
+                campanha.storagePath
+            ) {
+
+                try {
+
+                    await deleteObject(
+                        storageRef(
+                            storage,
+                            campanha.storagePath
+                        )
+                    );
+
+                }
+                catch (
+                    erroStorage
+                ) {
+
+                    console.warn(
+                        "Arquivo não encontrado ou já removido:",
+                        erroStorage
+                    );
+
+                }
+
+            }
+
+
+            await remove(
+                ref(
+                    db,
+                    'comerciais/' +
+                    id
+                )
+            );
+
+
+            await carregarCampanhas();
+
+
+            alert(
+                "Campanha excluída com sucesso."
+            );
+
+        }
+        catch (erro) {
+
+            console.error(
+                erro
+            );
+
+
+            alert(
+                "Não foi possível excluir a campanha."
+            );
+
+        }
+
+    }
+
+
+    /* =====================================================
+       VISUALIZAR CAMPANHA
+    ====================================================== */
+
+    function visualizarCampanha(
+        id
+    ) {
+
+        const campanha =
+            campanhasGlobal.find(
+                item =>
+                    item.id === id
+            );
+
+
+        if (!campanha) return;
+
+
+        if (
+            !campanha.arquivoUrl
+        ) {
+
+            alert(
+                "Esta campanha não possui arquivo."
+            );
+
+            return;
+
+        }
+
+
+        if (
+            campanha.tipo ===
+            "video"
+        ) {
+
+            const janela =
+                window.open(
+                    "",
+                    "_blank",
+                    "width=800,height=600"
+                );
+
+
+            if (!janela) {
+
+                alert(
+                    "O navegador bloqueou a janela de visualização."
+                );
+
+                return;
+
+            }
+
+
+            janela.document.write(`
+
+                <!DOCTYPE html>
+
+                <html>
+
+                <head>
+
+                    <title>
+                        Visualizar Comercial
+                    </title>
+
+                    <style>
+
+                        body{
+                            margin:0;
+                            background:#000;
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                            height:100vh;
+                        }
+
+                        video{
+                            max-width:95%;
+                            max-height:95%;
+                        }
+
+                    </style>
+
+                </head>
+
+                <body>
+
+                    <video
+                        controls
+                        autoplay
+                        src="${campanha.arquivoUrl}"
+                    ></video>
+
+                </body>
+
+                </html>
+
+            `);
+
+        }
+        else {
+
+            const audio =
+                new Audio(
+                    campanha.arquivoUrl
+                );
+
+            audio.controls = true;
+
+            audio.play()
+                .catch(() => {});
+
+
+            alert(
+                `Reproduzindo: ${campanha.nome}`
+            );
+
+        }
+
+    }
+
+
+    /* =====================================================
+       CANCELAR EDIÇÃO
+    ====================================================== */
+
+    btnCancelarComercial.addEventListener(
+        'click',
+        limparFormularioComercial
+    );
+
+
+    function limparFormularioComercial() {
+
+        commercialIdEditando.value =
+            "";
+
+
+        nomeComercial.value =
+            "";
+
+        clienteComercial.value =
+            "";
+
+
+        arquivoComercial.value =
+            "";
+
+
+        inicioCampanha.value =
+            "";
+
+        fimCampanha.value =
+            "";
+
+
+        frequenciaCampanha.value =
+            "10";
+
+
+        arquivoAtualUrl =
+            "";
+
+        arquivoAtualStoragePath =
+            "";
+
+
+        arquivoAtualInfo.innerText =
+            "";
+
+
+        destinoCampanha =
+            "todos";
+
+
+        targetTodos.classList.add(
+            'active'
+        );
+
+        targetClientes.classList.remove(
+            'active'
+        );
+
+        clientsPanel.classList.remove(
+            'show'
+        );
+
+
+        document
+            .querySelectorAll(
+                '#clientsList input[type="checkbox"]'
+            )
+            .forEach(
+                checkbox =>
+                    checkbox.checked = false
+            );
+
+
+        tipoMidiaAtual =
+            "audio";
+
+
+        document
+            .querySelectorAll(
+                'input[name="tipoMidia"]'
+            )
+            .forEach(
+                input => {
+
+                    input.checked =
+                        input.value ===
+                        "audio";
+
+                }
+            );
+
+
+        arquivoComercial.accept =
+            "audio/*";
+
+
+        commercialFormTitle.innerText =
+            "Cadastrar Novo Comercial";
+
+
+        btnSalvarComercial.innerText =
+            "📢 CADASTRAR CAMPANHA";
+
+
+        btnCancelarComercial.classList.add(
+            'hidden'
+        );
+
+
+        uploadProgress.style.display =
+            "none";
+
+
+        uploadProgressText.innerText =
+            "";
+
+    }
+
+
+    /* =====================================================
+       UTILITÁRIOS
+    ====================================================== */
+
+    function formatarDataHora(
+        timestamp
+    ) {
+
+        if (!timestamp) return "-";
+
+
+        const data =
+            new Date(
+                Number(timestamp)
+            );
+
+
+        return data.toLocaleString(
+            'pt-BR',
+            {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            }
+        );
+
+    }
+
+
+    function converterTimestampParaInput(
+        timestamp
+    ) {
+
+        if (!timestamp) return "";
+
+
+        const data =
+            new Date(
+                Number(timestamp)
+            );
+
+
+        const ano =
+            data.getFullYear();
+
+
+        const mes =
+            String(
+                data.getMonth() + 1
+            )
+            .padStart(2, '0');
+
+
+        const dia =
+            String(
+                data.getDate()
+            )
+            .padStart(2, '0');
+
+
+        const hora =
+            String(
+                data.getHours()
+            )
+            .padStart(2, '0');
+
+
+        const minuto =
+            String(
+                data.getMinutes()
+            )
+            .padStart(2, '0');
+
+
+        return `${ano}-${mes}-${dia}T${hora}:${minuto}`;
+
+    }
+
+
+    function sanitizarNomeArquivo(
+        nome
+    ) {
+
+        return nome
+            .normalize('NFD')
+            .replace(
+                /[\u0300-\u036f]/g,
+                ''
+            )
+            .replace(
+                /[^a-zA-Z0-9._-]/g,
+                '_'
+            );
+
+    }
+
+
+    function escapeHtml(
+        texto
+    ) {
+
+        return String(
+            texto ?? ""
+        )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+    }
+
+
+    function escapeAttribute(
+        texto
+    ) {
+
+        return escapeHtml(
+            texto
+        );
+
+    }
+
+
+    /* =====================================================
+       ATUALIZA STATUS PERIODICAMENTE
+    ====================================================== */
+
+    setInterval(
+        () => {
+
+            if (
+                campanhasGlobal.length > 0
+            ) {
+
+                renderizarCampanhas();
+
+            }
+
+        },
+        60000
+    );
+
+
+</script>
+
 </body>
 </html>
