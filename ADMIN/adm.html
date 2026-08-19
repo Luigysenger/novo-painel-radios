@@ -1456,9 +1456,11 @@
 </div>
 
 
+<!-- CORREÇÃO DE ÁUDIO: Atributos crossOrigin e preload adicionados -->
 <audio
     id="audioStreaming"
-    preload="none"
+    preload="auto"
+    crossorigin="anonymous"
 ></audio>
 
 
@@ -1961,7 +1963,7 @@
 
 
     /* =====================================================
-       TOCAR RÁDIO
+       TOCAR RÁDIO (CORRIGIDO PARA OUVIR STREAMINGS)
     ====================================================== */
 
     function tocarRadioPorIndice(index) {
@@ -2014,21 +2016,31 @@
         btnPlayPause.innerText =
             "⏸️";
 
-
-        audioElement.src =
-            radio.url;
-
+        // CORREÇÃO DE ÁUDIO: Parar o stream anterior, resetar a fonte e carregar adequadamente
+        audioElement.pause();
+        audioElement.currentTime = 0;
+        audioElement.src = radio.url;
+        audioElement.load();
 
         audioElement.play()
             .catch(
-                err =>
+                err => {
                     console.error(
-                        "Erro no stream:",
+                        "Erro no stream de áudio:",
                         err
-                    )
+                    );
+                    btnPlayPause.innerText = "▶️";
+                    alert("Não foi possível carregar ou reproduzir o stream desta rádio. Verifique se o link está correto e se o navegador permite áudio inseguro (HTTP vs HTTPS).");
+                }
             );
 
     }
+
+    // CORREÇÃO DE ÁUDIO: Listener extra para capturar erros de mídia em tempo de execução
+    audioElement.addEventListener('error', (e) => {
+        console.error("Erro na tag de áudio:", e);
+        btnPlayPause.innerText = "▶️";
+    });
 
 
     /* =====================================================
@@ -2125,10 +2137,13 @@
                     indiceRadioAtual !== -1
                 ) {
 
-                    audioElement.play();
-
-                    btnPlayPause.innerText =
-                        "⏸️";
+                    audioElement.play()
+                        .then(() => {
+                            btnPlayPause.innerText = "⏸️";
+                        })
+                        .catch(err => {
+                            console.error("Erro ao retomar reprodução:", err);
+                        });
 
                 }
 
