@@ -740,7 +740,6 @@
             const cap = document.getElementById('inputCapituloBiblia').value;
             const display = document.getElementById('resultadoLeituraBiblia');
 
-            // Textos de exemplo estruturados internos (100% gratuito e rápido)
             const acervoBiblico = {
                 "Gênesis": "No princípio criou Deus os céus e a terra. A terra era sem forma e vazia; e havia trevas sobre a face do abismo...",
                 "Salmos": `Salmo ${cap}: O Senhor é o meu pastor; nada me faltará. Deleita-te também no Senhor, e ele te concederá os desejos do teu coração.`,
@@ -757,7 +756,7 @@
 
     <script type="module">
         import { db } from '../firebase-config.js';
-        import { ref, get, push, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { ref, get, push, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         let nomeUsuarioId = localStorage.getItem('usuarioLogado') || "ouvinte_anonimo";
         let chaveFirebaseUser = nomeUsuarioId.replace(/[^a-zA-Z0-9]/g, "_");
@@ -803,6 +802,7 @@
             }
             carregarDadosDoPainel();
             verificarNotificacaoRadioNova();
+            monitorarComerciaisOuvinte(); // Inicia o monitoramento de comerciais em tempo real
         });
 
         document.getElementById('btnSair').addEventListener('click', () => {
@@ -1126,6 +1126,98 @@
                 enviarMensagemParaAdm();
             }
         });
+
+        // ==========================================
+        // SISTEMA DE COMERCIAIS AUTOMÁTICOS
+        // ==========================================
+        let comerciaisAtivos = [];
+        let temporizadorComerciais = null;
+
+        function monitorarComerciaisOuvinte() {
+            const comerciaisRef = ref(db, 'comerciais');
+            
+            onValue(comerciaisRef, (snapshot) => {
+                comerciaisAtivos = [];
+                if (snapshot.exists()) {
+                    const agora = Date.now();
+                    
+                    snapshot.forEach((child) => {
+                        const campanha = child.val();
+                        
+                        const ativa = campanha.ativa !== false;
+                        const dentroDoPrazo = agora >= Number(campanha.inicio) && agora <= Number(campanha.fim);
+                        
+                        let permitidoParaEsteOuvinte = true;
+                        if (campanha.destino === 'clientes') {
+                            const listaClientes = campanha.clientes || [];
+                            permitidoParaEsteOuvinte = listaClientes.includes(nomeUsuarioId);
+                        }
+
+                        if (ativa && dentroDoPrazo && permitidoParaEsteOuvinte) {
+                            comerciaisAtivos.push(campanha);
+                        }
+                    });
+                    
+                    iniciarCicloDeComerciais();
+                }
+            });
+        }
+
+        function iniciarCicloDeComerciais() {
+            if (temporizadorComerciais) clearInterval(temporizadorComerciais);
+            
+            if (comerciaisAtivos.length === 0) return;
+
+            const menorIntervaloMinutos = Math.min(...comerciaisAtivos.map(c => Number(c.frequenciaMinutos) || 10));
+            const intervaloMs = menorIntervaloMinutos * 60 * 1000;
+
+            temporizadorComerciais = setInterval(() => {
+                tocarProximoComercial();
+            }, intervaloMs);
+        }
+
+        function tocarProximoComercial() {
+            if (comerciaisAtivos.length === 0) return;
+
+            const comercialAleatorio = comerciaisAtivos[Math.floor(Math.random() * comerciaisAtivos.length)];
+            const estavaTocando = !audioElement.paused;
+
+            if (estavaTocando) {
+                audioElement.pause();
+            }
+
+            if (comercialAleatorio.tipo === 'video') {
+                exibirModalVideoOuvinte(comercialAleatorio.arquivoUrl, () => {
+                    if (estavaTocando) audioElement.play();
+                });
+            } else {
+                const audioComercial = new Audio(comercialAleatorio.arquivoUrl);
+                audioComercial.play().catch(err => console.log("Erro ao reproduzir comercial:", err));
+
+                audioComercial.onended = () => {
+                    if (estavaTocando) {
+                        audioElement.play();
+                    }
+                };
+            }
+        }
+
+        function exibirModalVideoOuvinte(urlVideo, callbackFim) {
+            let modal = document.getElementById('modalVideoOuvinte');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'modalVideoOuvinte';
+                modal.style = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:9999;";
+                modal.innerHTML = `<video id='videoComercialPlayer' src='${urlVideo}' controls autoplay style='max-width:90%; max-height:90%;'></video>`;
+                document.body.appendChild(modal);
+                
+                const vid = document.getElementById('videoComercialPlayer');
+                vid.onended = () => {
+                    modal.remove();
+                    if (callbackFim) callbackFim();
+                };
+            }
+        }
     </script>
 </body>
 </html>
