@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel do Ouvinte - Sistema de Rádios</title>
+    <title>Painel do Ouvinte</title>
     <style>
         * {
             box-sizing: border-box;
@@ -62,8 +62,8 @@
             background-color: #b7791f;
             color: white;
         }
-        
-        /* Main Grid (Painel Normal) */
+
+        /* Estrutura original do painel */
         .main-grid {
             display: grid;
             grid-template-columns: 280px 1fr 300px;
@@ -75,13 +75,14 @@
             border-radius: 12px;
             padding: 15px;
             border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 15px;
         }
         .panel-box h3 {
-            font-size: 14px;
+            font-size: 13px;
             margin-bottom: 15px;
             color: #e0e0e0;
         }
-        
+
         /* Lista de Rádios (Esquerda) */
         .radio-item {
             background: #1f1235;
@@ -91,10 +92,20 @@
             font-size: 12px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: space-between;
             border: 1px solid #7c3aed;
         }
-        
+        .btn-remover {
+            background: #ff2a85;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
         /* Grid de Cards (Centro) */
         .cards-grid {
             display: grid;
@@ -113,27 +124,10 @@
             text-align: center;
             padding: 10px;
             border: 1px solid rgba(255,255,255,0.1);
+            cursor: grab;
         }
-        .card-1 { background: linear-gradient(135deg, #2d3748, #4a5568); }
-        .card-2 { background: linear-gradient(135deg, #d69e2e, #b7791f); }
-        .card-3 { background: linear-gradient(135deg, #38a169, #2f855a); }
-        .card-4 { background: linear-gradient(135deg, #d53f8c, #97266d); }
-        
-        /* Direita (Horóscopo e Chat) */
-        .horoscope-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-            font-size: 11px;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        .signo {
-            background: #1f1235;
-            padding: 6px 2px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
+
+        /* Direita (Palavra do Dia e Chat) */
         .chat-input {
             width: 100%;
             background: #1f1235;
@@ -143,6 +137,8 @@
             color: white;
             font-size: 12px;
             margin-bottom: 8px;
+            height: 60px;
+            resize: none;
         }
         .btn-enviar {
             width: 100%;
@@ -235,13 +231,12 @@
             border-radius: 50%;
             cursor: pointer;
             font-weight: bold;
-            font-size: 11px;
+            font-size: 10px;
             box-shadow: 0 5px 10px rgba(0,0,0,0.4);
             transition: 0.1s;
         }
         .btn-power-retro:active {
             transform: scale(0.95);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
         }
         .vintage-btn-play {
             background: linear-gradient(145deg, #e0e0e0, #9e9e9e);
@@ -276,71 +271,94 @@
     <header>
         <div class="logo-area">
             <h1>Painel do Ouvinte</h1>
-            <p>Olá, OUVINTE ANÔNIMO</p>
+            <p>Olá, SUZY</p>
         </div>
         <div class="top-info">
-            <span>🕒 23:35:58</span>
-            <span>📍 Cascavel: 23°C</span>
+            <span id="relogio">🕒 08:51:12</span>
+            <span>Salvador: 23°C</span>
+            <!-- Botão que criamos para alternar o visual -->
             <button class="btn-modo-retro" onclick="alternarModoRetro()">📻 Modo Rádio Retrô</button>
             <button class="btn-sair">SAIR</button>
         </div>
     </header>
 
-    <!-- TELA 1: Painel Normal de Customização -->
-    <div id="painel-normal" class="main-grid">
-        <div class="panel-box">
-            <h3>1. ADICIONE SUAS RÁDIOS</h3>
-            <div class="radio-item">✔ MARINGA FM</div>
-            <div class="radio-item">✔ ROTA DO SOL - BOA VISTA DA APARECIDA</div>
-            <div class="radio-item">✔ CAPITAL FM - CASCAVEL</div>
-            <div class="radio-item">✔ JOVEM PAM CASCAVEL</div>
-        </div>
+    <div style="text-align: center; margin-bottom: 20px; color: #ff2a85; font-size: 14px;">
+        🎧 CURTA AQUI SUAS RÁDIOS PREFERIDAS
+    </div>
 
+    <!-- TELA 1: Seu Painel Original com os Cards Exatamente Como Estavam -->
+    <div id="painel-normal" class="main-grid">
+        
+        <!-- Coluna Esquerda -->
         <div class="panel-box">
-            <h3>2. ARRASTE PARA REODERNAR</h3>
-            <div class="cards-grid">
-                <div class="card-radio card-1">JOVEM PAM CASCAVEL</div>
-                <div class="card-radio card-2">ANTENA 1</div>
-                <div class="card-radio card-3">MARINGA FM</div>
-                <div class="card-radio card-4">ROTA DO SOL</div>
-                <div class="card-radio card-1">CAPITAL FM</div>
-                <div class="card-radio card-2">MIX - PONTA GROSSA</div>
-                <div class="card-radio card-3">KISS FM</div>
-                <div class="card-radio card-4">COLMEIA</div>
-                <div class="card-radio card-1">TAROBÁ FM</div>
+            <h3>GERENCIAR SUAS RÁDIOS PREFERIDAS</h3>
+            <p style="font-size: 11px; color: #a0a0a0; margin-bottom: 10px;">1. Adicione suas rádios</p>
+            
+            <div class="radio-item">
+                <span>✔ JOVEM PAN - CASCAVEL PR.</span>
+                <button class="btn-remover">-</button>
+            </div>
+            <div class="radio-item">
+                <span>🎯 ALPHA FM - SP</span>
+                <button class="btn-remover">-</button>
+            </div>
+            <div class="radio-item">
+                <span>🎵 ANTENA 1 - SP</span>
+                <button class="btn-remover">-</button>
+            </div>
+            <div class="radio-item">
+                <span>📻 OURO VERDE EASY - PR</span>
+                <button class="btn-remover">-</button>
             </div>
         </div>
 
-        <div>
-            <div class="panel-box" style="margin-bottom: 15px;">
-                <h3>🛡 HORÓSCOPO DO DIA</h3>
-                <div class="horoscope-grid">
-                    <div class="signo">ÁRIES</div>
-                    <div class="signo">TOURO</div>
-                    <div class="signo">GÊMEOS</div>
-                    <div class="signo">CÂNCER</div>
-                    <div class="signo">LEÃO</div>
-                    <div class="signo">VIRGEM</div>
-                    <div class="signo">LIBRA</div>
-                    <div class="signo">ESCORPIÃO</div>
+        <!-- Coluna Centro (Cards Coloridos e Arrastáveis) -->
+        <div class="panel-box">
+            <h3>GERENCIAR SUAS RÁDIOS PREFERIDAS</h3>
+            <p style="font-size: 11px; color: #a0a0a0; margin-bottom: 10px;">2. Arraste e solte sobre outro card para trocar de lugar</p>
+            
+            <div class="cards-grid">
+                <div class="card-radio" style="background: linear-gradient(135deg, #a3e635, #65a30d); color: #111;">
+                    🎵<br>ANTENA 1 - SP
                 </div>
-                <p style="font-size: 11px; color: #a0a0a0; text-align: center;">Clique em um signo acima para ver a previsão!</p>
+                <div class="card-radio" style="background: linear-gradient(135deg, #38bdf8, #0284c7); color: #111;">
+                    🎷<br>JOVEM PAN - CASCAVEL PR.
+                </div>
+                <div class="card-radio" style="background: linear-gradient(135deg, #facc15, #ca8a04); color: #111;">
+                    📻<br>OURO VERDE EASY - PR
+                </div>
+                <div class="card-radio" style="background: linear-gradient(135deg, #f472b6, #db2777); color: #111;">
+                    🎯<br>ALPHA FM - SP
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna Direita (Palavra do Dia e Mensagem) -->
+        <div>
+            <div class="panel-box">
+                <h3>📌 PALAVRA DO DIA</h3>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <button style="background: #1f1235; border: 1px solid #7c3aed; color: white; padding: 6px; border-radius: 6px; font-size: 11px; cursor: pointer;">🙏 Salmo do Dia</button>
+                    <button style="background: #1f1235; border: 1px solid #7c3aed; color: white; padding: 6px; border-radius: 6px; font-size: 11px; cursor: pointer;">📖 Ler a Bíblia</button>
+                </div>
+                <p style="font-size: 11px; color: #d1d1d1; font-style: italic;">"O Senhor é o meu pastor; nada me faltará." — Salmo 23:1 ⚡</p>
             </div>
 
             <div class="panel-box">
-                <h3 style="font-size: 11px;">💬 MANDE MENSAGEM PARA O ADM</h3>
-                <input type="text" class="chat-input" placeholder="Escreva seu recado...">
+                <h3>💬 MANDE MENSAGEM PARA O ADM PARA PEDIR PARA ADICIONAR UMA RÁDIO QUE VOCÊ GOSTE</h3>
+                <textarea class="chat-input" placeholder="Escreva seu recado ou pedido de rádio aqui..."></textarea>
                 <button class="btn-enviar">Enviar Mensagem</button>
             </div>
         </div>
+
     </div>
 
-    <!-- TELA 2: Rádio Retrô Clássica (Oculta por padrão, aparece ao clicar no botão) -->
+    <!-- TELA 2: Rádio Retrô Clássica (Aparece somente quando clica no botão do topo) -->
     <div id="tela-retro">
         <div class="radio-vintage-box">
             <div class="vintage-display">
-                <h2 id="radio-nome-atual">JOVEM PAM CASCAVEL</h2>
-                <p>SINTONIZADO • FM 101.5 MHz</p>
+                <h2>ANTENA 1 - SP</h2>
+                <p>SINTONIZADO • FM 94.7 MHz</p>
             </div>
             
             <div class="vintage-controls">
@@ -349,7 +367,7 @@
                     <span>SINTONIA</span>
                 </div>
 
-                <!-- Botão POWER que desliga a rádio retrô e volta para o painel de customização -->
+                <!-- Botão POWER que desliga a rádio retrô e volta para o painel da Suzy -->
                 <button class="btn-power-retro" onclick="alternarModoRetro()">POWER<br>OFF</button>
 
                 <button class="vintage-btn-play">▶</button>
@@ -362,30 +380,35 @@
         </div>
     </div>
 
-    <!-- Player Fixo Inferior -->
+    <!-- Player Fixo Inferior Original -->
     <div class="bottom-player">
-        <span style="font-size: 13px; color: #a0a0a0;">Nenhuma rádio selecionada</span>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="background: #2c2042; padding: 8px; border-radius: 6px;">🎵</div>
+            <div>
+                <div style="font-size: 13px; font-weight: bold;">ANTENA 1 - SP</div>
+                <div style="font-size: 11px; color: #a0a0a0;">Rádio pausada</div>
+            </div>
+        </div>
         <div>
             <button style="background:none; border:none; color:white; font-size:16px; cursor:pointer;">⏮</button>
             <button style="background:#9333ea; border:none; color:white; width:35px; height:35px; border-radius:50%; cursor:pointer; margin: 0 10px;">▶</button>
             <button style="background:none; border:none; color:white; font-size:16px; cursor:pointer;">⏭</button>
         </div>
+        <div></div>
     </div>
 
     <script>
-        // Função para alternar entre o Painel de Customização e a Rádio Retrô
+        // Função de alternância entre o painel da Suzy e a rádio retrô
         function alternarModoRetro() {
             const painelNormal = document.getElementById('painel-normal');
             const telaRetro = document.getElementById('tela-retro');
             const btnModo = document.querySelector('.btn-modo-retro');
 
             if (telaRetro.style.display === 'flex') {
-                // Volta para o painel de customização
                 telaRetro.style.display = 'none';
                 painelNormal.style.display = 'grid';
                 btnModo.innerText = '📻 Modo Rádio Retrô';
             } else {
-                // Abre a tela da rádio antiga
                 painelNormal.style.display = 'none';
                 telaRetro.style.display = 'flex';
                 btnModo.innerText = '⚙️ Voltar ao Painel';
