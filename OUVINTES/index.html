@@ -840,6 +840,219 @@
             }
         }
 
+
+        /* =========================================================
+           PAINEL PRINCIPAL RESPONSIVO + ORDENACAO POR TOQUE
+           ========================================================= */
+        .radio-card-user {
+            touch-action: pan-y;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .radio-card-user.touch-dragging {
+            opacity: 0.18 !important;
+            transform: none !important;
+            pointer-events: none;
+        }
+        .radio-card-touch-placeholder {
+            border: 2px dashed rgba(244, 114, 182, 0.85);
+            border-radius: 14px;
+            background: rgba(244, 114, 182, 0.10);
+            min-width: 0;
+            min-height: 100px;
+        }
+        .radio-card-touch-clone {
+            position: fixed !important;
+            z-index: 999999 !important;
+            pointer-events: none !important;
+            margin: 0 !important;
+            transition: none !important;
+            opacity: 0.96 !important;
+            transform: scale(1.04);
+            box-shadow: 0 18px 40px rgba(0,0,0,0.45) !important;
+        }
+        .mobile-drag-hint {
+            display: none;
+        }
+
+        @media (max-width: 1100px) {
+            .dashboard-grid {
+                grid-template-columns: 260px minmax(0, 1fr);
+            }
+            .right-panel {
+                grid-column: 1 / -1;
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 760px) {
+            body {
+                padding: 12px;
+                padding-bottom: 110px;
+                overflow-x: hidden;
+            }
+            .main-container {
+                width: 100%;
+                max-width: 100%;
+            }
+            .listener-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+                margin-bottom: 16px;
+            }
+            .listener-info h1 {
+                font-size: 20px;
+            }
+            .listener-widgets {
+                width: 100%;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .btn-retro-mode {
+                flex: 1 1 100%;
+                min-height: 40px;
+            }
+            .banner-title {
+                font-size: 12px;
+                margin-bottom: 16px;
+                line-height: 1.4;
+            }
+            .dashboard-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 14px;
+            }
+            .center-panel {
+                order: 1;
+                min-height: auto;
+                padding: 14px;
+            }
+            .sidebar-panel {
+                order: 2;
+                max-height: none;
+                padding: 14px;
+            }
+            .right-panel {
+                order: 3;
+                display: flex;
+                gap: 14px;
+            }
+            .center-panel h3 {
+                font-size: 11px;
+            }
+            .radios-grid-user {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+                min-height: 0;
+                margin-top: 10px;
+            }
+            .radio-card-user {
+                width: 100%;
+                height: clamp(112px, 31vw, 145px);
+                min-width: 0;
+                padding: 10px 8px;
+                border-radius: 12px;
+            }
+            .radio-card-user .icon {
+                font-size: clamp(25px, 8vw, 34px);
+                margin-bottom: 4px;
+            }
+            .radio-card-user h4 {
+                font-size: clamp(9px, 2.7vw, 12px);
+            }
+            .btn-pincel {
+                width: 26px;
+                height: 26px;
+                font-size: 12px;
+            }
+            .mobile-drag-hint {
+                display: block;
+                font-size: 10px;
+                color: #94a3b8;
+                text-align: center;
+                margin-top: 4px;
+            }
+            .bible-options-grid {
+                gap: 6px;
+            }
+            .car-player-bar {
+                padding: 9px 12px;
+            }
+            .player-info {
+                min-width: 0;
+                gap: 8px;
+                max-width: 58%;
+            }
+            .player-icon-box {
+                font-size: 22px;
+                padding: 7px;
+            }
+            .player-text-details h4 {
+                font-size: 11px;
+                max-width: 160px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .player-status-sub {
+                font-size: 9px;
+            }
+            .player-controls {
+                gap: 7px;
+            }
+            .control-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 12px;
+            }
+            .control-btn.main-play {
+                width: 44px;
+                height: 44px;
+                font-size: 15px;
+            }
+            .player-spacer {
+                display: none;
+            }
+            .customizer-content, .bible-modal-content {
+                width: calc(100% - 24px);
+                max-height: 88vh;
+                padding: 18px;
+            }
+            .color-picker-grid {
+                gap: 7px;
+            }
+            .color-dot {
+                width: 30px;
+                height: 30px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            body {
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+            .center-panel {
+                padding: 10px;
+            }
+            .radios-grid-user {
+                gap: 7px;
+            }
+            .radio-card-user {
+                height: 108px;
+                padding: 8px 6px;
+            }
+            .radio-card-user .icon {
+                font-size: 25px;
+            }
+            .radio-card-user h4 {
+                font-size: 9px;
+            }
+        }
+
         .hidden { display: none !important; }
 
     </style>
@@ -929,7 +1142,7 @@
             <!-- Coluna 2: Grid Central de Preferidas -->
             <div class="center-panel">
                 <h3>GERENCIAR SUAS RÁDIOS PREFERIDAS</h3>
-                <div style="font-size: 11px; color: #94a3b8; margin-bottom: 15px; text-align: center; font-weight: 600;">2. ARRASTE E SOLTE SOBRE OUTRO CARD PARA TROCAR DE LUGAR</div>
+                <div style="font-size: 11px; color: #94a3b8; margin-bottom: 15px; text-align: center; font-weight: 600;">2. ARRASTE E SOLTE SOBRE OUTRO CARD PARA TROCAR DE LUGAR <span class="mobile-drag-hint">📱 No celular: segure o card por um instante e arraste</span></div>
                 <div class="radios-grid-user" id="centerRadiosGrid"></div>
             </div>
 
@@ -1329,8 +1542,10 @@
                     abrirModalPincelOuvinte(radio.id, corCard, iconeCard);
                 });
 
+                // Arrastar no computador (mouse)
                 card.addEventListener('dragstart', (e) => {
                     e.dataTransfer.setData('text/plain', radio.id);
+                    e.dataTransfer.effectAllowed = 'move';
                     card.classList.add('dragging');
                 });
 
@@ -1341,6 +1556,7 @@
 
                 card.addEventListener('dragover', (e) => {
                     e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
                     card.classList.add('drag-over');
                 });
 
@@ -1353,22 +1569,180 @@
                     card.classList.remove('drag-over');
                     const draggedId = e.dataTransfer.getData('text/plain');
                     const targetId = radio.id;
-
-                    if (draggedId && draggedId !== targetId) {
-                        const oldIndex = radiosFavoritasIds.indexOf(draggedId);
-                        const newIndex = radiosFavoritasIds.indexOf(targetId);
-
-                        if (oldIndex !== -1 && newIndex !== -1) {
-                            radiosFavoritasIds.splice(oldIndex, 1);
-                            radiosFavoritasIds.splice(newIndex, 0, draggedId);
-                            salvarPreferenciasNoFirebase();
-                            renderizarTudo();
-                        }
-                    }
+                    reordenarRadiosPorId(draggedId, targetId);
                 });
+
+                // Arrastar por toque no celular/tablet: exige pressionar e segurar
+                ativarArrastePorToque(card, radio.id);
 
                 centerRadiosGrid.appendChild(card);
             });
+        }
+
+        function reordenarRadiosPorId(draggedId, targetId) {
+            if (!draggedId || !targetId || draggedId === targetId) return;
+
+            const oldIndex = radiosFavoritasIds.indexOf(draggedId);
+            const newIndex = radiosFavoritasIds.indexOf(targetId);
+
+            if (oldIndex === -1 || newIndex === -1) return;
+
+            radiosFavoritasIds.splice(oldIndex, 1);
+            const indiceDestinoAtualizado = radiosFavoritasIds.indexOf(targetId);
+            radiosFavoritasIds.splice(indiceDestinoAtualizado, 0, draggedId);
+
+            salvarPreferenciasNoFirebase();
+            renderizarTudo();
+        }
+
+        function ativarArrastePorToque(card, radioId) {
+            let timerPressao = null;
+            let arrastandoToque = false;
+            let inicioX = 0;
+            let inicioY = 0;
+            let clone = null;
+            let placeholder = null;
+            let larguraOriginal = 0;
+            let alturaOriginal = 0;
+
+            const TEMPO_PRESSAO = 380;
+            const DISTANCIA_CANCELAMENTO = 10;
+
+            card.addEventListener('touchstart', (e) => {
+                if (e.touches.length !== 1) return;
+                if (e.target.closest('button')) return;
+
+                const toque = e.touches[0];
+                inicioX = toque.clientX;
+                inicioY = toque.clientY;
+                arrastandoToque = false;
+
+                clearTimeout(timerPressao);
+                timerPressao = setTimeout(() => {
+                    iniciarArrasteToque(card, radioId, toque.clientX, toque.clientY);
+                }, TEMPO_PRESSAO);
+            }, { passive: true });
+
+            card.addEventListener('touchmove', (e) => {
+                if (!e.touches.length) return;
+                const toque = e.touches[0];
+                const dx = Math.abs(toque.clientX - inicioX);
+                const dy = Math.abs(toque.clientY - inicioY);
+
+                if (!arrastandoToque && (dx > DISTANCIA_CANCELAMENTO || dy > DISTANCIA_CANCELAMENTO)) {
+                    clearTimeout(timerPressao);
+                    return;
+                }
+
+                if (arrastandoToque) {
+                    e.preventDefault();
+                    moverArrasteToque(toque.clientX, toque.clientY);
+                }
+            }, { passive: false });
+
+            card.addEventListener('touchend', (e) => {
+                clearTimeout(timerPressao);
+                if (arrastandoToque) {
+                    e.preventDefault();
+                    finalizarArrasteToque();
+                }
+            }, { passive: false });
+
+            card.addEventListener('touchcancel', () => {
+                clearTimeout(timerPressao);
+                if (arrastandoToque) cancelarArrasteToque();
+            });
+
+            function iniciarArrasteToque(elemento, id, x, y) {
+                arrastandoToque = true;
+                elemento.classList.add('touch-dragging');
+
+                const rect = elemento.getBoundingClientRect();
+                larguraOriginal = rect.width;
+                alturaOriginal = rect.height;
+
+                placeholder = document.createElement('div');
+                placeholder.className = 'radio-card-touch-placeholder';
+                placeholder.style.width = larguraOriginal + 'px';
+                placeholder.style.height = alturaOriginal + 'px';
+                placeholder.dataset.id = id;
+                elemento.parentNode.insertBefore(placeholder, elemento);
+
+                clone = elemento.cloneNode(true);
+                clone.classList.remove('touch-dragging');
+                clone.classList.add('radio-card-touch-clone');
+                clone.style.width = larguraOriginal + 'px';
+                clone.style.height = alturaOriginal + 'px';
+                clone.style.left = (x - larguraOriginal / 2) + 'px';
+                clone.style.top = (y - alturaOriginal / 2) + 'px';
+                document.body.appendChild(clone);
+            }
+
+            function moverArrasteToque(x, y) {
+                if (!clone || !placeholder) return;
+
+                clone.style.left = (x - larguraOriginal / 2) + 'px';
+                clone.style.top = (y - alturaOriginal / 2) + 'px';
+
+                const alvo = document.elementFromPoint(x, y);
+                const cardAlvo = alvo ? alvo.closest('.radio-card-user') : null;
+
+                if (!cardAlvo || cardAlvo === card || cardAlvo.classList.contains('touch-dragging')) {
+                    return;
+                }
+
+                const rectAlvo = cardAlvo.getBoundingClientRect();
+                const antes = x < rectAlvo.left + rectAlvo.width / 2 || y < rectAlvo.top + rectAlvo.height / 2;
+
+                if (antes) {
+                    centerRadiosGrid.insertBefore(placeholder, cardAlvo);
+                } else {
+                    centerRadiosGrid.insertBefore(placeholder, cardAlvo.nextSibling);
+                }
+            }
+
+            function finalizarArrasteToque() {
+                if (!arrastandoToque) return;
+                arrastandoToque = false;
+
+                if (clone) {
+                    clone.remove();
+                    clone = null;
+                }
+
+                card.classList.remove('touch-dragging');
+
+                if (placeholder) {
+                    placeholder.parentNode.insertBefore(card, placeholder);
+                    placeholder.remove();
+                    placeholder = null;
+                }
+
+                const novaOrdem = Array.from(centerRadiosGrid.querySelectorAll('.radio-card-user'))
+                    .map(el => el.dataset.id)
+                    .filter(Boolean);
+
+                if (novaOrdem.length === radiosFavoritasIds.length) {
+                    radiosFavoritasIds = novaOrdem;
+                    salvarPreferenciasNoFirebase();
+                    renderizarTudo();
+                } else {
+                    renderizarTudo();
+                }
+            }
+
+            function cancelarArrasteToque() {
+                arrastandoToque = false;
+                if (clone) {
+                    clone.remove();
+                    clone = null;
+                }
+                card.classList.remove('touch-dragging');
+                if (placeholder) {
+                    placeholder.remove();
+                    placeholder = null;
+                }
+            }
         }
 
         function tocarRadioPorObjeto(radio) {
