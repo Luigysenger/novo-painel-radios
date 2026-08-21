@@ -542,33 +542,33 @@
         }
 
         /* ==========================================
-           MODO RÁDIO RETRÔ (AUTOAJUSTÁVEL E IMERSIVO)
+           MODO RÁDIO RETRÔ (TELA CHEIA E ULTRA REALISTA)
            ========================================== */
         #retroRadioContainer {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: radial-gradient(circle at center, #2c1d11 0%, #110904 100%);
+            background: radial-gradient(circle at center, #2c1d11 0%, #0d0603 100%);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            padding: 15px;
+            padding: 10px;
             box-sizing: border-box;
         }
         .retro-cabinet {
-            background: linear-gradient(135deg, #4a2e18 0%, #2b180a 100%);
-            border: 8px solid #1a0e05;
-            border-radius: 25px;
-            width: 100%;
-            max-width: 650px;
-            height: auto;
-            max-height: 92vh;
-            padding: 25px;
+            background: linear-gradient(145deg, #5c3a1e 0%, #351f0f 50%, #211107 100%);
+            border: 10px solid #140a04;
+            border-radius: 30px;
+            width: 100vw;
+            height: 100vh;
+            max-width: none;
+            max-height: none;
+            padding: 20px 25px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.8), inset 0 0 40px rgba(0,0,0,0.6);
+            box-shadow: 0 0 50px rgba(0,0,0,0.9), inset 0 0 60px rgba(0,0,0,0.7);
             position: relative;
         }
         .retro-top-panel {
@@ -576,79 +576,115 @@
             justify-content: space-between;
             width: 100%;
             align-items: center;
-            margin-bottom: 10px;
+            z-index: 2;
         }
         .retro-led {
             width: 14px; height: 14px;
-            background-color: #550000;
+            background-color: #440000;
             border-radius: 50%;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.9);
             transition: all 0.3s ease;
         }
         .retro-led.on {
-            background-color: #ff3333;
-            box-shadow: 0 0 12px #ff0000, 0 0 20px #ff3333, inset 0 2px 4px rgba(255,255,255,0.6);
+            background-color: #ff2222;
+            box-shadow: 0 0 12px #ff0000, 0 0 22px #ff3333, inset 0 2px 4px rgba(255,255,255,0.6);
         }
         .btn-exit-retro {
-            background: rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.5);
             color: #fcd34d;
-            border: 1px solid rgba(252, 211, 77, 0.3);
-            padding: 6px 14px;
+            border: 1px solid rgba(252, 211, 77, 0.4);
+            padding: 8px 16px;
             border-radius: 20px;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
             transition: background 0.2s;
         }
-        .btn-exit-retro:hover { background: rgba(252, 211, 77, 0.2); }
+        .btn-exit-retro:hover { background: rgba(252, 211, 77, 0.25); }
 
+        /* MODULADOR DIGITAL ESTILO APARELHOS AIWA ANOS 90 */
         .retro-dial-glass {
-            background: #0c0805;
-            border: 4px inset #191007;
-            border-radius: 12px;
+            background: #050508;
+            border: 5px inset #12121c;
+            border-radius: 14px;
             width: 100%;
-            padding: 15px;
+            max-width: 600px;
+            padding: 15px 20px;
             text-align: center;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.9);
-            margin: 10px 0;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.95);
+            margin: auto 0;
         }
         .retro-station-title {
-            font-size: 18px;
-            color: #fbbf24;
+            font-size: 16px;
+            color: #ffb703;
             font-weight: 800;
-            text-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
-            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(255, 183, 3, 0.6);
+            margin-bottom: 12px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            letter-spacing: 1px;
         }
-        .retro-station-freq {
-            font-size: 12px;
-            color: #9ca3af;
-            letter-spacing: 2px;
+        
+        /* Container das Barras do Modulador Digital Espectro */
+        .digital-modulator-box {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 6px;
+            height: 65px;
+            padding: 5px 0;
+            background: rgba(0, 20, 10, 0.4);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 100, 0.15);
+            overflow: hidden;
+        }
+        .mod-bar {
+            width: 12px;
+            background: linear-gradient(to top, #00ff88 0%, #ffaa00 70%, #ff3333 100%);
+            border-radius: 3px 3px 0 0;
+            height: 8px;
+            transition: height 0.15s ease;
+            box-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
+        }
+        /* Animação dinâmica das barrinhas quando tocando */
+        .playing-spectrum .mod-bar:nth-child(1) { animation: bounceBar 0.5s infinite alternate ease-in-out; }
+        .playing-spectrum .mod-bar:nth-child(2) { animation: bounceBar 0.35s infinite alternate ease-in-out 0.1s; }
+        .playing-spectrum .mod-bar:nth-child(3) { animation: bounceBar 0.6s infinite alternate ease-in-out 0.05s; }
+        .playing-spectrum .mod-bar:nth-child(4) { animation: bounceBar 0.4s infinite alternate ease-in-out 0.2s; }
+        .playing-spectrum .mod-bar:nth-child(5) { animation: bounceBar 0.55s infinite alternate ease-in-out 0.15s; }
+        .playing-spectrum .mod-bar:nth-child(6) { animation: bounceBar 0.3s infinite alternate ease-in-out 0.25s; }
+        .playing-spectrum .mod-bar:nth-child(7) { animation: bounceBar 0.5s infinite alternate ease-in-out 0.08s; }
+        .playing-spectrum .mod-bar:nth-child(8) { animation: bounceBar 0.45s infinite alternate ease-in-out 0.18s; }
+        .playing-spectrum .mod-bar:nth-child(9) { animation: bounceBar 0.38s infinite alternate ease-in-out 0.12s; }
+
+        @keyframes bounceBar {
+            0% { height: 10px; opacity: 0.5; }
+            100% { height: 58px; opacity: 1; }
         }
 
         .retro-speaker-grille {
             width: 100%;
-            height: 150px;
-            background: repeating-linear-gradient(0deg, #160d05, #160d05 6px, #0b0602 6px, #0b0602 12px);
+            max-width: 500px;
+            height: 120px;
+            background: repeating-linear-gradient(0deg, #120a04, #120a04 6px, #070402 6px, #070402 12px);
             border-radius: 12px;
-            border: 4px solid #110904;
+            border: 4px solid #0d0502;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 10px 0;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+            margin: auto 0;
+            box-shadow: inset 0 0 25px rgba(0,0,0,0.95);
         }
         .retro-brand-badge {
-            background: linear-gradient(135deg, #d97706, #b45309);
+            background: linear-gradient(135deg, #d97706, #92400e);
             color: #fff;
-            padding: 6px 18px;
+            padding: 8px 22px;
             border-radius: 6px;
             font-weight: 900;
-            font-size: 13px;
-            letter-spacing: 2px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            font-size: 14px;
+            letter-spacing: 3px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
             border: 1px solid #f59e0b;
         }
 
@@ -656,8 +692,10 @@
             display: flex;
             justify-content: space-around;
             width: 100%;
+            max-width: 500px;
             align-items: center;
-            margin-top: 10px;
+            margin-top: auto;
+            margin-bottom: 10px;
         }
         .retro-knob-container {
             display: flex;
@@ -668,7 +706,7 @@
         }
         .retro-knob-container:active { cursor: grabbing; }
         .retro-knob {
-            width: 75px; height: 75px;
+            width: 80px; height: 80px;
             background: radial-gradient(circle, #332211 40%, #150e07 90%);
             border: 5px solid #0a0502;
             border-radius: 50%;
@@ -713,7 +751,17 @@
 
             <div class="retro-dial-glass">
                 <div class="retro-station-title" id="retroTitleDisplay">Nenhuma Rádio Selecionada</div>
-                <div class="retro-station-freq" id="retroFreqDisplay">FM 88.5 - 108.0 MHz</div>
+                <div class="digital-modulator-box" id="digitalModulatorSpectrum">
+                    <div class="mod-bar"></div>
+                    <div class="mod-bar"></div>
+                    <div class="mod-bar"></div>
+                    <div class="mod-bar"></div>
+                    <div class="mod-bar"></div>
+                    <div class="mod-bar"></div>
+                    <div class="mod-bar"></div>
+                    <div class="mod-bar"></div>
+                    <div class="mod-bar"></div>
+                </div>
             </div>
 
             <div class="retro-speaker-grille">
@@ -1344,13 +1392,14 @@
         });
 
         // ==========================================
-        // SISTEMA DO MODO RÁDIO RETRÔ INTERATIVO
+        // SISTEMA DO MODO RÁDIO RETRÔ (TELA CHEIA & MODULADOR)
         // ==========================================
         const retroContainer = document.getElementById('retroRadioContainer');
         const btnAbrirRetro = document.getElementById('btnAbrirRetro');
         const btnSairRetro = document.getElementById('btnSairRetro');
         const retroTitleDisplay = document.getElementById('retroTitleDisplay');
         const retroLed = document.getElementById('retroLedIndicator');
+        const digitalModulatorSpectrum = document.getElementById('digitalModulatorSpectrum');
         const dialVolume = document.getElementById('dialVolume');
         const dialSintonia = document.getElementById('dialSintonia');
         const labelVolumeText = document.getElementById('labelVolumeText');
@@ -1379,8 +1428,10 @@
 
             if (!audioElement.paused && volumeRetretroAtual > 0) {
                 retroLed.classList.add('on');
+                digitalModulatorSpectrum.classList.add('playing-spectrum');
             } else {
                 retroLed.classList.remove('on');
+                digitalModulatorSpectrum.classList.remove('playing-spectrum');
             }
 
             audioElement.volume = volumeRetretroAtual / 30;
@@ -1422,7 +1473,6 @@
             arrastandoVolume = false;
         });
 
-        // Suporte a toque mobile para o volume
         knobVolumeContainer.addEventListener('touchstart', (e) => {
             arrastandoVolume = true;
             startXVol = e.touches[0].clientX;
@@ -1452,7 +1502,6 @@
             arrastandoVolume = false;
         });
 
-        // Clique direto no botão de volume para alternar Ligar/Desligar
         knobVolumeContainer.addEventListener('click', (e) => {
             if (Math.abs(e.clientX - startXVol) < 5) {
                 if (volumeRetretroAtual === 0) {
@@ -1467,7 +1516,7 @@
             }
         });
 
-        // Interação por toque/arraste no Botão de Sintonia (Próxima / Anterior)
+        // Interação de sintonia
         let arrastandoSintonia = false;
         let startXSintonia = 0;
 
