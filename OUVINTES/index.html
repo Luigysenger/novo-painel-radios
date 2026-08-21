@@ -546,40 +546,44 @@
            ========================================== */
         #retroRadioContainer {
             position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            min-height: 100dvh;
             background: radial-gradient(circle at center, #2c1d11 0%, #110904 100%);
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 9999;
-            padding: 15px;
-            box-sizing: border-box;
+            z-index: 999999;
+            padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+            overflow: hidden;
         }
         .retro-cabinet {
             background: linear-gradient(135deg, #4a2e18 0%, #2b180a 100%);
-            border: 8px solid #1a0e05;
-            border-radius: 25px;
-            width: 100%;
-            max-width: 650px;
-            height: auto;
-            max-height: 92vh;
-            padding: 25px;
+            border: clamp(4px, 0.9vw, 8px) solid #1a0e05;
+            border-radius: clamp(14px, 2.5vw, 25px);
+            width: min(94vw, 760px);
+            height: min(94dvh, 860px);
+            min-height: 0;
+            padding: clamp(12px, 3vw, 25px);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 25px 60px rgba(0,0,0,0.8), inset 0 0 40px rgba(0,0,0,0.6);
             position: relative;
+            overflow: hidden;
         }
         .retro-top-panel {
             display: flex;
             justify-content: space-between;
             width: 100%;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: clamp(4px, 1.2vh, 10px);
+            flex: 0 0 auto;
         }
         .retro-led {
-            width: 14px; height: 14px;
+            width: clamp(10px, 2vw, 14px); height: clamp(10px, 2vw, 14px);
             background-color: #550000;
             border-radius: 50%;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
@@ -593,9 +597,9 @@
             background: rgba(0,0,0,0.4);
             color: #fcd34d;
             border: 1px solid rgba(252, 211, 77, 0.3);
-            padding: 6px 14px;
+            padding: clamp(5px, 1.2vw, 6px) clamp(10px, 2vw, 14px);
             border-radius: 20px;
-            font-size: 11px;
+            font-size: clamp(9px, 1.8vw, 11px);
             font-weight: 700;
             cursor: pointer;
             transition: background 0.2s;
@@ -603,17 +607,18 @@
         .btn-exit-retro:hover { background: rgba(252, 211, 77, 0.2); }
 
         .retro-dial-glass {
-            background: #0c0805;
+            background: linear-gradient(180deg, #080b08 0%, #020402 100%);
             border: 4px inset #191007;
             border-radius: 12px;
             width: 100%;
-            padding: 15px;
+            padding: clamp(10px, 2.2vw, 15px);
             text-align: center;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.9);
-            margin: 10px 0;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.9), 0 4px 12px rgba(0,0,0,0.35);
+            margin: clamp(4px, 1.2vh, 10px) 0;
+            flex: 0 0 auto;
         }
         .retro-station-title {
-            font-size: 18px;
+            font-size: clamp(15px, 3vw, 22px);
             color: #fbbf24;
             font-weight: 800;
             text-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
@@ -623,30 +628,88 @@
             text-overflow: ellipsis;
         }
         .retro-station-freq {
-            font-size: 12px;
+            font-size: clamp(10px, 2vw, 12px);
             color: #9ca3af;
             letter-spacing: 2px;
+        }
+        .retro-digital-tuner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(5px, 1.2vw, 10px);
+            margin-top: 8px;
+            min-height: clamp(42px, 8vh, 62px);
+            flex-wrap: wrap;
+        }
+        .retro-digital-display {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: clamp(170px, 48vw, 300px);
+            padding: 5px 12px;
+            border-radius: 6px;
+            background: #020402;
+            border: 2px solid #161b16;
+            color: #78ff4a;
+            font-family: "Courier New", monospace;
+            font-size: clamp(18px, 4.2vw, 32px);
+            font-weight: 900;
+            letter-spacing: clamp(2px, 0.7vw, 5px);
+            text-shadow: 0 0 5px #78ff4a, 0 0 12px rgba(120,255,74,0.7);
+            box-shadow: inset 0 0 14px rgba(0,0,0,0.95), 0 0 8px rgba(120,255,74,0.15);
+        }
+        .retro-tuner-label {
+            color: #fbbf24;
+            font-family: "Courier New", monospace;
+            font-size: clamp(9px, 1.8vw, 12px);
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+        .retro-level-meter {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 3px;
+            height: 32px;
+            padding: 4px 7px;
+            background: #020402;
+            border: 1px solid #151b15;
+            border-radius: 5px;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.8);
+        }
+        .retro-level-bar {
+            width: clamp(4px, 0.9vw, 7px);
+            height: var(--h);
+            background: linear-gradient(to top, #22c55e 0 60%, #facc15 60% 82%, #ef4444 82%);
+            box-shadow: 0 0 4px rgba(34,197,94,0.6);
+            animation: tunerPulse 0.9s ease-in-out infinite alternate;
+            animation-delay: var(--d);
+        }
+        @keyframes tunerPulse {
+            from { opacity: .55; transform: scaleY(.72); }
+            to { opacity: 1; transform: scaleY(1); }
         }
 
         .retro-speaker-grille {
             width: 100%;
-            height: 150px;
+            flex: 1 1 auto;
+            min-height: clamp(90px, 24vh, 210px);
             background: repeating-linear-gradient(0deg, #160d05, #160d05 6px, #0b0602 6px, #0b0602 12px);
             border-radius: 12px;
             border: 4px solid #110904;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 10px 0;
+            margin: clamp(5px, 1.4vh, 10px) 0;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
         }
         .retro-brand-badge {
             background: linear-gradient(135deg, #d97706, #b45309);
             color: #fff;
-            padding: 6px 18px;
+            padding: clamp(5px, 1.2vw, 6px) clamp(12px, 3vw, 18px);
             border-radius: 6px;
             font-weight: 900;
-            font-size: 13px;
+            font-size: clamp(10px, 2.2vw, 13px);
             letter-spacing: 2px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
             border: 1px solid #f59e0b;
@@ -657,7 +720,9 @@
             justify-content: space-around;
             width: 100%;
             align-items: center;
-            margin-top: 10px;
+            margin-top: clamp(5px, 1.2vh, 10px);
+            flex: 0 0 auto;
+            padding-bottom: 2px;
         }
         .retro-knob-container {
             display: flex;
@@ -668,7 +733,7 @@
         }
         .retro-knob-container:active { cursor: grabbing; }
         .retro-knob {
-            width: 75px; height: 75px;
+            width: clamp(58px, 14vw, 82px); height: clamp(58px, 14vw, 82px);
             background: radial-gradient(circle, #332211 40%, #150e07 90%);
             border: 5px solid #0a0502;
             border-radius: 50%;
@@ -678,19 +743,49 @@
         }
         .retro-knob-indicator {
             position: absolute;
-            top: 6px; left: 50%;
+            top: 5px; left: 50%;
             transform: translateX(-50%);
-            width: 4px; height: 22px;
+            width: 3px; height: clamp(17px, 4vw, 22px);
             background-color: #fbbf24;
             border-radius: 2px;
             box-shadow: 0 0 6px #fbbf24;
         }
         .retro-knob-label {
-            font-size: 11px;
+            font-size: clamp(9px, 1.8vw, 11px);
             color: #d1d5db;
             margin-top: 8px;
             font-weight: 700;
             letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 600px) {
+            #retroRadioContainer { padding: 6px; }
+            .retro-cabinet {
+                width: 96vw;
+                height: 96dvh;
+                padding: 12px;
+                border-width: 4px;
+                border-radius: 18px;
+            }
+            .retro-dial-glass { padding: 9px; }
+            .retro-speaker-grille { min-height: 0; }
+            .retro-controls-row { gap: 20px; }
+        }
+
+        @media (max-height: 600px) and (orientation: landscape) {
+            #retroRadioContainer { padding: 5px 10px; }
+            .retro-cabinet {
+                width: min(96vw, 900px);
+                height: 94dvh;
+                padding: 8px 16px;
+            }
+            .retro-speaker-grille { min-height: 70px; margin: 4px 0; }
+            .retro-dial-glass { margin: 4px 0; padding: 6px; }
+            .retro-controls-row { margin-top: 4px; }
+        }
+
+        @media (min-width: 1200px) {
+            .retro-cabinet { width: min(70vw, 820px); }
         }
 
         .hidden { display: none !important; }
@@ -713,7 +808,20 @@
 
             <div class="retro-dial-glass">
                 <div class="retro-station-title" id="retroTitleDisplay">Nenhuma Rádio Selecionada</div>
-                <div class="retro-station-freq" id="retroFreqDisplay">FM 88.5 - 108.0 MHz</div>
+                <div class="retro-digital-tuner">
+                    <span class="retro-tuner-label">STEREO</span>
+                    <div class="retro-digital-display" id="retroFreqDisplay">FM --.-</div>
+                    <div class="retro-level-meter" aria-label="Nível do sinal">
+                        <span class="retro-level-bar" style="--h:8px;--d:0s"></span>
+                        <span class="retro-level-bar" style="--h:12px;--d:.08s"></span>
+                        <span class="retro-level-bar" style="--h:16px;--d:.16s"></span>
+                        <span class="retro-level-bar" style="--h:20px;--d:.24s"></span>
+                        <span class="retro-level-bar" style="--h:24px;--d:.32s"></span>
+                        <span class="retro-level-bar" style="--h:28px;--d:.40s"></span>
+                        <span class="retro-level-bar" style="--h:22px;--d:.48s"></span>
+                        <span class="retro-level-bar" style="--h:17px;--d:.56s"></span>
+                    </div>
+                </div>
             </div>
 
             <div class="retro-speaker-grille">
@@ -1376,6 +1484,11 @@
             } else {
                 retroTitleDisplay.innerText = "Selecione uma Rádio";
             }
+
+            const radioAtual = todasRadiosGlobal.find(r => r.nome === rádioAtivaNomeGlobal);
+            const frequencia = radioAtual && radioAtual.frequencia ? String(radioAtual.frequencia) : "--.-";
+            const prefixo = radioAtual && radioAtual.frequencia ? "FM" : "FM";
+            document.getElementById('retroFreqDisplay').innerText = `${prefixo} ${frequencia}`;
 
             if (!audioElement.paused && volumeRetretroAtual > 0) {
                 retroLed.classList.add('on');
