@@ -72,6 +72,21 @@
             font-size: 13px;
             color: #cbd5e1;
         }
+        
+        .btn-retro-mode {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 12px;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+            transition: all 0.2s ease;
+        }
+        .btn-retro-mode:hover { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(245, 158, 11, 0.6); }
+
         .btn-sair {
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             color: white;
@@ -446,7 +461,7 @@
             min-height: 120px;
         }
 
-        /* PLAYER PROFISSIONAL INFERIOR REESTRUTURADO */
+        /* PLAYER PROFISSIONAL INFERIOR */
         .car-player-bar {
             position: fixed;
             bottom: 0; left: 0; width: 100%;
@@ -526,6 +541,158 @@
             min-width: 280px;
         }
 
+        /* ==========================================
+           MODO RÁDIO RETRÔ (AUTOAJUSTÁVEL E IMERSIVO)
+           ========================================== */
+        #retroRadioContainer {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle at center, #2c1d11 0%, #110904 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+        .retro-cabinet {
+            background: linear-gradient(135deg, #4a2e18 0%, #2b180a 100%);
+            border: 8px solid #1a0e05;
+            border-radius: 25px;
+            width: 100%;
+            max-width: 650px;
+            height: auto;
+            max-height: 92vh;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.8), inset 0 0 40px rgba(0,0,0,0.6);
+            position: relative;
+        }
+        .retro-top-panel {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .retro-led {
+            width: 14px; height: 14px;
+            background-color: #550000;
+            border-radius: 50%;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
+            transition: all 0.3s ease;
+        }
+        .retro-led.on {
+            background-color: #ff3333;
+            box-shadow: 0 0 12px #ff0000, 0 0 20px #ff3333, inset 0 2px 4px rgba(255,255,255,0.6);
+        }
+        .btn-exit-retro {
+            background: rgba(0,0,0,0.4);
+            color: #fcd34d;
+            border: 1px solid rgba(252, 211, 77, 0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-exit-retro:hover { background: rgba(252, 211, 77, 0.2); }
+
+        .retro-dial-glass {
+            background: #0c0805;
+            border: 4px inset #191007;
+            border-radius: 12px;
+            width: 100%;
+            padding: 15px;
+            text-align: center;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.9);
+            margin: 10px 0;
+        }
+        .retro-station-title {
+            font-size: 18px;
+            color: #fbbf24;
+            font-weight: 800;
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .retro-station-freq {
+            font-size: 12px;
+            color: #9ca3af;
+            letter-spacing: 2px;
+        }
+
+        .retro-speaker-grille {
+            width: 100%;
+            height: 150px;
+            background: repeating-linear-gradient(0deg, #160d05, #160d05 6px, #0b0602 6px, #0b0602 12px);
+            border-radius: 12px;
+            border: 4px solid #110904;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 0;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+        }
+        .retro-brand-badge {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            color: #fff;
+            padding: 6px 18px;
+            border-radius: 6px;
+            font-weight: 900;
+            font-size: 13px;
+            letter-spacing: 2px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            border: 1px solid #f59e0b;
+        }
+
+        .retro-controls-row {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .retro-knob-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: grab;
+            user-select: none;
+        }
+        .retro-knob-container:active { cursor: grabbing; }
+        .retro-knob {
+            width: 75px; height: 75px;
+            background: radial-gradient(circle, #332211 40%, #150e07 90%);
+            border: 5px solid #0a0502;
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.8), inset 0 2px 5px rgba(255,255,255,0.15);
+            transition: transform 0.05s ease-out;
+        }
+        .retro-knob-indicator {
+            position: absolute;
+            top: 6px; left: 50%;
+            transform: translateX(-50%);
+            width: 4px; height: 22px;
+            background-color: #fbbf24;
+            border-radius: 2px;
+            box-shadow: 0 0 6px #fbbf24;
+        }
+        .retro-knob-label {
+            font-size: 11px;
+            color: #d1d5db;
+            margin-top: 8px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
         .hidden { display: none !important; }
     </style>
 </head>
@@ -536,6 +703,43 @@
         Eiiii Ligadão! Tem Rádio nova adicionada pelo adm, Curta sem moderação.
     </div>
 
+    <!-- MODO RÁDIO RETRÔ TELA CHEIA -->
+    <div id="retroRadioContainer" class="hidden">
+        <div class="retro-cabinet">
+            <div class="retro-top-panel">
+                <div class="retro-led" id="retroLedIndicator"></div>
+                <button class="btn-exit-retro" id="btnSairRetro">Voltar ao Painel Normal</button>
+            </div>
+
+            <div class="retro-dial-glass">
+                <div class="retro-station-title" id="retroTitleDisplay">Nenhuma Rádio Selecionada</div>
+                <div class="retro-station-freq" id="retroFreqDisplay">FM 88.5 - 108.0 MHz</div>
+            </div>
+
+            <div class="retro-speaker-grille">
+                <div class="retro-brand-badge">VINTAGE SOUND</div>
+            </div>
+
+            <div class="retro-controls-row">
+                <!-- Botão Giratório de Sintonia / Passar Rádio -->
+                <div class="retro-knob-container" id="knobSintonia" title="Deslize para trocar de rádio">
+                    <div class="retro-knob" id="dialSintonia">
+                        <div class="retro-knob-indicator"></div>
+                    </div>
+                    <span class="retro-knob-label">SINTONIA</span>
+                </div>
+
+                <!-- Botão Giratório de Volume / Ligar Desligar (0 a 30) -->
+                <div class="retro-knob-container" id="knobVolume" title="Deslize para ajustar volume (0-30) ou clique para desligar">
+                    <div class="retro-knob" id="dialVolume">
+                        <div class="retro-knob-indicator"></div>
+                    </div>
+                    <span class="retro-knob-label" id="labelVolumeText">VOL: 0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="main-container">
         <div class="listener-header">
             <div class="listener-info">
@@ -543,6 +747,7 @@
                 <p id="nomeOuvinteDisplay">Olá, Ouvinte</p>
             </div>
             <div class="listener-widgets">
+                <button class="btn-retro-mode" id="btnAbrirRetro">📻 Mudar para o Painel Rádio Retrô</button>
                 <span id="relogioDigital">00:00:00</span>
                 <span id="climaInfo">Salvador: 23°C</span>
                 <button class="btn-sair" id="btnSair">SAIR</button>
@@ -802,7 +1007,7 @@
             }
             carregarDadosDoPainel();
             verificarNotificacaoRadioNova();
-            monitorarComerciaisOuvinte(); // Inicia o monitoramento de comerciais em tempo real
+            monitorarComerciaisOuvinte();
         });
 
         document.getElementById('btnSair').addEventListener('click', () => {
@@ -1024,23 +1229,33 @@
 
             audioElement.src = radio.url;
             audioElement.play().catch(err => console.error("Erro no stream:", err));
+
+            atualizarTelaRetrô();
         }
 
         document.getElementById('btnProximo').addEventListener('click', () => {
+            proximaRadio();
+        });
+
+        document.getElementById('btnAnterior').addEventListener('click', () => {
+            radioAnterior();
+        });
+
+        function proximaRadio() {
             const radiosAtivasNoCentro = radiosFavoritasIds.map(id => todasRadiosGlobal.find(r => r.id === id)).filter(Boolean);
             if (radiosAtivasNoCentro.length === 0) return;
             let proximo = indiceRadioAtual + 1;
             if (proximo >= radiosAtivasNoCentro.length) proximo = 0;
             tocarRadioPorObjeto(radiosAtivasNoCentro[proximo]);
-        });
+        }
 
-        document.getElementById('btnAnterior').addEventListener('click', () => {
+        function radioAnterior() {
             const radiosAtivasNoCentro = radiosFavoritasIds.map(id => todasRadiosGlobal.find(r => r.id === id)).filter(Boolean);
             if (radiosAtivasNoCentro.length === 0) return;
             let anterior = indiceRadioAtual - 1;
             if (anterior < 0) anterior = radiosAtivasNoCentro.length - 1;
             tocarRadioPorObjeto(radiosAtivasNoCentro[anterior]);
-        });
+        }
 
         btnPlayPause.addEventListener('click', () => {
             const radiosAtivasNoCentro = radiosFavoritasIds.map(id => todasRadiosGlobal.find(r => r.id === id)).filter(Boolean);
@@ -1058,6 +1273,7 @@
                 playerStatusText.innerText = "Rádio pausada";
                 document.querySelectorAll('.radio-card-user').forEach(c => c.classList.remove('active-neon'));
             }
+            atualizarTelaRetrô();
         });
 
         const modalOuvinte = document.getElementById('modalPersonalizacaoOuvinte');
@@ -1126,6 +1342,189 @@
                 enviarMensagemParaAdm();
             }
         });
+
+        // ==========================================
+        // SISTEMA DO MODO RÁDIO RETRÔ INTERATIVO
+        // ==========================================
+        const retroContainer = document.getElementById('retroRadioContainer');
+        const btnAbrirRetro = document.getElementById('btnAbrirRetro');
+        const btnSairRetro = document.getElementById('btnSairRetro');
+        const retroTitleDisplay = document.getElementById('retroTitleDisplay');
+        const retroLed = document.getElementById('retroLedIndicator');
+        const dialVolume = document.getElementById('dialVolume');
+        const dialSintonia = document.getElementById('dialSintonia');
+        const labelVolumeText = document.getElementById('labelVolumeText');
+        const knobVolumeContainer = document.getElementById('knobVolume');
+        const knobSintoniaContainer = document.getElementById('knobSintonia');
+
+        let volumeRetretroAtual = 15; // 0 a 30
+        let anguloVolume = (volumeRetretroAtual / 30) * 270 - 135;
+        let anguloSintonia = 0;
+
+        btnAbrirRetro.addEventListener('click', () => {
+            retroContainer.classList.remove('hidden');
+            atualizarTelaRetrô();
+        });
+
+        btnSairRetro.addEventListener('click', () => {
+            retroContainer.classList.add('hidden');
+        });
+
+        function atualizarTelaRetrô() {
+            if (rádioAtivaNomeGlobal) {
+                retroTitleDisplay.innerText = rádioAtivaNomeGlobal;
+            } else {
+                retroTitleDisplay.innerText = "Selecione uma Rádio";
+            }
+
+            if (!audioElement.paused && volumeRetretroAtual > 0) {
+                retroLed.classList.add('on');
+            } else {
+                retroLed.classList.remove('on');
+            }
+
+            audioElement.volume = volumeRetretroAtual / 30;
+            labelVolumeText.innerText = `VOL: ${volumeRetretroAtual}`;
+            dialVolume.style.transform = `rotate(${anguloVolume}deg)`;
+            dialSintonia.style.transform = `rotate(${anguloSintonia}deg)`;
+        }
+
+        // Interação por toque/arraste no Botão de Volume (0 a 30)
+        let arrastandoVolume = false;
+        let startXVol = 0;
+
+        knobVolumeContainer.addEventListener('mousedown', (e) => {
+            arrastandoVolume = true;
+            startXVol = e.clientX;
+            e.preventDefault();
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!arrastandoVolume) return;
+            const deltaX = e.clientX - startXVol;
+            startXVol = e.clientX;
+
+            if (deltaX > 2 && volumeRetretroAtual < 30) volumeRetretroAtual++;
+            if (deltaX < -2 && volumeRetretroAtual > 0) volumeRetretroAtual--;
+
+            anguloVolume = (volumeRetretroAtual / 30) * 270 - 135;
+
+            if (volumeRetretroAtual === 0) {
+                audioElement.pause();
+            } else if (audioElement.paused && rádioAtivaNomeGlobal) {
+                audioElement.play().catch(()=>{});
+            }
+
+            atualizarTelaRetrô();
+        });
+
+        window.addEventListener('mouseup', () => {
+            arrastandoVolume = false;
+        });
+
+        // Suporte a toque mobile para o volume
+        knobVolumeContainer.addEventListener('touchstart', (e) => {
+            arrastandoVolume = true;
+            startXVol = e.touches[0].clientX;
+            e.preventDefault();
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (!arrastandoVolume) return;
+            const deltaX = e.touches[0].clientX - startXVol;
+            startXVol = e.touches[0].clientX;
+
+            if (deltaX > 2 && volumeRetretroAtual < 30) volumeRetretroAtual++;
+            if (deltaX < -2 && volumeRetretroAtual > 0) volumeRetretroAtual--;
+
+            anguloVolume = (volumeRetretroAtual / 30) * 270 - 135;
+
+            if (volumeRetretroAtual === 0) {
+                audioElement.pause();
+            } else if (audioElement.paused && rádioAtivaNomeGlobal) {
+                audioElement.play().catch(()=>{});
+            }
+
+            atualizarTelaRetrô();
+        });
+
+        window.addEventListener('touchend', () => {
+            arrastandoVolume = false;
+        });
+
+        // Clique direto no botão de volume para alternar Ligar/Desligar
+        knobVolumeContainer.addEventListener('click', (e) => {
+            if (Math.abs(e.clientX - startXVol) < 5) {
+                if (volumeRetretroAtual === 0) {
+                    volumeRetretroAtual = 15;
+                    if (rádioAtivaNomeGlobal) audioElement.play().catch(()=>{});
+                } else {
+                    volumeRetretroAtual = 0;
+                    audioElement.pause();
+                }
+                anguloVolume = (volumeRetretroAtual / 30) * 270 - 135;
+                atualizarTelaRetrô();
+            }
+        });
+
+        // Interação por toque/arraste no Botão de Sintonia (Próxima / Anterior)
+        let arrastandoSintonia = false;
+        let startXSintonia = 0;
+
+        knobSintoniaContainer.addEventListener('mousedown', (e) => {
+            arrastandoSintonia = true;
+            startXSintonia = e.clientX;
+            e.preventDefault();
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!arrastandoSintonia) return;
+            const deltaX = e.clientX - startXSintonia;
+            
+            if (Math.abs(deltaX) > 25) {
+                if (deltaX > 0) {
+                    proximaRadio();
+                    anguloSintonia += 45;
+                } else {
+                    radioAnterior();
+                    anguloSintonia -= 45;
+                }
+                startXSintonia = e.clientX;
+                atualizarTelaRetrô();
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            arrastandoSintonia = false;
+        });
+
+        knobSintoniaContainer.addEventListener('touchstart', (e) => {
+            arrastandoSintonia = true;
+            startXSintonia = e.touches[0].clientX;
+            e.preventDefault();
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (!arrastandoSintonia) return;
+            const deltaX = e.touches[0].clientX - startXSintonia;
+
+            if (Math.abs(deltaX) > 25) {
+                if (deltaX > 0) {
+                    proximaRadio();
+                    anguloSintonia += 45;
+                } else {
+                    radioAnterior();
+                    anguloSintonia -= 45;
+                }
+                startXSintonia = e.touches[0].clientX;
+                atualizarTelaRetrô();
+            }
+        });
+
+        window.addEventListener('touchend', () => {
+            arrastandoSintonia = false;
+        });
+
 
         // ==========================================
         // SISTEMA DE COMERCIAIS AUTOMÁTICOS
