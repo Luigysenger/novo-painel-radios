@@ -541,42 +541,48 @@
             min-width: 280px;
         }
 
-        /* ==========================================
-           MODO RÁDIO RETRÔ (TELA CHEIA E ULTRA REALISTA)
-           ========================================== */
+        /* =========================================================
+           MODO RÁDIO RETRÔ (ESTILO MÓVEL DE MADEIRA CLÁSSICO E RESPONSIVO)
+           ========================================================= */
         #retroRadioContainer {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: radial-gradient(circle at center, #2c1d11 0%, #0d0603 100%);
+            background: #050302;
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            padding: 10px;
+            padding: 15px;
             box-sizing: border-box;
+            overflow-y: auto;
         }
+
+        /* Gabinete de Rádio Estilo Antigo de Madeira com Borda Arredondada Realista */
         .retro-cabinet {
-            background: linear-gradient(145deg, #5c3a1e 0%, #351f0f 50%, #211107 100%);
-            border: 10px solid #140a04;
-            border-radius: 30px;
-            width: 100vw;
-            height: 100vh;
-            max-width: none;
-            max-height: none;
+            background: linear-gradient(135deg, #784722 0%, #4a2a12 50%, #29160a 100%);
+            border: 14px solid #1a0e05;
+            border-radius: 35px;
+            width: 100%;
+            max-width: 780px;
+            height: auto;
+            min-height: 520px;
+            max-height: 95vh;
             padding: 20px 25px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 0 50px rgba(0,0,0,0.9), inset 0 0 60px rgba(0,0,0,0.7);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.95), inset 0 0 50px rgba(0,0,0,0.8);
             position: relative;
         }
+
         .retro-top-panel {
             display: flex;
             justify-content: space-between;
             width: 100%;
             align-items: center;
             z-index: 2;
+            margin-bottom: 5px;
         }
         .retro-led {
             width: 14px; height: 14px;
@@ -590,36 +596,72 @@
             box-shadow: 0 0 12px #ff0000, 0 0 22px #ff3333, inset 0 2px 4px rgba(255,255,255,0.6);
         }
         .btn-exit-retro {
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
             color: #fcd34d;
             border: 1px solid rgba(252, 211, 77, 0.4);
-            padding: 8px 16px;
+            padding: 6px 14px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             cursor: pointer;
             transition: background 0.2s;
         }
         .btn-exit-retro:hover { background: rgba(252, 211, 77, 0.25); }
 
-        /* MODULADOR DIGITAL ESTILO APARELHOS AIWA ANOS 90 */
-        .retro-dial-glass {
-            background: #050508;
-            border: 5px inset #12121c;
-            border-radius: 14px;
+        /* GRADE DE ALTO-FALANTE ESTILO VINTAGE (METÁLICA DOURADA/BRONZE) */
+        .retro-speaker-grille {
             width: 100%;
-            max-width: 600px;
-            padding: 15px 20px;
+            height: 160px;
+            background: repeating-linear-gradient(0deg, #3d2512, #3d2512 8px, #1c1007 8px, #1c1007 16px);
+            border-radius: 14px;
+            border: 6px solid #140a04;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.9);
+            margin: 10px 0;
+        }
+        .retro-speaker-mesh {
+            position: absolute;
+            width: 96%;
+            height: 85%;
+            background: radial-gradient(circle, rgba(212,175,55,0.15) 0%, rgba(30,15,5,0.8) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(212,175,55,0.3);
+        }
+        .retro-brand-badge {
+            background: linear-gradient(135deg, #d97706, #92400e);
+            color: #fff;
+            padding: 6px 18px;
+            border-radius: 4px;
+            font-weight: 900;
+            font-size: 12px;
+            letter-spacing: 2px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.7);
+            border: 1px solid #f59e0b;
+        }
+
+        /* PAINEL DE DIAL / SINTONIA ESTILO RÁDIO ANTIGO COM NOME DA RÁDIO E MODULADOR DIGITAL */
+        .retro-dial-glass {
+            background: #09090e;
+            border: 4px inset #1b150f;
+            border-radius: 10px;
+            width: 100%;
+            padding: 10px 15px;
             text-align: center;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.95);
-            margin: auto 0;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.95);
+            margin: 10px 0;
         }
         .retro-station-title {
-            font-size: 16px;
+            font-size: 14px;
             color: #ffb703;
             font-weight: 800;
-            text-shadow: 0 0 10px rgba(255, 183, 3, 0.6);
-            margin-bottom: 12px;
+            text-shadow: 0 0 8px rgba(255, 183, 3, 0.6);
+            margin-bottom: 8px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -631,23 +673,22 @@
             display: flex;
             justify-content: center;
             align-items: flex-end;
-            gap: 6px;
-            height: 65px;
-            padding: 5px 0;
-            background: rgba(0, 20, 10, 0.4);
-            border-radius: 8px;
+            gap: 5px;
+            height: 45px;
+            padding: 4px 0;
+            background: rgba(0, 15, 8, 0.5);
+            border-radius: 6px;
             border: 1px solid rgba(0, 255, 100, 0.15);
             overflow: hidden;
         }
         .mod-bar {
-            width: 12px;
+            width: 10px;
             background: linear-gradient(to top, #00ff88 0%, #ffaa00 70%, #ff3333 100%);
-            border-radius: 3px 3px 0 0;
-            height: 8px;
+            border-radius: 2px 2px 0 0;
+            height: 6px;
             transition: height 0.15s ease;
-            box-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
+            box-shadow: 0 0 6px rgba(0, 255, 136, 0.4);
         }
-        /* Animação dinâmica das barrinhas quando tocando */
         .playing-spectrum .mod-bar:nth-child(1) { animation: bounceBar 0.5s infinite alternate ease-in-out; }
         .playing-spectrum .mod-bar:nth-child(2) { animation: bounceBar 0.35s infinite alternate ease-in-out 0.1s; }
         .playing-spectrum .mod-bar:nth-child(3) { animation: bounceBar 0.6s infinite alternate ease-in-out 0.05s; }
@@ -659,43 +700,17 @@
         .playing-spectrum .mod-bar:nth-child(9) { animation: bounceBar 0.38s infinite alternate ease-in-out 0.12s; }
 
         @keyframes bounceBar {
-            0% { height: 10px; opacity: 0.5; }
-            100% { height: 58px; opacity: 1; }
-        }
-
-        .retro-speaker-grille {
-            width: 100%;
-            max-width: 500px;
-            height: 120px;
-            background: repeating-linear-gradient(0deg, #120a04, #120a04 6px, #070402 6px, #070402 12px);
-            border-radius: 12px;
-            border: 4px solid #0d0502;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: auto 0;
-            box-shadow: inset 0 0 25px rgba(0,0,0,0.95);
-        }
-        .retro-brand-badge {
-            background: linear-gradient(135deg, #d97706, #92400e);
-            color: #fff;
-            padding: 8px 22px;
-            border-radius: 6px;
-            font-weight: 900;
-            font-size: 14px;
-            letter-spacing: 3px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
-            border: 1px solid #f59e0b;
+            0% { height: 8px; opacity: 0.5; }
+            100% { height: 38px; opacity: 1; }
         }
 
         .retro-controls-row {
             display: flex;
             justify-content: space-around;
             width: 100%;
-            max-width: 500px;
+            max-width: 450px;
             align-items: center;
-            margin-top: auto;
-            margin-bottom: 10px;
+            margin-top: 5px;
         }
         .retro-knob-container {
             display: flex;
@@ -706,32 +721,50 @@
         }
         .retro-knob-container:active { cursor: grabbing; }
         .retro-knob {
-            width: 80px; height: 80px;
+            width: 65px; height: 65px;
             background: radial-gradient(circle, #332211 40%, #150e07 90%);
-            border: 5px solid #0a0502;
+            border: 4px solid #0a0502;
             border-radius: 50%;
             position: relative;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.8), inset 0 2px 5px rgba(255,255,255,0.15);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.8), inset 0 2px 4px rgba(255,255,255,0.15);
             transition: transform 0.05s ease-out;
         }
         .retro-knob-indicator {
             position: absolute;
-            top: 6px; left: 50%;
+            top: 4px; left: 50%;
             transform: translateX(-50%);
-            width: 4px; height: 22px;
+            width: 3px; height: 18px;
             background-color: #fbbf24;
             border-radius: 2px;
-            box-shadow: 0 0 6px #fbbf24;
+            box-shadow: 0 0 5px #fbbf24;
         }
         .retro-knob-label {
-            font-size: 11px;
+            font-size: 10px;
             color: #d1d5db;
-            margin-top: 8px;
+            margin-top: 6px;
             font-weight: 700;
             letter-spacing: 0.5px;
         }
 
         .hidden { display: none !important; }
+
+        /* Ajustes responsivos para telas de celulares menores */
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .retro-cabinet {
+                padding: 12px;
+                border-width: 8px;
+                min-height: 480px;
+            }
+            .retro-speaker-grille {
+                height: 110px;
+            }
+            .retro-knob {
+                width: 55px; height: 55px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -741,7 +774,7 @@
         Eiiii Ligadão! Tem Rádio nova adicionada pelo adm, Curta sem moderação.
     </div>
 
-    <!-- MODO RÁDIO RETRÔ TELA CHEIA -->
+    <!-- MODO RÁDIO RETRÔ TELA CHEIA (ESTILO MADEIRA CLÁSSICO) -->
     <div id="retroRadioContainer" class="hidden">
         <div class="retro-cabinet">
             <div class="retro-top-panel">
@@ -749,6 +782,14 @@
                 <button class="btn-exit-retro" id="btnSairRetro">Voltar ao Painel Normal</button>
             </div>
 
+            <!-- Grade de Alto-falante de Madeira Estilo Rádio Antigo -->
+            <div class="retro-speaker-grille">
+                <div class="retro-speaker-mesh">
+                    <div class="retro-brand-badge">VINTAGE SOUND</div>
+                </div>
+            </div>
+
+            <!-- Visor contendo o Nome da Rádio e o Modulador Digital Estilo Anos 90 -->
             <div class="retro-dial-glass">
                 <div class="retro-station-title" id="retroTitleDisplay">Nenhuma Rádio Selecionada</div>
                 <div class="digital-modulator-box" id="digitalModulatorSpectrum">
@@ -762,10 +803,6 @@
                     <div class="mod-bar"></div>
                     <div class="mod-bar"></div>
                 </div>
-            </div>
-
-            <div class="retro-speaker-grille">
-                <div class="retro-brand-badge">VINTAGE SOUND</div>
             </div>
 
             <div class="retro-controls-row">
@@ -1392,7 +1429,7 @@
         });
 
         // ==========================================
-        // SISTEMA DO MODO RÁDIO RETRÔ (TELA CHEIA & MODULADOR)
+        // SISTEMA DO MODO RÁDIO RETRÔ (ESTILO MADEIRA)
         // ==========================================
         const retroContainer = document.getElementById('retroRadioContainer');
         const btnAbrirRetro = document.getElementById('btnAbrirRetro');
@@ -1440,7 +1477,6 @@
             dialSintonia.style.transform = `rotate(${anguloSintonia}deg)`;
         }
 
-        // Interação por toque/arraste no Botão de Volume (0 a 30)
         let arrastandoVolume = false;
         let startXVol = 0;
 
@@ -1516,7 +1552,6 @@
             }
         });
 
-        // Interação de sintonia
         let arrastandoSintonia = false;
         let startXSintonia = 0;
 
@@ -1659,8 +1694,7 @@
                 modal.innerHTML = `<video id='videoComercialPlayer' src='${urlVideo}' controls autoplay style='max-width:90%; max-height:90%;'></video>`;
                 document.body.appendChild(modal);
                 
-                const vid = document.getElementById('videoComercialPlayer');
-                vid.onended = () => {
+                .onended = () => {
                     modal.remove();
                     if (callbackFim) callbackFim();
                 };
