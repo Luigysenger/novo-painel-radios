@@ -641,7 +641,6 @@
             text-overflow: ellipsis;
         }
 
-        /* Modulador / display digital inspirado nos rádios dos anos 90 */
         .retro-digital-tuner {
             width: 100%;
             display: grid;
@@ -788,7 +787,6 @@
             letter-spacing: .5px;
         }
 
-        /* Celulares: o aparelho usa praticamente toda a tela */
         @media (max-width: 700px) {
             #retroRadioContainer {
                 padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
@@ -805,7 +803,6 @@
             }
         }
 
-        /* Tablets */
         @media (min-width: 701px) and (max-width: 1100px) {
             .retro-cabinet {
                 width: min(94vw, 760px);
@@ -813,7 +810,6 @@
             }
         }
 
-        /* Paisagem em celulares/tablets: vira um rádio largo */
         @media (max-height: 600px) and (orientation: landscape) {
             #retroRadioContainer {
                 padding: 5px 8px;
@@ -840,10 +836,6 @@
             }
         }
 
-
-        /* =========================================================
-           PAINEL PRINCIPAL RESPONSIVO + ORDENACAO POR TOQUE
-           ========================================================= */
         .radio-card-user {
             touch-action: pan-y;
             -webkit-user-select: none;
@@ -1095,7 +1087,6 @@
             </div>
 
             <div class="retro-controls-row">
-                <!-- Botão Giratório de Sintonia / Passar Rádio -->
                 <div class="retro-knob-container" id="knobSintonia" title="Deslize para trocar de rádio">
                     <div class="retro-knob" id="dialSintonia">
                         <div class="retro-knob-indicator"></div>
@@ -1103,7 +1094,6 @@
                     <span class="retro-knob-label">SINTONIA</span>
                 </div>
 
-                <!-- Botão Giratório de Volume / Ligar Desligar (0 a 30) -->
                 <div class="retro-knob-container" id="knobVolume" title="Deslize para ajustar volume (0-30) ou clique para desligar">
                     <div class="retro-knob" id="dialVolume">
                         <div class="retro-knob-indicator"></div>
@@ -1146,7 +1136,7 @@
                 <div class="radios-grid-user" id="centerRadiosGrid"></div>
             </div>
 
-            <!-- Coluna 3: Palavra do Dia & Mensagens -->
+            <!-- Coluna 3: Palavra do Dia & Mensagens (Com Mensagem do Dia Ajustada) -->
             <div class="right-panel">
                 <div class="bible-card">
                     <h3>📖 PALAVRA DO DIA</h3>
@@ -1301,6 +1291,32 @@
             document.getElementById('relogioDigital').innerText = agora.toLocaleTimeString();
         }, 1000);
 
+        // Sistema dinâmico da Mensagem do Dia
+        function carregarMensagemDoDia() {
+            const mensagensDoDia = [
+                "\"O Senhor é o meu pastor; nada me faltará.\" — Salmo 23:1 ✨",
+                "\"Tudo posso naquele que me fortalece.\" — Filipenses 4:13 🌟",
+                "\"Confia no Senhor de todo o teu coração e não te estribes no teu próprio entendimento.\" — Provérbios 3:5 💡",
+                "\"O choro pode durar uma noite, mas a alegria vem pela manhã.\" — Salmo 30:5 🌅",
+                "\"Buscai primeiro o reino de Deus, e a sua justiça, e todas estas coisas vos serão acrescentadas.\" — Mateus 6:33 🕊️",
+                "\"O Senhor te abençoe e te guarde; o Senhor faça resplandecer o seu rosto sobre ti.\" — Números 6:24-25 🙏",
+                "\"Lâmpada para os meus pés é a tua palavra, e luz para o meu caminho.\" — Salmo 119:105 📖"
+            ];
+
+            // Seleciona a mensagem baseada no dia do ano atual para mudar automaticamente todo dia
+            const dataAtual = new Date();
+            const inicioAno = new Date(dataAtual.getFullYear(), 0, 0);
+            const diff = dataAtual - inicioAno;
+            const umDia = 1000 * 60 * 60 * 24;
+            const diaDoAno = Math.floor(diff / umDia);
+
+            const indiceMensagem = diaDoAno % mensagensDoDia.length;
+            const elementoVersiculo = document.getElementById('bibleDailyText');
+            if (elementoVersiculo) {
+                elementoVersiculo.innerText = mensagensDoDia[indiceMensagem];
+            }
+        }
+
         window.abrirSalmoDoDia = function() {
             document.getElementById('modalSalmoDia').classList.remove('hidden');
         };
@@ -1330,6 +1346,11 @@
             };
 
             display.innerHTML = `<strong>${livro} Capítulo ${cap}:</strong><br><br>${acervoBiblico[livro] || "Palavra inspiradora guardada no coração. Continue firme na fé!"}`;
+        });
+
+        // Inicializa a mensagem do dia ao carregar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarMensagemDoDia();
         });
     </script>
 
@@ -1542,7 +1563,6 @@
                     abrirModalPincelOuvinte(radio.id, corCard, iconeCard);
                 });
 
-                // Arrastar no computador (mouse)
                 card.addEventListener('dragstart', (e) => {
                     e.dataTransfer.setData('text/plain', radio.id);
                     e.dataTransfer.effectAllowed = 'move';
@@ -1572,7 +1592,6 @@
                     reordenarRadiosPorId(draggedId, targetId);
                 });
 
-                // Arrastar por toque no celular/tablet: exige pressionar e segurar
                 ativarArrastePorToque(card, radio.id);
 
                 centerRadiosGrid.appendChild(card);
@@ -1878,9 +1897,6 @@
             }
         });
 
-        // ==========================================
-        // SISTEMA DO MODO RÁDIO RETRÔ INTERATIVO
-        // ==========================================
         const retroContainer = document.getElementById('retroRadioContainer');
         const btnAbrirRetro = document.getElementById('btnAbrirRetro');
         const btnSairRetro = document.getElementById('btnSairRetro');
@@ -1892,7 +1908,7 @@
         const knobVolumeContainer = document.getElementById('knobVolume');
         const knobSintoniaContainer = document.getElementById('knobSintonia');
 
-        let volumeRetretroAtual = 15; // 0 a 30
+        let volumeRetretroAtual = 15;
         let anguloVolume = (volumeRetretroAtual / 30) * 270 - 135;
         let anguloSintonia = 0;
 
@@ -1930,7 +1946,6 @@
                 retroLed.classList.remove('on');
             }
 
-            // Modulador digital visual: não altera a frequência real do streaming.
             const numeroSintonia = todasRadiosGlobal.length > 0 && indiceRadioAtual >= 0
                 ? String(indiceRadioAtual + 1).padStart(2, '0')
                 : '--';
@@ -1942,7 +1957,6 @@
             dialSintonia.style.transform = `rotate(${anguloSintonia}deg)`;
         }
 
-        // Interação por toque/arraste no Botão de Volume (0 a 30)
         let arrastandoVolume = false;
         let startXVol = 0;
 
@@ -1975,7 +1989,6 @@
             arrastandoVolume = false;
         });
 
-        // Suporte a toque mobile para o volume
         knobVolumeContainer.addEventListener('touchstart', (e) => {
             arrastandoVolume = true;
             startXVol = e.touches[0].clientX;
@@ -2005,7 +2018,6 @@
             arrastandoVolume = false;
         });
 
-        // Clique direto no botão de volume para alternar Ligar/Desligar
         knobVolumeContainer.addEventListener('click', (e) => {
             if (Math.abs(e.clientX - startXVol) < 5) {
                 if (volumeRetretroAtual === 0) {
@@ -2020,7 +2032,6 @@
             }
         });
 
-        // Interação por toque/arraste no Botão de Sintonia (Próxima / Anterior)
         let arrastandoSintonia = false;
         let startXSintonia = 0;
 
@@ -2078,10 +2089,6 @@
             arrastandoSintonia = false;
         });
 
-
-        // ==========================================
-        // SISTEMA DE COMERCIAIS AUTOMÁTICOS
-        // ==========================================
         let comerciaisAtivos = [];
         let temporizadorComerciais = null;
 
