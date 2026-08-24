@@ -133,11 +133,10 @@
         const inputMensagem = document.getElementById('inputMensagem');
         const btnEnviar = document.getElementById('btnEnviar');
 
-        // Identificação única anônima por navegador (caso queira rastrear o ouvinte entre abas/aparelhos se usar login, 
-        // ou mantemos geral sincronizado na nuvem para todos visualizarem o chat global da rádio).
+        // Identificação única anônima por navegador
         let ouvinteId = localStorage.getItem('ouvinte_chat_id');
         if (!ouvinteId) {
-            ouvinteId = 'ouvinte_' + Math.random().toString(36.25).substr(2, 9);
+            ouvinteId = 'ouvinte_' + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('ouvinte_chat_id', ouvinteId);
         }
 
@@ -150,25 +149,39 @@
                 boxMensagens.innerHTML = '<div class="message-bubble">Nenhuma mensagem enviada ainda. Digite algo abaixo!</div>';
                 return;
             }
+
+            // Transforma o snapshot em array para ordenar de forma segura caso o timestamp demore a retornar do servidor
+            let mensagens = [];
             snapshot.forEach((doc) => {
-                const dados = doc.data();
+                mensagens.push({ id: doc.id, ...doc.data() });
+            });
+
+            // Ordena garantindo que mensagens sem timestamp recente fiquem no final sem sumir
+            mensagens.sort((a, b) => {
+                if (!a.timestamp) return 1;
+                if (!b.timestamp) return -1;
+                return a.timestamp.toMillis() - b.timestamp.toMillis();
+            });
+
+            mensagens.forEach((dados) => {
                 const div = document.createElement('div');
                 div.className = 'message-bubble';
-                
-                // Exibe o texto enviado
                 div.textContent = dados.texto || "Mensagem vazia";
                 boxMensagens.appendChild(div);
             });
+
             boxMensagens.scrollTop = boxMensagens.scrollHeight;
         }, (error) => {
             console.error("Erro ao carregar chat: ", error);
-            boxMensagens.innerHTML = '<div class="message-bubble">Erro ao conectar com o chat em tempo real.</div>';
+            boxMensagens.innerHTML = '<div class="message-bubble">Erro ao conectar com o chat em tempo real. Verifique as regras do Firebase.</div>';
         });
 
         // Evento de clique para enviar mensagem ao Firebase
         async function enviarMensagem() {
             const textoMensagem = inputMensagem.value.trim();
             if (textoMensagem === "") return;
+
+            btnEnviar.disabled = true;
 
             try {
                 await addDoc(collection(db, "mensagens_chat"), {
@@ -181,6 +194,8 @@
             } catch (erro) {
                 console.error("Erro ao enviar mensagem: ", erro);
                 alert("Erro ao enviar mensagem. Verifique a conexão.");
+            } finally {
+                btnEnviar.disabled = false;
             }
         }
 
