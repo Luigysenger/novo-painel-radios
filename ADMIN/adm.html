@@ -571,6 +571,106 @@
         }
 
         /* ==============================
+           ÁREA DE CHAT (NOVO MÓDULO)
+        ============================== */
+
+        .chat-admin-section {
+            margin-top: 35px;
+        }
+
+        .chat-admin-box {
+            background: rgba(30, 41, 59, 0.92);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            box-shadow: 0 10px 35px rgba(0,0,0,0.25);
+        }
+
+        .chat-admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .chat-admin-header h2 {
+            color: #38bdf8;
+            font-size: 20px;
+        }
+
+        .chat-messages-container {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            height: 350px;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .chat-msg-item {
+            background: rgba(30, 41, 59, 0.8);
+            padding: 10px 12px;
+            border-radius: 8px;
+            border-left: 4px solid #38bdf8;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .chat-msg-content {
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .chat-msg-user {
+            font-weight: bold;
+            color: #38bdf8;
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+
+        .chat-msg-text {
+            font-size: 13px;
+            color: #f8fafc;
+        }
+
+        .chat-msg-time {
+            font-size: 9px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .btn-delete-msg {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .btn-delete-msg:hover {
+            background: #dc2626;
+        }
+
+        .chat-controls-bar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* ==============================
            MODAL PERSONALIZAÇÃO
         ============================== */
 
@@ -887,7 +987,31 @@
 
 
     <!-- ======================================================
-         NOVA ÁREA DE COMERCIAIS
+         NOVA ÁREA DE CHAT DOS OUVINTES (MODERAÇÃO)
+    ======================================================= -->
+
+    <section class="chat-admin-section">
+        <div class="chat-admin-box">
+            <div class="chat-admin-header">
+                <h2>💬 Moderação do Chat ao Vivo</h2>
+                <span style="font-size: 11px; color: #94a3b8;">Gerencie e remova mensagens enviadas pelos ouvintes no player.</span>
+            </div>
+
+            <div class="chat-messages-container" id="chatMessagesContainer">
+                <div style="font-size:12px; color:#64748b; text-align:center; margin-top:50px;">Carregando mensagens do chat...</div>
+            </div>
+
+            <div class="chat-controls-bar">
+                <button type="button" id="btnLimparChat" class="btn-sair" style="background:#dc2626; font-size:12px;">
+                    🗑️ LIMPAR TODO O CHAT
+                </button>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ======================================================
+         ÁREA DE COMERCIAIS
     ======================================================= -->
 
     <section class="commercial-section">
@@ -1501,7 +1625,11 @@
         push,
         get,
         remove,
-        update
+        update,
+        onValue,
+        query,
+        orderByChild,
+        limitToLast
     }
     from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
@@ -1554,6 +1682,8 @@
         carregarCampanhas();
 
         carregarMensagemDoDia();
+
+        ouvirMensagensChat();
 
     });
 
@@ -1610,6 +1740,83 @@
         } catch (erro) {
             console.error("Erro ao salvar mensagem do dia:", erro);
             alert("Erro ao salvar a mensagem do dia.");
+        }
+    });
+
+
+    /* =====================================================
+       MODERAÇÃO DO CHAT AO VIVO
+    ====================================================== */
+
+    const chatMessagesContainer = document.getElementById('chatMessagesContainer');
+    const btnLimparChat = document.getElementById('btnLimparChat');
+
+    function ouvirMensagensChat() {
+        const chatRef = query(ref(db, 'chat_ao_vivo'), orderByChild('timestamp'), limitToLast(100));
+        
+        onValue(chatRef, (snapshot) => {
+            chatMessagesContainer.innerHTML = "";
+
+            if (!snapshot.exists()) {
+                chatMessagesContainer.innerHTML = '<div style="font-size:12px; color:#64748b; text-align:center; margin-top:50px;">Nenhuma mensagem no chat no momento.</div>';
+                return;
+            }
+
+            let mensagens = [];
+            snapshot.forEach((child) => {
+                mensagens.push({
+                    id: child.key,
+                    ...child.val()
+                });
+            });
+
+            // Ordenar por data caso necessário
+            mensagens.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+            mensagens.forEach((msg) => {
+                const item = document.createElement('div');
+                item.className = 'chat-msg-item';
+
+                const dataFmt = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}) : '';
+
+                item.innerHTML = `
+                    <div class="chat-msg-content">
+                        <div class="chat-msg-user">${escapeHtml(msg.usuario || 'Anônimo')}</div>
+                        <div class="chat-msg-text">${escapeHtml(msg.texto || '')}</div>
+                        <div class="chat-msg-time">${dataFmt}</div>
+                    </div>
+                    <button class="btn-delete-msg" data-id="${msg.id}" title="Excluir mensagem">Excluir</button>
+                `;
+
+                chatMessagesContainer.appendChild(item);
+            });
+
+            // Rolagem automática para o fim
+            chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+
+            // Atribuir evento de exclusão individual
+            document.querySelectorAll('.btn-delete-msg').forEach((btn) => {
+                btn.addEventListener('click', async (e) => {
+                    const idMsg = e.target.getAttribute('data-id');
+                    try {
+                        await remove(ref(db, 'chat_ao_vivo/' + idMsg));
+                    } catch (err) {
+                        console.error("Erro ao apagar mensagem:", err);
+                    }
+                });
+            });
+        });
+    }
+
+    btnLimparChat.addEventListener('click', async () => {
+        if (confirm("Tem certeza que deseja apagar todo o histórico do chat ao vivo?")) {
+            try {
+                await remove(ref(db, 'chat_ao_vivo'));
+                alert("Chat limpo com sucesso!");
+            } catch (err) {
+                console.error("Erro ao limpar chat:", err);
+                alert("Erro ao limpar o chat.");
+            }
         }
     });
 
@@ -1741,6 +1948,7 @@
             );
 
             return;
+
         }
 
 
