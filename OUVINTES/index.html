@@ -1360,6 +1360,19 @@
             }
         }
 
+        // NOVO: Monitorar em tempo real a Mensagem do Dia vinda do Firebase
+        function monitorarMensagemDoDia() {
+            const mensagemRef = ref(db, 'configuracoes/mensagemDoDia');
+            onValue(mensagemRef, (snapshot) => {
+                const bibleDailyText = document.getElementById('bibleDailyText');
+                if (snapshot.exists() && snapshot.val()) {
+                    bibleDailyText.innerText = `"${snapshot.val()}" ✨`;
+                } else {
+                    bibleDailyText.innerText = `"O Senhor é o meu pastor; nada me faltará." — Salmo 23:1 ✨`;
+                }
+            });
+        }
+
         document.addEventListener('click', (e) => {
             if (balaoAviso.style.display === 'block') {
                 balaoAviso.style.display = 'none';
@@ -1382,6 +1395,7 @@
             carregarDadosDoPainel();
             verificarNotificacaoRadioNova();
             monitorarComerciaisOuvinte();
+            monitorarMensagemDoDia(); // Inicializa o ouvinte em tempo real da mensagem do dia
         });
 
         document.getElementById('btnSair').addEventListener('click', () => {
