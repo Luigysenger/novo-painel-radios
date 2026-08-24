@@ -69,6 +69,7 @@
             font-size: 13px;
             max-width: 80%;
             border: 1px solid #7c3aed;
+            word-break: break-word;
         }
         .chat-input-area {
             display: flex;
@@ -132,7 +133,15 @@
         const inputMensagem = document.getElementById('inputMensagem');
         const btnEnviar = document.getElementById('btnEnviar');
 
-        // Função para escutar as mensagens em tempo real do Firebase
+        // Identificação única anônima por navegador (caso queira rastrear o ouvinte entre abas/aparelhos se usar login, 
+        // ou mantemos geral sincronizado na nuvem para todos visualizarem o chat global da rádio).
+        let ouvinteId = localStorage.getItem('ouvinte_chat_id');
+        if (!ouvinteId) {
+            ouvinteId = 'ouvinte_' + Math.random().toString(36.25).substr(2, 9);
+            localStorage.setItem('ouvinte_chat_id', ouvinteId);
+        }
+
+        // Função para escutar as mensagens em tempo real do Firebase na coleção unificada "mensagens_chat"
         const q = query(collection(db, "mensagens_chat"), orderBy("timestamp", "asc"));
         
         onSnapshot(q, (snapshot) => {
@@ -145,33 +154,43 @@
                 const dados = doc.data();
                 const div = document.createElement('div');
                 div.className = 'message-bubble';
+                
+                // Exibe o texto enviado
                 div.textContent = dados.texto || "Mensagem vazia";
                 boxMensagens.appendChild(div);
             });
             boxMensagens.scrollTop = boxMensagens.scrollHeight;
+        }, (error) => {
+            console.error("Erro ao carregar chat: ", error);
+            boxMensagens.innerHTML = '<div class="message-bubble">Erro ao conectar com o chat em tempo real.</div>';
         });
 
         // Evento de clique para enviar mensagem ao Firebase
-        btnEnviar.addEventListener('click', async () => {
+        async function enviarMensagem() {
             const textoMensagem = inputMensagem.value.trim();
             if (textoMensagem === "") return;
 
             try {
                 await addDoc(collection(db, "mensagens_chat"), {
                     texto: textoMensagem,
+                    remetenteId: ouvinteId,
                     timestamp: serverTimestamp()
                 });
                 inputMensagem.value = "";
+                inputMensagem.focus();
             } catch (erro) {
                 console.error("Erro ao enviar mensagem: ", erro);
                 alert("Erro ao enviar mensagem. Verifique a conexão.");
             }
-        });
+        }
+
+        btnEnviar.addEventListener('click', enviarMensagem);
 
         // Enviar também ao apertar a tecla Enter
         inputMensagem.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                btnEnviar.click();
+                e.preventDefault();
+                enviarMensagem();
             }
         });
     </script>
