@@ -150,13 +150,11 @@
                 return;
             }
 
-            // Transforma o snapshot em array para ordenar de forma segura caso o timestamp demore a retornar do servidor
             let mensagens = [];
             snapshot.forEach((doc) => {
                 mensagens.push({ id: doc.id, ...doc.data() });
             });
 
-            // Ordena garantindo que mensagens sem timestamp recente fiquem no final sem sumir
             mensagens.sort((a, b) => {
                 if (!a.timestamp) return 1;
                 if (!b.timestamp) return -1;
@@ -173,10 +171,9 @@
             boxMensagens.scrollTop = boxMensagens.scrollHeight;
         }, (error) => {
             console.error("Erro ao carregar chat: ", error);
-            boxMensagens.innerHTML = '<div class="message-bubble">Erro ao conectar com o chat em tempo real. Verifique as regras do Firebase.</div>';
+            boxMensagens.innerHTML = '<div class="message-bubble">Erro ao conectar com o chat em tempo real.</div>';
         });
 
-        // Evento de clique para enviar mensagem ao Firebase
         async function enviarMensagem() {
             const textoMensagem = inputMensagem.value.trim();
             if (textoMensagem === "") return;
@@ -201,7 +198,6 @@
 
         btnEnviar.addEventListener('click', enviarMensagem);
 
-        // Enviar também ao apertar a tecla Enter
         inputMensagem.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
