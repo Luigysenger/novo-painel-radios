@@ -789,6 +789,29 @@
 
 
     <!-- ==============================
+         MENSAGEM DO DIA (NOVO MÓDULO)
+    ================================ -->
+
+    <div class="card-form">
+        <h2>💬 Mensagem do Dia para os Ouvintes</h2>
+        <div class="form-group">
+            <label>TEXTO DA MENSAGEM</label>
+            <textarea id="inputMensagemDia" rows="3" placeholder="Digite aqui a mensagem que aparecerá em destaque para os ouvintes..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>STATUS DA MENSAGEM</label>
+            <select id="selectMensagemAtiva">
+                <option value="true">Exibir Mensagem para os Ouvintes</option>
+                <option value="false">Ocultar Mensagem</option>
+            </select>
+        </div>
+        <button type="button" id="btnSalvarMensagem" class="btn-salvar">
+            SALVAR MENSAGEM DO DIA
+        </button>
+    </div>
+
+
+    <!-- ==============================
          CADASTRO DE RÁDIO
     ============================== -->
 
@@ -1530,6 +1553,8 @@
 
         carregarCampanhas();
 
+        carregarMensagemDoDia();
+
     });
 
 
@@ -1548,6 +1573,45 @@
             window.location.href = "../index.html";
 
         });
+
+
+    /* =====================================================
+       MENSAGEM DO DIA
+    ====================================================== */
+
+    const inputMensagemDia = document.getElementById('inputMensagemDia');
+    const selectMensagemAtiva = document.getElementById('selectMensagemAtiva');
+    const btnSalvarMensagem = document.getElementById('btnSalvarMensagem');
+
+    async function carregarMensagemDoDia() {
+        try {
+            const snapshot = await get(ref(db, 'configuracoes/mensagemDoDia'));
+            if (snapshot.exists()) {
+                const dados = snapshot.val();
+                inputMensagemDia.value = dados.texto || '';
+                selectMensagemAtiva.value = String(dados.ativa ?? true);
+            }
+        } catch (erro) {
+            console.error("Erro ao carregar mensagem do dia:", erro);
+        }
+    }
+
+    btnSalvarMensagem.addEventListener('click', async () => {
+        const texto = inputMensagemDia.value.trim();
+        const ativa = selectMensagemAtiva.value === 'true';
+
+        try {
+            await set(ref(db, 'configuracoes/mensagemDoDia'), {
+                texto: texto,
+                ativa: ativa,
+                atualizadoEm: Date.now()
+            });
+            alert("Mensagem do dia salva com sucesso!");
+        } catch (erro) {
+            console.error("Erro ao salvar mensagem do dia:", erro);
+            alert("Erro ao salvar a mensagem do dia.");
+        }
+    });
 
 
     /* =====================================================
