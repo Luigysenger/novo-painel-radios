@@ -86,17 +86,12 @@
             font-size: 13px;
             color: #cbd5e1;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 8px;
         }
-        .chat-header-info i {
-            color: #10b981;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.4; }
-            100% { opacity: 1; }
+        .chat-header-info span {
+            color: #ff2a85;
+            font-weight: 600;
         }
         .chat-messages {
             flex: 1;
@@ -108,14 +103,17 @@
             scroll-behavior: smooth;
         }
         .message-bubble {
-            background: rgba(31, 18, 53, 0.7);
-            padding: 12px 18px;
+            background: rgba(31, 18, 53, 0.8);
+            padding: 12px 16px;
             border-radius: 14px;
             font-size: 14px;
             max-width: 75%;
             border: 1px solid rgba(255, 255, 255, 0.06);
             word-break: break-word;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
         .message-bubble.me {
             background: linear-gradient(135deg, #ff2a85 0%, #e01e73 100%);
@@ -123,6 +121,26 @@
             align-self: flex-end;
             border-bottom-right-radius: 4px;
             box-shadow: 0 4px 15px rgba(255, 42, 133, 0.3);
+        }
+        .msg-author {
+            font-size: 11px;
+            font-weight: 600;
+            color: #d8b4fe;
+        }
+        .message-bubble.me .msg-author {
+            color: rgba(255, 255, 255, 0.85);
+        }
+        .msg-text {
+            font-size: 14px;
+        }
+        .msg-time {
+            font-size: 10px;
+            color: #94a3b8;
+            align-self: flex-end;
+            margin-top: 2px;
+        }
+        .message-bubble.me .msg-time {
+            color: rgba(255, 255, 255, 0.7);
         }
         .chat-input-area {
             padding: 20px;
@@ -182,7 +200,8 @@
 
     <div class="chat-container">
         <div class="chat-header-info">
-            <i class="fa-solid fa-circle"></i> Conectado com o Administrador • Histórico em tempo real
+            <span><i class="fa-solid fa-circle" style="color: #10b981; font-size: 10px;"></i> Conectado com o ADM</span>
+            <div id="nomeOuvinteDisplay" style="font-size: 12px; color: #cbd5e1;">Identificação: Ouvinte</div>
         </div>
         
         <div id="boxMensagens" class="chat-messages">
@@ -197,12 +216,11 @@
         </div>
     </div>
 
-    <!-- Firebase Inicializado Autônomo e Direto -->
+    <!-- Script Corrigido para Coleção 'mensagens' e exibição de Nome/Hora -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Configuração direta do projeto Firestore para evitar erros de caminhos de pastas
         const firebaseConfig = {
             projectId: "novo-jeito-de-ouvir-radio"
         };
@@ -213,15 +231,20 @@
         const boxMensagens = document.getElementById('boxMensagens');
         const inputMensagem = document.getElementById('inputMensagem');
         const btnEnviar = document.getElementById('btnEnviar');
+        const nomeOuvinteDisplay = document.getElementById('nomeOuvinteDisplay');
 
+        // Pega o nome do ouvinte logado no painel (salvo no localStorage) ou gera um padrão amigável
+        let nomeOuvinte = localStorage.getItem('usuario_logado_nome') || localStorage.getItem('ouvinte_nome') || 'Ouvinte';
         let ouvinteId = localStorage.getItem('ouvinte_chat_id');
         if (!ouvinteId) {
             ouvinteId = 'ouvinte_' + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('ouvinte_chat_id', ouvinteId);
         }
 
-        // Tempo real ativado
-        onSnapshot(collection(db, "mensagens_chat"), (snapshot) => {
+        nomeOuvinteDisplay.textContent = `Logado como: ${nomeOuvinte}`;
+
+        // Escutando a coleção correta 'mensagens' (mesma do painel ADM)
+        onSnapshot(collection(db, "mensagens"), (snapshot) => {
             boxMensagens.innerHTML = "";
             if (snapshot.empty) {
                 boxMensagens.innerHTML = '<div class="message-bubble" style="text-align: center; background: transparent; border: none; color: #94a3b8;">Nenhuma mensagem enviada ainda. Seja o primeiro a mandar um alô!</div>';
@@ -241,12 +264,25 @@
 
             mensagens.forEach((dados) => {
                 const div = document.createElement('div');
-                if (dados.remetenteId === ouvinteId) {
-                    div.className = 'message-bubble me';
-                } else {
-                    div.className = 'message-bubble';
+                
+                const isMe = dados.remetenteId === ouvinteId || dados.autor === nomeOuvinte;
+                div.className = isMe ? 'message-bubble me' : 'message-bubble';
+
+                // Formatando a hora do envio
+                let horaFormatada = "Agora";
+                if (dados.timestamp && dados.timestamp.toDate) {
+                    horaFormatada = dados.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 }
-                div.textContent = dados.texto || "Mensagem vazia";
+
+                const autorNome = dados.autor || dados.nomeOuvinte || "Ouvinte Anônimo";
+                const textoMsg = dados.texto || dados.mensagem || "Mensagem vazia";
+
+                div.innerHTML = `
+                    <span class="msg-author">${autorNome}</span>
+                    <span class="msg-text">${textoMsg}</span>
+                    <span class="msg-time">${horaFormatada}</span>
+                `;
+
                 boxMensagens.appendChild(div);
             });
 
@@ -263,8 +299,10 @@
             btnEnviar.disabled = true;
 
             try {
-                await addDoc(collection(db, "mensagens_chat"), {
+                // Salvando na coleção 'mensagens' com nome e ID para o painel ADM receber perfeitamente
+                await addDoc(collection(db, "mensagens"), {
                     texto: textoMensagem,
+                    autor: nomeOuvinte,
                     remetenteId: ouvinteId,
                     timestamp: serverTimestamp()
                 });
