@@ -1603,7 +1603,6 @@
 </div>
 
 
-<!-- CORREÇÃO DE ÁUDIO: Atributos crossOrigin e preload adicionados -->
 <audio
     id="audioStreaming"
     preload="auto"
@@ -1770,7 +1769,6 @@
                 });
             });
 
-            // Ordenar por data caso necessário
             mensagens.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
             mensagens.forEach((msg) => {
@@ -1791,10 +1789,8 @@
                 chatMessagesContainer.appendChild(item);
             });
 
-            // Rolagem automática para o fim
             chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
 
-            // Atribuir evento de exclusão individual
             document.querySelectorAll('.btn-delete-msg').forEach((btn) => {
                 btn.addEventListener('click', async (e) => {
                     const idMsg = e.target.getAttribute('data-id');
@@ -2235,7 +2231,7 @@
 
 
     /* =====================================================
-       TOCAR RÁDIO (CORRIGIDO PARA OUVIR STREAMINGS)
+       TOCAR RÁDIO
     ====================================================== */
 
     function tocarRadioPorIndice(index) {
@@ -2288,7 +2284,6 @@
         btnPlayPause.innerText =
             "⏸️";
 
-        // CORREÇÃO DE ÁUDIO: Parar o stream anterior, resetar a fonte e carregar adequadamente
         audioElement.pause();
         audioElement.currentTime = 0;
         audioElement.src = radio.url;
@@ -2308,7 +2303,6 @@
 
     }
 
-    // CORREÇÃO DE ÁUDIO: Listener extra para capturar erros de mídia em tempo de execução
     audioElement.addEventListener('error', (e) => {
         console.error("Erro na tag de áudio:", e);
         btnPlayPause.innerText = "▶️";
@@ -3336,10 +3330,6 @@
             let storagePath =
                 arquivoAtualStoragePath;
 
-
-            /* ==============================
-               UPLOAD
-            ============================== */
 
             if (arquivo) {
 
