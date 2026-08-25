@@ -1257,10 +1257,69 @@
 
     <script type="module">
         import { db } from '../firebase-config.js';
-        import { ref, get, push, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { ref, get, push, set, update, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         let nomeUsuarioId = localStorage.getItem('usuarioLogado') || "ouvinte_anonimo";
         let chaveFirebaseUser = nomeUsuarioId.replace(/[^a-zA-Z0-9]/g, "_");
+
+
+        // =====================================================
+        // IDENTIDADE + PRESENÇA PARA O CHAT
+        // Mantém o ouvinte Online no ADM enquanto este painel estiver aberto.
+        // =====================================================
+        let chatOuvinteId = localStorage.getItem('usuarioKey') || localStorage.getItem('userId') || null;
+        let chatOuvinteNome = localStorage.getItem('usuarioNome') || localStorage.getItem('usuarioLogado') || nomeUsuarioId;
+        let timerPresencaChat = null;
+
+        async function resolverIdentidadeChatOuvinte() {
+            if (chatOuvinteId) return chatOuvinteId;
+
+            try {
+                const contasSnap = await get(ref(db, 'contas'));
+                if (contasSnap.exists()) {
+                    const alvo = String(localStorage.getItem('usuarioLogado') || localStorage.getItem('usuarioNome') || '').trim().toLowerCase();
+                    contasSnap.forEach(child => {
+                        if (chatOuvinteId) return;
+                        const conta = child.val() || {};
+                        const candidatos = [conta.nome, conta.email, conta.login].filter(Boolean).map(v => String(v).trim().toLowerCase());
+                        if (alvo && candidatos.includes(alvo)) {
+                            chatOuvinteId = child.key;
+                            chatOuvinteNome = conta.nome || chatOuvinteNome;
+                        }
+                    });
+                }
+            } catch (erro) {
+                console.warn('Não foi possível localizar a conta do ouvinte para o chat:', erro);
+            }
+
+            if (!chatOuvinteId) chatOuvinteId = chaveFirebaseUser;
+            localStorage.setItem('usuarioKey', chatOuvinteId);
+            localStorage.setItem('userId', chatOuvinteId);
+            if (chatOuvinteNome) localStorage.setItem('usuarioNome', chatOuvinteNome);
+            return chatOuvinteId;
+        }
+
+        async function ativarPresencaChatOuvinte() {
+            const id = await resolverIdentidadeChatOuvinte();
+            if (!id) return;
+
+            const perfilRef = ref(db, `ouvintes_chat/${id}/perfil`);
+            const presencaRef = ref(db, `ouvintes_chat/${id}/presenca`);
+
+            await update(perfilRef, { nome: chatOuvinteNome || 'Ouvinte' });
+            await update(presencaRef, { status: 'online', lastSeen: Date.now() });
+
+            try {
+                await onDisconnect(presencaRef).set({ status: 'offline', lastSeen: Date.now() });
+            } catch (erro) {
+                console.warn('onDisconnect indisponível para presença:', erro);
+            }
+
+            if (timerPresencaChat) clearInterval(timerPresencaChat);
+            timerPresencaChat = setInterval(() => {
+                update(presencaRef, { status: 'online', lastSeen: Date.now() }).catch(() => {});
+            }, 20000);
+        }
 
         const balaoAviso = document.getElementById('balaoAviso');
 
@@ -1337,10 +1396,15 @@
             verificarNotificacaoRadioNova();
             monitorarComerciaisOuvinte();
             monitorarMensagemDoDia(); // Inicializa o ouvinte em tempo real da mensagem do dia
+            ativarPresencaChatOuvinte();
         });
 
-        document.getElementById('btnSair').addEventListener('click', () => {
+        document.getElementById('btnSair').addEventListener('click', async () => {
             audioElement.pause();
+            try {
+                const id = await resolverIdentidadeChatOuvinte();
+                if (id) await update(ref(db, `ouvintes_chat/${id}/presenca`), { status: 'offline', lastSeen: Date.now() });
+            } catch (e) {}
             localStorage.removeItem('usuarioLogado');
             window.location.href = "../index.html";
         });
