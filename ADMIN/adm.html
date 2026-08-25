@@ -571,7 +571,7 @@
         }
 
         /* ==============================
-           ÁREA DE CHAT (NOVO MÓDULO)
+           ÁREA DE CHAT (NOVO MÓDULO APRIMORADO)
         ============================== */
 
         .chat-admin-section {
@@ -600,6 +600,78 @@
             font-size: 20px;
         }
 
+        .chat-layout-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 15px;
+        }
+
+        @media(max-width: 900px) {
+            .chat-layout-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .ouvintes-sidebar {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 15px;
+            max-height: 420px;
+            overflow-y: auto;
+        }
+
+        .ouvintes-sidebar h3 {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .ouvinte-status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+
+        .ouvinte-status-item:hover {
+            background: rgba(56, 189, 248, 0.15);
+        }
+
+        .msn-icon {
+            font-size: 14px;
+        }
+
+        .ouvinte-nome {
+            font-weight: bold;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+        }
+
+        .status-online {
+            color: #4ade80 !important; /* Verde */
+        }
+
+        .status-offline {
+            color: #f87171 !important; /* Vermelho */
+        }
+
+        .chat-main-area {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
         .chat-messages-container {
             background: #0f172a;
             border: 1px solid #334155;
@@ -610,7 +682,6 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            margin-bottom: 15px;
         }
 
         .chat-msg-item {
@@ -668,6 +739,42 @@
             gap: 10px;
             align-items: center;
             flex-wrap: wrap;
+        }
+
+        .chat-send-box {
+            display: flex;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .chat-send-box input {
+            flex: 1;
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 10px;
+            border-radius: 8px;
+            color: white;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .chat-send-box input:focus {
+            border-color: #38bdf8;
+        }
+
+        .btn-enviar-chat {
+            background: #0284c7;
+            color: white;
+            border: none;
+            padding: 0 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .btn-enviar-chat:hover {
+            background: #0369a1;
         }
 
         /* ==============================
@@ -987,24 +1094,42 @@
 
 
     <!-- ======================================================
-         NOVA ÁREA DE CHAT DOS OUVINTES (MODERAÇÃO)
+         ÁREA DE CHAT DOS OUVINTES (MODERAÇÃO E DIRETOS)
     ======================================================= -->
 
     <section class="chat-admin-section">
         <div class="chat-admin-box">
             <div class="chat-admin-header">
-                <h2>💬 Moderação do Chat ao Vivo</h2>
-                <span style="font-size: 11px; color: #94a3b8;">Gerencie e remova mensagens enviadas pelos ouvintes no player.</span>
+                <h2>💬 Moderação de Mensagens e Ouvintes</h2>
+                <span style="font-size: 11px; color: #94a3b8;">Monitore o status dos ouvintes (Online/Offline) e gerencie mensagens em tempo real.</span>
             </div>
 
-            <div class="chat-messages-container" id="chatMessagesContainer">
-                <div style="font-size:12px; color:#64748b; text-align:center; margin-top:50px;">Carregando mensagens do chat...</div>
-            </div>
+            <div class="chat-layout-grid">
+                <!-- COLUNA DA ESQUERDA: LISTA DE OUVINTES COM STATUS E ÍCONE MSN -->
+                <div class="ouvintes-sidebar">
+                    <h3>Ouvintes Cadastrados</h3>
+                    <div id="listaOuvintesStatus">
+                        <div style="font-size:11px; color:#64748b; text-align:center; margin-top:20px;">Carregando ouvintes...</div>
+                    </div>
+                </div>
 
-            <div class="chat-controls-bar">
-                <button type="button" id="btnLimparChat" class="btn-sair" style="background:#dc2626; font-size:12px;">
-                    🗑️ LIMPAR TODO O CHAT
-                </button>
+                <!-- COLUNA DA DIREITA: MENSAGENS E ENVIO -->
+                <div class="chat-main-area">
+                    <div class="chat-messages-container" id="chatMessagesContainer">
+                        <div style="font-size:12px; color:#64748b; text-align:center; margin-top:50px;">Carregando mensagens do chat...</div>
+                    </div>
+
+                    <div class="chat-send-box">
+                        <input type="text" id="inputMsgAdm" placeholder="Escrever mensagem como Administrador..." autocomplete="off">
+                        <button type="button" id="btnEnviarMsgAdm" class="btn-enviar-chat">Enviar</button>
+                    </div>
+
+                    <div class="chat-controls-bar" style="margin-top: 5px;">
+                        <button type="button" id="btnLimparChat" class="btn-sair" style="background:#dc2626; font-size:12px;">
+                            🗑️ LIMPAR TODO O CHAT
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -1684,6 +1809,8 @@
 
         ouvirMensagensChat();
 
+        monitorarOuvintesOnline();
+
     });
 
 
@@ -1744,13 +1871,19 @@
 
 
     /* =====================================================
-       MODERAÇÃO DO CHAT AO VIVO
+       MODERAÇÃO DO CHAT AO VIVO E MONITORAMENTO DE OUVINTES
     ====================================================== */
 
     const chatMessagesContainer = document.getElementById('chatMessagesContainer');
     const btnLimparChat = document.getElementById('btnLimparChat');
+    const inputMsgAdm = document.getElementById('inputMsgAdm');
+    const btnEnviarMsgAdm = document.getElementById('btnEnviarMsgAdm');
+    const listaOuvintesStatus = document.getElementById('listaOuvintesStatus');
+
+    let ouvinteSelecionadoChat = null; // null = geral ou todos, ou nome/id do ouvinte específico
 
     function ouvirMensagensChat() {
+        // Escutando tanto no caminho chat_ao_vivo quanto chat_ouvintes para garantir compatibilidade
         const chatRef = query(ref(db, 'chat_ao_vivo'), orderByChild('timestamp'), limitToLast(100));
         
         onValue(chatRef, (snapshot) => {
@@ -1803,6 +1936,88 @@
             });
         });
     }
+
+    // Monitorar ouvintes cadastrados e status Online/Offline (com base no heartbeat / ultima_atividade)
+    function monitorarOuvintesOnline() {
+        onValue(ref(db, 'ouvintes_cadastrados'), (snapshot) => {
+            listaOuvintesStatus.innerHTML = "";
+
+            if (!snapshot.exists()) {
+                listaOuvintesStatus.innerHTML = '<div style="font-size:11px; color:#64748b; text-align:center; padding:10px;">Nenhum ouvinte cadastrado.</div>';
+                return;
+            }
+
+            const agora = Date.now();
+            let htmlGeral = `<div class="ouvinte-status-item" data-ouvinte="todos" style="border: 1px dashed #38bdf8;">
+                <span class="msn-icon">👤</span>
+                <span class="ouvinte-nome" style="color: #38bdf8;">💬 Enviar para Todos</span>
+            </div>`;
+
+            snapshot.forEach((child) => {
+                const ouvinte = child.val();
+                const nomeOuvinte = ouvinte.nome || ouvinte.usuario || ouvinte.email || "Ouvinte";
+                const ultimaAtv = ouvinte.ultimaAtividade || ouvinte.ultimoAcesso || 0;
+                
+                // Se a última atividade ocorreu nos últimos 45 segundos, considera online
+                const isOnline = (agora - ultimaAtv) < 45000;
+                const statusClass = isOnline ? 'status-online' : 'status-offline';
+                const statusTexto = isOnline ? 'Online' : 'Offline';
+
+                htmlGeral += `
+                    <div class="ouvinte-status-item" data-ouvinte="${escapeAttribute(nomeOuvinte)}">
+                        <span class="msn-icon">👤</span>
+                        <span class="ouvinte-nome ${statusClass}">${escapeHtml(nomeOuvinte)}</span>
+                        <span style="font-size: 9px; color: ${isOnline ? '#4ade80' : '#f87171'};">${statusTexto}</span>
+                    </div>
+                `;
+            });
+
+            listaOuvintesStatus.innerHTML = htmlGeral;
+
+            // Evento de clique para selecionar o ouvinte para quem quer mandar mensagem
+            document.querySelectorAll('.ouvinte-status-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    const dest = el.getAttribute('data-ouvinte');
+                    ouvinteSelecionadoChat = dest === 'todos' ? null : dest;
+                    
+                    document.querySelectorAll('.ouvinte-status-item').forEach(item => item.style.background = 'rgba(30, 41, 59, 0.5)');
+                    el.style.background = 'rgba(56, 189, 248, 0.25)';
+
+                    if (ouvinteSelecionadoChat) {
+                        inputMsgAdm.placeholder = `Enviar mensagem direta para @${ouvinteSelecionadoChat}...`;
+                    } else {
+                        inputMsgAdm.placeholder = `Escrever mensagem como Administrador (Geral)...`;
+                    }
+                });
+            });
+        });
+    }
+
+    // Enviar mensagem do Admin
+    async function enviarMensagemAdmin() {
+        const texto = inputMsgAdm.value.trim();
+        if (!texto) return;
+
+        try {
+            const novaMsgRef = push(ref(db, 'chat_ao_vivo'));
+            await set(novaMsgRef, {
+                usuario: ouvinteSelecionadoChat ? `Administrador (Para: ${ouvinteSelecionadoChat})` : 'Administrador',
+                texto: texto,
+                destinatario: ouvinteSelecionadoChat || 'todos',
+                timestamp: Date.now()
+            });
+
+            inputMsgAdm.value = "";
+        } catch (err) {
+            console.error("Erro ao enviar mensagem do adm:", err);
+            alert("Erro ao enviar mensagem.");
+        }
+    }
+
+    btnEnviarMsgAdm.addEventListener('click', enviarMensagemAdmin);
+    inputMsgAdm.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') enviarMensagemAdmin();
+    });
 
     btnLimparChat.addEventListener('click', async () => {
         if (confirm("Tem certeza que deseja apagar todo o histórico do chat ao vivo?")) {
