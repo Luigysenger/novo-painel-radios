@@ -216,7 +216,7 @@
         </div>
     </div>
 
-    <!-- Script Corrigido para Coleção 'mensagens' e exibição de Nome/Hora -->
+    <!-- Script unificado para a coleção 'mensagens' -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -233,7 +233,6 @@
         const btnEnviar = document.getElementById('btnEnviar');
         const nomeOuvinteDisplay = document.getElementById('nomeOuvinteDisplay');
 
-        // Pega o nome do ouvinte logado no painel (salvo no localStorage) ou gera um padrão amigável
         let nomeOuvinte = localStorage.getItem('usuario_logado_nome') || localStorage.getItem('ouvinte_nome') || 'Ouvinte';
         let ouvinteId = localStorage.getItem('ouvinte_chat_id');
         if (!ouvinteId) {
@@ -243,7 +242,7 @@
 
         nomeOuvinteDisplay.textContent = `Logado como: ${nomeOuvinte}`;
 
-        // Escutando a coleção correta 'mensagens' (mesma do painel ADM)
+        // Lendo da coleção 'mensagens' (mesma do painel ADM)
         onSnapshot(collection(db, "mensagens"), (snapshot) => {
             boxMensagens.innerHTML = "";
             if (snapshot.empty) {
@@ -268,13 +267,12 @@
                 const isMe = dados.remetenteId === ouvinteId || dados.autor === nomeOuvinte;
                 div.className = isMe ? 'message-bubble me' : 'message-bubble';
 
-                // Formatando a hora do envio
                 let horaFormatada = "Agora";
                 if (dados.timestamp && dados.timestamp.toDate) {
                     horaFormatada = dados.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 }
 
-                const autorNome = dados.autor || dados.nomeOuvinte || "Ouvinte Anônimo";
+                const autorNome = dados.autor || dados.nomeOuvinte || "Ouvinte";
                 const textoMsg = dados.texto || dados.mensagem || "Mensagem vazia";
 
                 div.innerHTML = `
@@ -299,7 +297,7 @@
             btnEnviar.disabled = true;
 
             try {
-                // Salvando na coleção 'mensagens' com nome e ID para o painel ADM receber perfeitamente
+                // Salvando na coleção 'mensagens' para o painel ADM receber instantaneamente
                 await addDoc(collection(db, "mensagens"), {
                     texto: textoMensagem,
                     autor: nomeOuvinte,
