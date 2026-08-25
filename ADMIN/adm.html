@@ -571,7 +571,7 @@
         }
 
         /* ==============================
-           ÁREA DE CHAT (NOVO MÓDULO APRIMORADO)
+           ÁREA DE CHAT (MÓDULO APRIMORADO)
         ============================== */
 
         .chat-admin-section {
@@ -659,11 +659,11 @@
         }
 
         .status-online {
-            color: #4ade80 !important; /* Verde */
+            color: #4ade80 !important;
         }
 
         .status-offline {
-            color: #f87171 !important; /* Vermelho */
+            color: #f87171 !important;
         }
 
         .chat-main-area {
@@ -939,36 +939,25 @@
             display: none !important;
         }
 
-        /* ==============================
-           RESPONSIVO
-        ============================== */
-
         @media(max-width: 800px) {
-
             .commercial-grid-form {
                 grid-template-columns: 1fr;
             }
-
             .full-width {
                 grid-column: auto;
             }
-
             .target-selector {
                 grid-template-columns: 1fr;
             }
-
             .clients-list {
                 grid-template-columns: 1fr;
             }
-
             .campaign-card {
                 grid-template-columns: 1fr;
             }
-
             .campaign-actions {
                 justify-content: flex-end;
             }
-
             header {
                 padding: 15px;
             }
@@ -980,24 +969,10 @@
 
 <div class="container">
 
-    <!-- ==============================
-         CABEÇALHO
-    ============================== -->
-
     <header>
-
         <h1>Painel do Administrador</h1>
-
-        <button class="btn-sair" id="btnSair">
-            Sair
-        </button>
-
+        <button class="btn-sair" id="btnSair">Sair</button>
     </header>
-
-
-    <!-- ==============================
-         MENSAGEM DO DIA (NOVO MÓDULO)
-    ================================ -->
 
     <div class="card-form">
         <h2>💬 Mensagem do Dia para os Ouvintes</h2>
@@ -1017,85 +992,23 @@
         </button>
     </div>
 
-
-    <!-- ==============================
-         CADASTRO DE RÁDIO
-    ============================== -->
-
     <div class="card-form">
-
-        <h2 id="formTitulo">
-            Adicionar Nova Rádio
-        </h2>
-
-        <input
-            type="hidden"
-            id="radioIdEditando"
-        >
-
+        <h2 id="formTitulo">Adicionar Nova Rádio</h2>
+        <input type="hidden" id="radioIdEditando">
         <div class="form-group">
-
-            <label>
-                NOME DA RÁDIO
-            </label>
-
-            <input
-                type="text"
-                id="nomeRadio"
-                placeholder="Ex: Rádio Hits FM"
-                autocomplete="off"
-            >
-
+            <label>NOME DA RÁDIO</label>
+            <input type="text" id="nomeRadio" placeholder="Ex: Rádio Hits FM" autocomplete="off">
         </div>
-
         <div class="form-group">
-
-            <label>
-                URL / LINK DE STREAMING
-            </label>
-
-            <input
-                type="text"
-                id="urlRadio"
-                placeholder="https://exemplo.com/stream"
-                autocomplete="off"
-            >
-
+            <label>URL / LINK DE STREAMING</label>
+            <input type="text" id="urlRadio" placeholder="https://exemplo.com/stream" autocomplete="off">
         </div>
-
-        <button
-            type="button"
-            id="btnSalvarRadio"
-            class="btn-salvar"
-        >
-            CADASTRAR RÁDIO
-        </button>
-
-        <button
-            type="button"
-            id="btnCancelarEdicao"
-            class="btn-salvar hidden"
-            style="background:#475569;margin-left:10px;"
-        >
-            CANCELAR
-        </button>
-
+        <button type="button" id="btnSalvarRadio" class="btn-salvar">CADASTRAR RÁDIO</button>
+        <button type="button" id="btnCancelarEdicao" class="btn-salvar hidden" style="background:#475569;margin-left:10px;">CANCELAR</button>
     </div>
 
-
-    <h2 style="margin-bottom:15px;">
-        Rádios Cadastradas
-    </h2>
-
-    <div
-        class="radios-grid"
-        id="gridRadios"
-    ></div>
-
-
-    <!-- ======================================================
-         ÁREA DE CHAT DOS OUVINTES (MODERAÇÃO E DIRETOS)
-    ======================================================= -->
+    <h2 style="margin-bottom:15px;">Rádios Cadastradas</h2>
+    <div class="radios-grid" id="gridRadios"></div>
 
     <section class="chat-admin-section">
         <div class="chat-admin-box">
@@ -1105,7 +1018,6 @@
             </div>
 
             <div class="chat-layout-grid">
-                <!-- COLUNA DA ESQUERDA: LISTA DE OUVINTES COM STATUS E ÍCONE MSN -->
                 <div class="ouvintes-sidebar">
                     <h3>Ouvintes Cadastrados</h3>
                     <div id="listaOuvintesStatus">
@@ -1113,7 +1025,6 @@
                     </div>
                 </div>
 
-                <!-- COLUNA DA DIREITA: MENSAGENS E ENVIO -->
                 <div class="chat-main-area">
                     <div class="chat-messages-container" id="chatMessagesContainer">
                         <div style="font-size:12px; color:#64748b; text-align:center; margin-top:50px;">Carregando mensagens do chat...</div>
@@ -1134,439 +1045,111 @@
         </div>
     </section>
 
-
-    <!-- ======================================================
-         ÁREA DE COMERCIAIS
-    ======================================================= -->
-
     <section class="commercial-section">
-
         <div class="commercial-header">
-
             <div>
-
-                <h2>
-                    📢 Comerciais e Mídias
-                </h2>
-
-                <span>
-                    Gerencie campanhas comerciais exibidas aos ouvintes.
-                </span>
-
+                <h2>📢 Comerciais e Mídias</h2>
+                <span>Gerencie campanhas comerciais exibidas aos ouvintes.</span>
             </div>
-
         </div>
-
-
-        <!-- ==============================
-             FORMULÁRIO
-        ============================== -->
 
         <div class="commercial-form">
-
-            <h3
-                id="commercialFormTitle"
-                style="margin-bottom:20px;color:#c4b5fd;"
-            >
-                Cadastrar Novo Comercial
-            </h3>
-
-            <input
-                type="hidden"
-                id="commercialIdEditando"
-            >
+            <h3 id="commercialFormTitle" style="margin-bottom:20px;color:#c4b5fd;">Cadastrar Novo Comercial</h3>
+            <input type="hidden" id="commercialIdEditando">
 
             <div class="commercial-grid-form">
-
-
-                <!-- NOME -->
-
                 <div class="form-group">
-
-                    <label>
-                        NOME DO COMERCIAL / CAMPANHA
-                    </label>
-
-                    <input
-                        type="text"
-                        id="nomeComercial"
-                        placeholder="Ex: Supermercado ABC - Oferta de Agosto"
-                    >
-
+                    <label>NOME DO COMERCIAL / CAMPANHA</label>
+                    <input type="text" id="nomeComercial" placeholder="Ex: Supermercado ABC - Oferta de Agosto">
                 </div>
-
-
-                <!-- CLIENTE -->
-
                 <div class="form-group">
-
-                    <label>
-                        CLIENTE / ANUNCIANTE
-                    </label>
-
-                    <input
-                        type="text"
-                        id="clienteComercial"
-                        placeholder="Ex: Supermercado ABC"
-                    >
-
+                    <label>CLIENTE / ANUNCIANTE</label>
+                    <input type="text" id="clienteComercial" placeholder="Ex: Supermercado ABC">
                 </div>
-
-
-                <!-- TIPO -->
-
                 <div class="form-group full-width">
-
-                    <label>
-                        TIPO DA MÍDIA
-                    </label>
-
+                    <label>TIPO DA MÍDIA</label>
                     <div class="media-type">
-
                         <label>
-
-                            <input
-                                type="radio"
-                                name="tipoMidia"
-                                value="audio"
-                                checked
-                            >
-
-                            <span class="media-type-box">
-                                🎧 ÁUDIO / SPOT
-                            </span>
-
+                            <input type="radio" name="tipoMidia" value="audio" checked>
+                            <span class="media-type-box">🎧 ÁUDIO / SPOT</span>
                         </label>
-
-
                         <label>
-
-                            <input
-                                type="radio"
-                                name="tipoMidia"
-                                value="video"
-                            >
-
-                            <span class="media-type-box">
-                                🎬 VÍDEO
-                            </span>
-
+                            <input type="radio" name="tipoMidia" value="video">
+                            <span class="media-type-box">🎬 VÍDEO</span>
                         </label>
-
                     </div>
-
                 </div>
-
-
-                <!-- ARQUIVO -->
-
                 <div class="form-group full-width">
-
-                    <label>
-                        ARQUIVO DA MÍDIA
-                    </label>
-
+                    <label>ARQUIVO DA MÍDIA</label>
                     <div class="upload-box">
-
-                        <input
-                            type="file"
-                            id="arquivoComercial"
-                            accept="audio/*"
-                        >
-
-                        <div class="upload-info">
-                            O arquivo será armazenado no Firebase Cloud Storage.
-                        </div>
-
-                        <div
-                            id="arquivoAtualInfo"
-                            style="margin-top:8px;color:#a78bfa;font-size:11px;"
-                        ></div>
-
+                        <input type="file" id="arquivoComercial" accept="audio/*">
+                        <div class="upload-info">O arquivo será armazenado no Firebase Cloud Storage.</div>
+                        <div id="arquivoAtualInfo" style="margin-top:8px;color:#a78bfa;font-size:11px;"></div>
                     </div>
-
                 </div>
-
-
-                <!-- INÍCIO -->
-
                 <div class="form-group">
-
-                    <label>
-                        INÍCIO DA CAMPANHA
-                    </label>
-
-                    <input
-                        type="datetime-local"
-                        id="inicioCampanha"
-                    >
-
+                    <label>INÍCIO DA CAMPANHA</label>
+                    <input type="datetime-local" id="inicioCampanha">
                 </div>
-
-
-                <!-- FIM -->
-
                 <div class="form-group">
-
-                    <label>
-                        TÉRMINO DA CAMPANHA
-                    </label>
-
-                    <input
-                        type="datetime-local"
-                        id="fimCampanha"
-                    >
-
+                    <label>TÉRMINO DA CAMPANHA</label>
+                    <input type="datetime-local" id="fimCampanha">
                 </div>
-
-
-                <!-- FREQUÊNCIA -->
-
                 <div class="form-group full-width">
-
-                    <label>
-                        INTERVALO ENTRE INSERÇÕES
-                    </label>
-
+                    <label>INTERVALO ENTRE INSERÇÕES</label>
                     <select id="frequenciaCampanha">
-
-                        <option value="5">
-                            A cada 5 minutos
-                        </option>
-
-                        <option value="10" selected>
-                            A cada 10 minutos
-                        </option>
-
-                        <option value="20">
-                            A cada 20 minutos
-                        </option>
-
-                        <option value="30">
-                            A cada 30 minutos
-                        </option>
-
+                        <option value="5">A cada 5 minutos</option>
+                        <option value="10" selected>A cada 10 minutos</option>
+                        <option value="20">A cada 20 minutos</option>
+                        <option value="30">A cada 30 minutos</option>
                     </select>
-
-                    <small>
-                        O painel do ouvinte utilizará este intervalo para controlar as inserções.
-                    </small>
-
                 </div>
-
-
-                <!-- DESTINO -->
-
                 <div class="form-group full-width">
-
-                    <label>
-                        QUEM DEVE RECEBER ESTA CAMPANHA?
-                    </label>
-
+                    <label>QUEM DEVE RECEBER ESTA CAMPANHA?</label>
                     <div class="target-selector">
-
-                        <div
-                            class="target-option active"
-                            id="targetTodos"
-                            data-target="todos"
-                        >
-                            🌎 TODOS OS OUVINTES
-                        </div>
-
-
-                        <div
-                            class="target-option"
-                            id="targetClientes"
-                            data-target="clientes"
-                        >
-                            👥 CLIENTES SELECIONADOS
-                        </div>
-
+                        <div class="target-option active" id="targetTodos" data-target="todos">🌎 TODOS OS OUVINTES</div>
+                        <div class="target-option" id="targetClientes" data-target="clientes">👥 CLIENTES SELECIONADOS</div>
                     </div>
-
-
-                    <!-- CLIENTES -->
-
-                    <div
-                        class="clients-panel"
-                        id="clientsPanel"
-                    >
-
+                    <div class="clients-panel" id="clientsPanel">
                         <div class="clients-top">
-
-                            <strong>
-                                SELECIONE OS CLIENTES
-                            </strong>
-
-                            <input
-                                type="text"
-                                id="buscaCliente"
-                                class="clients-search"
-                                placeholder="Pesquisar..."
-                            >
-
+                            <strong>SELECIONE OS CLIENTES</strong>
+                            <input type="text" id="buscaCliente" class="clients-search" placeholder="Pesquisar...">
                         </div>
-
-                        <div
-                            id="clientsList"
-                            class="clients-list"
-                        >
-
-                            <div
-                                style="font-size:11px;color:#64748b;"
-                            >
-                                Carregando clientes...
-                            </div>
-
+                        <div id="clientsList" class="clients-list">
+                            <div style="font-size:11px;color:#64748b;">Carregando clientes...</div>
                         </div>
-
                     </div>
-
                 </div>
-
-
             </div>
-
-
-            <!-- BOTÕES -->
 
             <div class="commercial-buttons">
-
-                <button
-                    type="button"
-                    id="btnSalvarComercial"
-                    class="btn-primary"
-                >
-                    📢 CADASTRAR CAMPANHA
-                </button>
-
-                <button
-                    type="button"
-                    id="btnCancelarComercial"
-                    class="btn-secondary hidden"
-                >
-                    CANCELAR
-                </button>
-
+                <button type="button" id="btnSalvarComercial" class="btn-primary">📢 CADASTRAR CAMPANHA</button>
+                <button type="button" id="btnCancelarComercial" class="btn-secondary hidden">CANCELAR</button>
             </div>
 
-
-            <div
-                id="uploadProgress"
-                style="
-                    display:none;
-                    margin-top:15px;
-                    background:#0f172a;
-                    border-radius:8px;
-                    overflow:hidden;
-                "
-            >
-
-                <div
-                    id="uploadProgressBar"
-                    style="
-                        width:0%;
-                        height:8px;
-                        background:#8b5cf6;
-                        transition:width .2s;
-                    "
-                ></div>
-
+            <div id="uploadProgress" style="display:none;margin-top:15px;background:#0f172a;border-radius:8px;overflow:hidden;">
+                <div id="uploadProgressBar" style="width:0%;height:8px;background:#8b5cf6;transition:width .2s;"></div>
             </div>
-
-            <div
-                id="uploadProgressText"
-                style="
-                    margin-top:6px;
-                    font-size:10px;
-                    color:#94a3b8;
-                "
-            ></div>
-
+            <div id="uploadProgressText" style="margin-top:6px;font-size:10px;color:#94a3b8;"></div>
         </div>
 
-
-        <!-- ==============================
-             LISTA DAS CAMPANHAS
-        ============================== -->
-
-        <div
-            style="
-                margin-top:30px;
-                margin-bottom:15px;
-                display:flex;
-                justify-content:space-between;
-                align-items:center;
-            "
-        >
-
+        <div style="margin-top:30px;margin-bottom:15px;display:flex;justify-content:space-between;align-items:center;">
             <div>
-
-                <h2 style="font-size:18px;color:#f8fafc;">
-                    📋 Conteúdos de Mídia
-                </h2>
-
-                <span
-                    style="
-                        font-size:10px;
-                        color:#64748b;
-                    "
-                >
-                    Ordenados pelo vencimento das campanhas.
-                </span>
-
+                <h2 style="font-size:18px;color:#f8fafc;">📋 Conteúdos de Mídia</h2>
+                <span style="font-size:10px;color:#64748b;">Ordenados pelo vencimento das campanhas.</span>
             </div>
-
         </div>
-
-
-        <div
-            id="campaignList"
-            class="campaign-list"
-        ></div>
-
+        <div id="campaignList" class="campaign-list"></div>
     </section>
 
 </div>
 
-
-<!-- ======================================================
-     MODAL PERSONALIZAÇÃO DAS RÁDIOS
-======================================================= -->
-
-<div
-    id="modalPersonalizacao"
-    class="customizer-modal hidden"
->
-
+<div id="modalPersonalizacao" class="customizer-modal hidden">
     <div class="customizer-content">
-
-        <h3>
-            Personalizar Card da Rádio
-        </h3>
-
-        <input
-            type="hidden"
-            id="customRadioId"
-        >
-
-        <label
-            style="
-                font-size:11px;
-                font-weight:bold;
-                color:#94a3b8;
-                margin-bottom:6px;
-                display:block;
-            "
-        >
-            ESCOLHA A COR DO CARD
-        </label>
-
-        <div
-            class="color-picker-grid"
-            id="colorPickerGrid"
-        >
-
+        <h3>Personalizar Card da Rádio</h3>
+        <input type="hidden" id="customRadioId">
+        <label style="font-size:11px;font-weight:bold;color:#94a3b8;margin-bottom:6px;display:block;">ESCOLHA A COR DO CARD</label>
+        <div class="color-picker-grid" id="colorPickerGrid">
             <div class="color-dot" style="background:#a3e635;" data-color="#a3e635"></div>
             <div class="color-dot" style="background:#bef264;" data-color="#bef264"></div>
             <div class="color-dot" style="background:#86efac;" data-color="#86efac"></div>
@@ -1587,27 +1170,10 @@
             <div class="color-dot" style="background:#64748b;" data-color="#64748b"></div>
             <div class="color-dot" style="background:#e2e8f0;" data-color="#e2e8f0"></div>
             <div class="color-dot" style="background:#fbcfe8;" data-color="#fbcfe8"></div>
-
         </div>
 
-
-        <label
-            style="
-                font-size:11px;
-                font-weight:bold;
-                color:#94a3b8;
-                margin-bottom:6px;
-                display:block;
-            "
-        >
-            ESCOLHA UM ÍCONE
-        </label>
-
-        <div
-            class="icons-grid-picker"
-            id="iconsGridPicker"
-        >
-
+        <label style="font-size:11px;font-weight:bold;color:#94a3b8;margin-bottom:6px;display:block;">ESCOLHA UM ÍCONE</label>
+        <div class="icons-grid-picker" id="iconsGridPicker">
             <div class="icon-option" data-icon="📻">📻</div>
             <div class="icon-option" data-icon="🎵">🎵</div>
             <div class="icon-option" data-icon="🎶">🎶</div>
@@ -1628,212 +1194,59 @@
             <div class="icon-option" data-icon="🎯">🎯</div>
             <div class="icon-option" data-icon="💡">💡</div>
             <div class="icon-option" data-icon="🔊">🔊</div>
-
         </div>
 
-
-        <div
-            style="
-                display:flex;
-                gap:10px;
-                margin-top:15px;
-            "
-        >
-
-            <button
-                type="button"
-                id="btnSalvarPersonalizacao"
-                class="btn-salvar"
-                style="flex:1;"
-            >
-                SALVAR
-            </button>
-
-            <button
-                type="button"
-                id="btnFecharModal"
-                class="btn-salvar"
-                style="
-                    background:#475569;
-                    flex:1;
-                "
-            >
-                CANCELAR
-            </button>
-
+        <div style="display:flex;gap:10px;margin-top:15px;">
+            <button type="button" id="btnSalvarPersonalizacao" class="btn-salvar" style="flex:1;">SALVAR</button>
+            <button type="button" id="btnFecharModal" class="btn-salvar" style="background:#475569;flex:1;">CANCELAR</button>
         </div>
-
     </div>
-
 </div>
 
-
-<!-- ======================================================
-     PLAYER
-======================================================= -->
-
-<div
-    class="car-player-bar hidden"
-    id="carPlayerBar"
->
-
+<div class="car-player-bar hidden" id="carPlayerBar">
     <div class="player-info">
-
-        <span
-            id="playerIconDisplay"
-            style="font-size:26px;"
-        >
-            📻
-        </span>
-
-        <div>
-
-            <h4 id="playerNameDisplay">
-                Selecione uma Rádio
-            </h4>
-
-        </div>
-
+        <span id="playerIconDisplay" style="font-size:26px;">📻</span>
+        <div><h4 id="playerNameDisplay">Selecione uma Rádio</h4></div>
     </div>
-
-
     <div class="player-controls">
-
-        <button
-            class="control-btn"
-            id="btnAnterior"
-            title="Rádio Anterior"
-        >
-            ⏮️
-        </button>
-
-        <button
-            class="control-btn main-play"
-            id="btnPlayPause"
-            title="Tocar / Pausar"
-        >
-            ▶️
-        </button>
-
-        <button
-            class="control-btn"
-            id="btnProximo"
-            title="Próxima Rádio"
-        >
-            ⏭️
-        </button>
-
+        <button class="control-btn" id="btnAnterior" title="Rádio Anterior">⏮️</button>
+        <button class="control-btn main-play" id="btnPlayPause" title="Tocar / Pausar">▶️</button>
+        <button class="control-btn" id="btnProximo" title="Próxima Rádio">⏭️</button>
     </div>
-
 </div>
 
-
-<audio
-    id="audioStreaming"
-    preload="auto"
-    crossorigin="anonymous"
-></audio>
-
+<audio id="audioStreaming" preload="auto" crossorigin="anonymous"></audio>
 
 <script type="module">
-
-    /* =====================================================
-       FIREBASE
-    ====================================================== */
-
     import { db } from '../firebase-config.js';
-
-    import {
-        ref,
-        set,
-        push,
-        get,
-        remove,
-        update,
-        onValue,
-        query,
-        orderByChild,
-        limitToLast
-    }
-    from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
-
-    import {
-        getApp
-    }
-    from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-
-
-    import {
-        getStorage,
-        ref as storageRef,
-        uploadBytesResumable,
-        getDownloadURL,
-        deleteObject
-    }
-    from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
-
+    import { ref, set, push, get, remove, update, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
     const app = getApp();
-
     const storage = getStorage(app);
 
-
-    /* =====================================================
-       LOGIN
-    ====================================================== */
-
     window.addEventListener('DOMContentLoaded', () => {
-
-        const adminLogado =
-            localStorage.getItem('adminLogado');
-
+        const adminLogado = localStorage.getItem('adminLogado');
         if (adminLogado !== 'true') {
-
-            alert(
-                "Acesso restrito! Faça login com a conta de Administrador."
-            );
-
+            alert("Acesso restrito! Faça login com a conta de Administrador.");
             window.location.href = "../index.html";
-
             return;
         }
 
         carregarRadios();
-
         carregarClientes();
-
         carregarCampanhas();
-
         carregarMensagemDoDia();
-
         ouvirMensagensChat();
-
         monitorarOuvintesOnline();
-
     });
 
-
-    /* =====================================================
-       SAIR
-    ====================================================== */
-
-    document
-        .getElementById('btnSair')
-        .addEventListener('click', () => {
-
-            audioElement.pause();
-
-            localStorage.removeItem('adminLogado');
-
-            window.location.href = "../index.html";
-
-        });
-
-
-    /* =====================================================
-       MENSAGEM DO DIA
-    ====================================================== */
+    document.getElementById('btnSair').addEventListener('click', () => {
+        audioElement.pause();
+        localStorage.removeItem('adminLogado');
+        window.location.href = "../index.html";
+    });
 
     const inputMensagemDia = document.getElementById('inputMensagemDia');
     const selectMensagemAtiva = document.getElementById('selectMensagemAtiva');
@@ -1869,21 +1282,15 @@
         }
     });
 
-
-    /* =====================================================
-       MODERAÇÃO DO CHAT AO VIVO E MONITORAMENTO DE OUVINTES
-    ====================================================== */
-
     const chatMessagesContainer = document.getElementById('chatMessagesContainer');
     const btnLimparChat = document.getElementById('btnLimparChat');
     const inputMsgAdm = document.getElementById('inputMsgAdm');
     const btnEnviarMsgAdm = document.getElementById('btnEnviarMsgAdm');
     const listaOuvintesStatus = document.getElementById('listaOuvintesStatus');
 
-    let ouvinteSelecionadoChat = null; // null = geral ou todos, ou nome/id do ouvinte específico
+    let ouvinteSelecionadoChat = null;
 
     function ouvirMensagensChat() {
-        // Escutando tanto no caminho chat_ao_vivo quanto chat_ouvintes para garantir compatibilidade
         const chatRef = query(ref(db, 'chat_ao_vivo'), orderByChild('timestamp'), limitToLast(100));
         
         onValue(chatRef, (snapshot) => {
@@ -1907,7 +1314,6 @@
             mensagens.forEach((msg) => {
                 const item = document.createElement('div');
                 item.className = 'chat-msg-item';
-
                 const dataFmt = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}) : '';
 
                 item.innerHTML = `
@@ -1937,13 +1343,15 @@
         });
     }
 
-    // Monitorar ouvintes cadastrados e status Online/Offline (com base no heartbeat / ultima_atividade)
+    // Monitora a listagem e o status de ouvintes em múltiplos caminhos do banco de dados (previne falhas de nó incorreto)
     function monitorarOuvintesOnline() {
-        onValue(ref(db, 'ouvintes_cadastrados'), (snapshot) => {
+        const caminhoOuvintes = 'ouvintes_cadastrados';
+        
+        onValue(ref(db, caminhoOuvintes), (snapshot) => {
             listaOuvintesStatus.innerHTML = "";
 
             if (!snapshot.exists()) {
-                listaOuvintesStatus.innerHTML = '<div style="font-size:11px; color:#64748b; text-align:center; padding:10px;">Nenhum ouvinte cadastrado.</div>';
+                listaOuvintesStatus.innerHTML = '<div style="font-size:11px; color:#64748b; text-align:center; padding:10px;">Nenhum ouvinte cadastrado em "ouvintes_cadastrados".</div>';
                 return;
             }
 
@@ -1955,11 +1363,11 @@
 
             snapshot.forEach((child) => {
                 const ouvinte = child.val();
-                const nomeOuvinte = ouvinte.nome || ouvinte.usuario || ouvinte.email || "Ouvinte";
-                const ultimaAtv = ouvinte.ultimaAtividade || ouvinte.ultimoAcesso || 0;
+                const nomeOuvinte = ouvinte.nome || ouvinte.nomeUsuario || ouvinte.usuario || ouvinte.email || "Ouvinte";
+                const ultimaAtv = ouvinte.ultimaAtividade || ouvinte.ultimoAcesso || ouvinte.timestamp || 0;
                 
-                // Se a última atividade ocorreu nos últimos 45 segundos, considera online
-                const isOnline = (agora - ultimaAtv) < 45000;
+                // Se a última atividade ocorreu nos últimos 60 segundos, considera Online
+                const isOnline = (agora - ultimaAtv) < 60000;
                 const statusClass = isOnline ? 'status-online' : 'status-offline';
                 const statusTexto = isOnline ? 'Online' : 'Offline';
 
@@ -1974,7 +1382,6 @@
 
             listaOuvintesStatus.innerHTML = htmlGeral;
 
-            // Evento de clique para selecionar o ouvinte para quem quer mandar mensagem
             document.querySelectorAll('.ouvinte-status-item').forEach(el => {
                 el.addEventListener('click', () => {
                     const dest = el.getAttribute('data-ouvinte');
@@ -1993,7 +1400,6 @@
         });
     }
 
-    // Enviar mensagem do Admin
     async function enviarMensagemAdmin() {
         const texto = inputMsgAdm.value.trim();
         if (!texto) return;
@@ -2031,2922 +1437,635 @@
         }
     });
 
-
-    /* =====================================================
-       RÁDIOS
-    ====================================================== */
-
-    const nomeRadioInput =
-        document.getElementById('nomeRadio');
-
-    const urlRadioInput =
-        document.getElementById('urlRadio');
-
-    const btnSalvarRadio =
-        document.getElementById('btnSalvarRadio');
-
-    const btnCancelarEdicao =
-        document.getElementById('btnCancelarEdicao');
-
-    const radioIdEditandoInput =
-        document.getElementById('radioIdEditando');
-
-    const formTitulo =
-        document.getElementById('formTitulo');
-
-    const gridRadios =
-        document.getElementById('gridRadios');
-
+    const nomeRadioInput = document.getElementById('nomeRadio');
+    const urlRadioInput = document.getElementById('urlRadio');
+    const btnSalvarRadio = document.getElementById('btnSalvarRadio');
+    const btnCancelarEdicao = document.getElementById('btnCancelarEdicao');
+    const radioIdEditandoInput = document.getElementById('radioIdEditando');
+    const formTitulo = document.getElementById('formTitulo');
+    const gridRadios = document.getElementById('gridRadios');
 
     let listaRadiosObj = [];
-
     let indiceRadioAtual = -1;
 
-
-    const audioElement =
-        document.getElementById('audioStreaming');
-
-    const carPlayerBar =
-        document.getElementById('carPlayerBar');
-
-    const playerNameDisplay =
-        document.getElementById('playerNameDisplay');
-
-    const playerIconDisplay =
-        document.getElementById('playerIconDisplay');
-
-    const btnPlayPause =
-        document.getElementById('btnPlayPause');
-
+    const audioElement = document.getElementById('audioStreaming');
+    const carPlayerBar = document.getElementById('carPlayerBar');
+    const playerNameDisplay = document.getElementById('playerNameDisplay');
+    const playerIconDisplay = document.getElementById('playerIconDisplay');
+    const btnPlayPause = document.getElementById('btnPlayPause');
 
     let corSelecionada = "#86efac";
-
     let iconeSelecionado = "📻";
 
-
-    /* =====================================================
-       CORES
-    ====================================================== */
-
-    document
-        .querySelectorAll('.color-dot')
-        .forEach(dot => {
-
-            dot.addEventListener('click', e => {
-
-                document
-                    .querySelectorAll('.color-dot')
-                    .forEach(d =>
-                        d.classList.remove('selected')
-                    );
-
-                e.target.classList.add('selected');
-
-                corSelecionada =
-                    e.target.getAttribute('data-color');
-
-            });
-
+    document.querySelectorAll('.color-dot').forEach(dot => {
+        dot.addEventListener('click', e => {
+            document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('selected'));
+            e.target.classList.add('selected');
+            corSelecionada = e.target.getAttribute('data-color');
         });
+    });
 
-
-    /* =====================================================
-       ÍCONES
-    ====================================================== */
-
-    document
-        .querySelectorAll('.icon-option')
-        .forEach(opt => {
-
-            opt.addEventListener('click', e => {
-
-                document
-                    .querySelectorAll('.icon-option')
-                    .forEach(o =>
-                        o.classList.remove('selected')
-                    );
-
-                e.target.classList.add('selected');
-
-                iconeSelecionado =
-                    e.target.getAttribute('data-icon');
-
-            });
-
+    document.querySelectorAll('.icon-option').forEach(opt => {
+        opt.addEventListener('click', e => {
+            document.querySelectorAll('.icon-option').forEach(o => o.classList.remove('selected'));
+            e.target.classList.add('selected');
+            iconeSelecionado = e.target.getAttribute('data-icon');
         });
-
-
-    /* =====================================================
-       SALVAR RÁDIO
-    ====================================================== */
+    });
 
     async function salvarRadio() {
-
-        const nome =
-            nomeRadioInput.value.trim();
-
-        const url =
-            urlRadioInput.value.trim();
-
-        const idEdicao =
-            radioIdEditandoInput.value;
-
+        const nome = nomeRadioInput.value.trim();
+        const url = urlRadioInput.value.trim();
+        const idEdicao = radioIdEditandoInput.value;
 
         if (!nome || !url) {
-
-            alert(
-                "Por favor, preencha o nome e o link da rádio."
-            );
-
+            alert("Por favor, preencha o nome e o link da rádio.");
             return;
-
         }
-
 
         try {
-
             if (idEdicao) {
-
-                const radioRef =
-                    ref(
-                        db,
-                        'radios_cadastradas/' +
-                        idEdicao
-                    );
-
-                await update(
-                    radioRef,
-                    {
-                        nome: nome,
-                        url: url
-                    }
-                );
-
+                await update(ref(db, 'radios_cadastradas/' + idEdicao), { nome: nome, url: url });
             } else {
-
-                const radiosRef =
-                    ref(
-                        db,
-                        'radios_cadastradas'
-                    );
-
-                const novaRadioRef =
-                    push(radiosRef);
-
-                await set(
-                    novaRadioRef,
-                    {
-                        nome: nome,
-                        url: url,
-                        cor: "#86efac",
-                        icone: "📻"
-                    }
-                );
-
+                const novaRadioRef = push(ref(db, 'radios_cadastradas'));
+                await set(novaRadioRef, { nome: nome, url: url, cor: "#86efac", icone: "📻" });
             }
-
-
             limparFormulario();
-
             carregarRadios();
-
+        } catch (erro) {
+            console.error("Erro ao salvar rádio:", erro);
+            alert("Não foi possível salvar a rádio.");
         }
-        catch (erro) {
-
-            console.error(
-                "Erro ao salvar rádio:",
-                erro
-            );
-
-            alert(
-                "Não foi possível salvar a rádio."
-            );
-
-        }
-
     }
-
-
-    /* =====================================================
-       CARREGAR RÁDIOS
-    ====================================================== */
 
     async function carregarRadios() {
-
         try {
-
-            const radiosRef =
-                ref(
-                    db,
-                    'radios_cadastradas'
-                );
-
-            const snapshot =
-                await get(radiosRef);
-
-
+            const snapshot = await get(ref(db, 'radios_cadastradas'));
             gridRadios.innerHTML = "";
-
             listaRadiosObj = [];
 
-
             if (snapshot.exists()) {
+                snapshot.forEach(childSnapshot => {
+                    listaRadiosObj.push({ id: childSnapshot.key, ...childSnapshot.val() });
+                });
 
-                snapshot.forEach(
-                    childSnapshot => {
+                listaRadiosObj.forEach((radio, index) => {
+                    const corCard = radio.cor || "#86efac";
+                    const iconeCard = radio.icone || "📻";
 
-                        const id =
-                            childSnapshot.key;
+                    const card = document.createElement('div');
+                    card.className = 'radio-card';
+                    card.id = `card-radio-${index}`;
+                    card.style.setProperty('--card-bg', corCard);
 
-                        const dados =
-                            childSnapshot.val();
-
-                        listaRadiosObj.push({
-                            id,
-                            ...dados
-                        });
-
-                    }
-                );
-
-
-                listaRadiosObj.forEach(
-                    (radio, index) => {
-
-                        const corCard =
-                            radio.cor ||
-                            "#86efac";
-
-                        const iconeCard =
-                            radio.icone ||
-                            "📻";
-
-
-                        const card =
-                            document.createElement('div');
-
-                        card.className =
-                            'radio-card';
-
-                        card.id =
-                            `card-radio-${index}`;
-
-                        card.style.setProperty(
-                            '--card-bg',
-                            corCard
-                        );
-
-
-                        card.innerHTML = `
-
-                            <div class="radio-card-top">
-
-                                <span
-                                    class="radio-icon-display"
-                                >
-                                    ${iconeCard}
-                                </span>
-
-                                <h3
-                                    title="${escapeHtml(radio.nome)}"
-                                >
-                                    ${escapeHtml(radio.nome)}
-                                </h3>
-
+                    card.innerHTML = `
+                        <div class="radio-card-top">
+                            <span class="radio-icon-display">${iconeCard}</span>
+                            <h3 title="${escapeHtml(radio.nome)}">${escapeHtml(radio.nome)}</h3>
+                        </div>
+                        <div class="card-actions">
+                            <button class="action-btn btn-deletar" title="Deletar" data-id="${radio.id}">🗑️</button>
+                            <div class="card-tools-right">
+                                <button class="action-btn btn-personalizar" title="Personalizar" data-id="${radio.id}" data-cor="${corCard}" data-icone="${iconeCard}">🎨</button>
+                                <button class="action-btn btn-editar" title="Editar" data-id="${radio.id}" data-nome="${escapeAttribute(radio.nome)}" data-url="${escapeAttribute(radio.url)}">✏️</button>
                             </div>
+                        </div>
+                    `;
 
-                            <div class="card-actions">
-
-                                <button
-                                    class="action-btn btn-deletar"
-                                    title="Deletar"
-                                    data-id="${radio.id}"
-                                >
-                                    🗑️
-                                </button>
-
-                                <div class="card-tools-right">
-
-                                    <button
-                                        class="action-btn btn-personalizar"
-                                        title="Personalizar"
-                                        data-id="${radio.id}"
-                                        data-cor="${corCard}"
-                                        data-icone="${iconeCard}"
-                                    >
-                                        🎨
-                                    </button>
-
-                                    <button
-                                        class="action-btn btn-editar"
-                                        title="Editar"
-                                        data-id="${radio.id}"
-                                        data-nome="${escapeAttribute(radio.nome)}"
-                                        data-url="${escapeAttribute(radio.url)}"
-                                    >
-                                        ✏️
-                                    </button>
-
-                                </div>
-
-                            </div>
-
-                        `;
-
-
-                        card.addEventListener(
-                            'click',
-                            e => {
-
-                                if (
-                                    e.target.closest('button')
-                                ) return;
-
-                                tocarRadioPorIndice(index);
-
-                            }
-                        );
-
-
-                        gridRadios.appendChild(card);
-
-                    }
-                );
-
-
-                document
-                    .querySelectorAll('.btn-deletar')
-                    .forEach(btn => {
-
-                        btn.addEventListener(
-                            'click',
-                            e =>
-                                deletarRadio(
-                                    e.target.getAttribute('data-id')
-                                )
-                        );
-
+                    card.addEventListener('click', e => {
+                        if (e.target.closest('button')) return;
+                        tocarRadioPorIndice(index);
                     });
 
+                    gridRadios.appendChild(card);
+                });
 
-                document
-                    .querySelectorAll('.btn-editar')
-                    .forEach(btn => {
+                document.querySelectorAll('.btn-deletar').forEach(btn => {
+                    btn.addEventListener('click', e => deletarRadio(e.target.getAttribute('data-id')));
+                });
 
-                        btn.addEventListener(
-                            'click',
-                            e =>
-                                prepararEdicao(
-                                    e.target.getAttribute('data-id'),
-                                    e.target.getAttribute('data-nome'),
-                                    e.target.getAttribute('data-url')
-                                )
-                        );
+                document.querySelectorAll('.btn-editar').forEach(btn => {
+                    btn.addEventListener('click', e => prepararEdicao(e.target.getAttribute('data-id'), e.target.getAttribute('data-nome'), e.target.getAttribute('data-url')));
+                });
 
-                    });
-
-
-                document
-                    .querySelectorAll('.btn-personalizar')
-                    .forEach(btn => {
-
-                        btn.addEventListener(
-                            'click',
-                            e =>
-                                abrirModalPersonalizacao(
-                                    e.target.getAttribute('data-id'),
-                                    e.target.getAttribute('data-cor'),
-                                    e.target.getAttribute('data-icone')
-                                )
-                        );
-
-                    });
-
-
+                document.querySelectorAll('.btn-personalizar').forEach(btn => {
+                    btn.addEventListener('click', e => abrirModalPersonalizacao(e.target.getAttribute('data-id'), e.target.getAttribute('data-cor'), e.target.getAttribute('data-icone')));
+                });
             } else {
-
-                gridRadios.innerHTML =
-                    "<p style='color:#94a3b8;'>Nenhuma rádio cadastrada ainda.</p>";
-
+                gridRadios.innerHTML = "<p style='color:#94a3b8;'>Nenhuma rádio cadastrada ainda.</p>";
                 carPlayerBar.classList.add('hidden');
-
             }
-
+        } catch (erro) {
+            console.error("Erro ao carregar rádios:", erro);
         }
-        catch (erro) {
-
-            console.error(
-                "Erro ao carregar rádios:",
-                erro
-            );
-
-        }
-
     }
 
-
-    /* =====================================================
-       TOCAR RÁDIO
-    ====================================================== */
-
     function tocarRadioPorIndice(index) {
-
-        if (
-            index < 0 ||
-            index >= listaRadiosObj.length
-        ) return;
-
-
+        if (index < 0 || index >= listaRadiosObj.length) return;
         indiceRadioAtual = index;
+        const radio = listaRadiosObj[indiceRadioAtual];
 
-        const radio =
-            listaRadiosObj[indiceRadioAtual];
+        document.querySelectorAll('.radio-card').forEach((c, idx) => {
+            if (idx === indiceRadioAtual) c.classList.add('active-neon');
+            else c.classList.remove('active-neon');
+        });
 
-
-        document
-            .querySelectorAll('.radio-card')
-            .forEach((c, idx) => {
-
-                if (idx === indiceRadioAtual) {
-
-                    c.classList.add(
-                        'active-neon'
-                    );
-
-                } else {
-
-                    c.classList.remove(
-                        'active-neon'
-                    );
-
-                }
-
-            });
-
-
-        carPlayerBar.classList.remove(
-            'hidden'
-        );
-
-
-        playerNameDisplay.innerText =
-            radio.nome;
-
-        playerIconDisplay.innerText =
-            radio.icone || "📻";
-
-
-        btnPlayPause.innerText =
-            "⏸️";
+        carPlayerBar.classList.remove('hidden');
+        playerNameDisplay.innerText = radio.nome;
+        playerIconDisplay.innerText = radio.icone || "📻";
+        btnPlayPause.innerText = "⏸️";
 
         audioElement.pause();
         audioElement.currentTime = 0;
         audioElement.src = radio.url;
         audioElement.load();
-
-        audioElement.play()
-            .catch(
-                err => {
-                    console.error(
-                        "Erro no stream de áudio:",
-                        err
-                    );
-                    btnPlayPause.innerText = "▶️";
-                    alert("Não foi possível carregar ou reproduzir o stream desta rádio. Verifique se o link está correto e se o navegador permite áudio inseguro (HTTP vs HTTPS).");
-                }
-            );
-
+        audioElement.play().catch(err => {
+            btnPlayPause.innerText = "▶️";
+            alert("Não foi possível carregar ou reproduzir o stream desta rádio.");
+        });
     }
 
-    audioElement.addEventListener('error', (e) => {
-        console.error("Erro na tag de áudio:", e);
-        btnPlayPause.innerText = "▶️";
+    document.getElementById('btnProximo').addEventListener('click', () => {
+        if (listaRadiosObj.length === 0) return;
+        let proximo = indiceRadioAtual + 1;
+        if (proximo >= listaRadiosObj.length) proximo = 0;
+        tocarRadioPorIndice(proximo);
     });
 
+    document.getElementById('btnAnterior').addEventListener('click', () => {
+        if (listaRadiosObj.length === 0) return;
+        let anterior = indiceRadioAtual - 1;
+        if (anterior < 0) anterior = listaRadiosObj.length - 1;
+        tocarRadioPorIndice(anterior);
+    });
 
-    /* =====================================================
-       PRÓXIMA RÁDIO
-    ====================================================== */
-
-    document
-        .getElementById('btnProximo')
-        .addEventListener(
-            'click',
-            () => {
-
-                if (
-                    listaRadiosObj.length === 0
-                ) return;
-
-
-                let proximo =
-                    indiceRadioAtual + 1;
-
-
-                if (
-                    proximo >=
-                    listaRadiosObj.length
-                ) {
-
-                    proximo = 0;
-
-                }
-
-
-                tocarRadioPorIndice(
-                    proximo
-                );
-
+    btnPlayPause.addEventListener('click', () => {
+        if (audioElement.paused) {
+            if (indiceRadioAtual === -1 && listaRadiosObj.length > 0) tocarRadioPorIndice(0);
+            else if (indiceRadioAtual !== -1) {
+                audioElement.play().then(() => { btnPlayPause.innerText = "⏸️"; });
             }
-        );
-
-
-    /* =====================================================
-       RÁDIO ANTERIOR
-    ====================================================== */
-
-    document
-        .getElementById('btnAnterior')
-        .addEventListener(
-            'click',
-            () => {
-
-                if (
-                    listaRadiosObj.length === 0
-                ) return;
-
-
-                let anterior =
-                    indiceRadioAtual - 1;
-
-
-                if (anterior < 0) {
-
-                    anterior =
-                        listaRadiosObj.length - 1;
-
-                }
-
-
-                tocarRadioPorIndice(
-                    anterior
-                );
-
-            }
-        );
-
-
-    /* =====================================================
-       PLAY / PAUSE
-    ====================================================== */
-
-    btnPlayPause.addEventListener(
-        'click',
-        () => {
-
-            if (audioElement.paused) {
-
-                if (
-                    indiceRadioAtual === -1 &&
-                    listaRadiosObj.length > 0
-                ) {
-
-                    tocarRadioPorIndice(0);
-
-                }
-                else if (
-                    indiceRadioAtual !== -1
-                ) {
-
-                    audioElement.play()
-                        .then(() => {
-                            btnPlayPause.innerText = "⏸️";
-                        })
-                        .catch(err => {
-                            console.error("Erro ao retomar reprodução:", err);
-                        });
-
-                }
-
-            }
-            else {
-
-                audioElement.pause();
-
-                btnPlayPause.innerText =
-                    "▶️";
-
-            }
-
+        } else {
+            audioElement.pause();
+            btnPlayPause.innerText = "▶️";
         }
-    );
+    });
 
+    const modalPersonalizacao = document.getElementById('modalPersonalizacao');
+    const customRadioIdInput = document.getElementById('customRadioId');
 
-    /* =====================================================
-       PERSONALIZAÇÃO
-    ====================================================== */
+    function abrirModalPersonalizacao(id, corAtual, iconeAtual) {
+        customRadioIdInput.value = id;
+        corSelecionada = corAtual || "#86efac";
+        iconeSelecionado = iconeAtual || "📻";
 
-    const modalPersonalizacao =
-        document.getElementById(
-            'modalPersonalizacao'
-        );
+        document.querySelectorAll('.color-dot').forEach(dot => {
+            if (dot.getAttribute('data-color') === corSelecionada) dot.classList.add('selected');
+            else dot.classList.remove('selected');
+        });
 
-    const customRadioIdInput =
-        document.getElementById(
-            'customRadioId'
-        );
+        document.querySelectorAll('.icon-option').forEach(opt => {
+            if (opt.getAttribute('data-icon') === iconeSelecionado) opt.classList.add('selected');
+            else opt.classList.remove('selected');
+        });
 
-
-    function abrirModalPersonalizacao(
-        id,
-        corAtual,
-        iconeAtual
-    ) {
-
-        customRadioIdInput.value =
-            id;
-
-
-        corSelecionada =
-            corAtual || "#86efac";
-
-
-        iconeSelecionado =
-            iconeAtual || "📻";
-
-
-        document
-            .querySelectorAll('.color-dot')
-            .forEach(dot => {
-
-                if (
-                    dot.getAttribute(
-                        'data-color'
-                    ) === corSelecionada
-                ) {
-
-                    dot.classList.add(
-                        'selected'
-                    );
-
-                } else {
-
-                    dot.classList.remove(
-                        'selected'
-                    );
-
-                }
-
-            });
-
-
-        document
-            .querySelectorAll('.icon-option')
-            .forEach(opt => {
-
-                if (
-                    opt.getAttribute(
-                        'data-icon'
-                    ) === iconeSelecionado
-                ) {
-
-                    opt.classList.add(
-                        'selected'
-                    );
-
-                } else {
-
-                    opt.classList.remove(
-                        'selected'
-                    );
-
-                }
-
-            });
-
-
-        modalPersonalizacao.classList.remove(
-            'hidden'
-        );
-
+        modalPersonalizacao.classList.remove('hidden');
     }
 
+    document.getElementById('btnFecharModal').addEventListener('click', () => {
+        modalPersonalizacao.classList.add('hidden');
+    });
 
-    document
-        .getElementById('btnFecharModal')
-        .addEventListener(
-            'click',
-            () => {
-
-                modalPersonalizacao.classList.add(
-                    'hidden'
-                );
-
-            }
-        );
-
-
-    document
-        .getElementById(
-            'btnSalvarPersonalizacao'
-        )
-        .addEventListener(
-            'click',
-            async () => {
-
-                const id =
-                    customRadioIdInput.value;
-
-
-                try {
-
-                    const radioRef =
-                        ref(
-                            db,
-                            'radios_cadastradas/' +
-                            id
-                        );
-
-
-                    await update(
-                        radioRef,
-                        {
-                            cor: corSelecionada,
-                            icone: iconeSelecionado
-                        }
-                    );
-
-
-                    modalPersonalizacao.classList.add(
-                        'hidden'
-                    );
-
-
-                    carregarRadios();
-
-                }
-                catch (err) {
-
-                    console.error(err);
-
-                    alert(
-                        "Erro ao salvar personalização."
-                    );
-
-                }
-
-            }
-        );
-
-
-    /* =====================================================
-       DELETAR RÁDIO
-    ====================================================== */
+    document.getElementById('btnSalvarPersonalizacao').addEventListener('click', async () => {
+        const id = customRadioIdInput.value;
+        try {
+            await update(ref(db, 'radios_cadastradas/' + id), { cor: corSelecionada, icone: iconeSelecionado });
+            modalPersonalizacao.classList.add('hidden');
+            carregarRadios();
+        } catch (err) {
+            console.error(err);
+            alert("Erro ao salvar personalização.");
+        }
+    });
 
     async function deletarRadio(id) {
-
-        if (
-            !confirm(
-                "Tem certeza que deseja excluir esta rádio?"
-            )
-        ) return;
-
-
+        if (!confirm("Tem certeza que deseja excluir esta rádio?")) return;
         try {
-
-            await remove(
-                ref(
-                    db,
-                    'radios_cadastradas/' +
-                    id
-                )
-            );
-
-
+            await remove(ref(db, 'radios_cadastradas/' + id));
             carregarRadios();
-
+        } catch (erro) {
+            console.error("Erro ao remover rádio:", erro);
         }
-        catch (erro) {
-
-            console.error(
-                "Erro ao remover rádio:",
-                erro
-            );
-
-        }
-
     }
 
-
-    /* =====================================================
-       EDITAR RÁDIO
-    ====================================================== */
-
-    function prepararEdicao(
-        id,
-        nome,
-        url
-    ) {
-
-        radioIdEditandoInput.value =
-            id;
-
-        nomeRadioInput.value =
-            nome;
-
-        urlRadioInput.value =
-            url;
-
-        formTitulo.innerText =
-            "Editar Rádio";
-
-        btnSalvarRadio.innerText =
-            "ATUALIZAR RÁDIO";
-
-        btnCancelarEdicao.classList.remove(
-            'hidden'
-        );
-
-
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-
+    function prepararEdicao(id, nome, url) {
+        radioIdEditandoInput.value = id;
+        nomeRadioInput.value = nome;
+        urlRadioInput.value = url;
+        formTitulo.innerText = "Editar Rádio";
+        btnSalvarRadio.innerText = "ATUALIZAR RÁDIO";
+        btnCancelarEdicao.classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-
 
     function limparFormulario() {
-
-        radioIdEditandoInput.value =
-            "";
-
-        nomeRadioInput.value =
-            "";
-
-        urlRadioInput.value =
-            "";
-
-        formTitulo.innerText =
-            "Adicionar Nova Rádio";
-
-        btnSalvarRadio.innerText =
-            "CADASTRAR RÁDIO";
-
-        btnCancelarEdicao.classList.add(
-            'hidden'
-        );
-
+        radioIdEditandoInput.value = "";
+        nomeRadioInput.value = "";
+        urlRadioInput.value = "";
+        formTitulo.innerText = "Adicionar Nova Rádio";
+        btnSalvarRadio.innerText = "CADASTRAR RÁDIO";
+        btnCancelarEdicao.classList.add('hidden');
     }
 
+    btnCancelarEdicao.addEventListener('click', limparFormulario);
+    btnSalvarRadio.addEventListener('click', salvarRadio);
 
-    btnCancelarEdicao.addEventListener(
-        'click',
-        limparFormulario
-    );
-
-
-    btnSalvarRadio.addEventListener(
-        'click',
-        salvarRadio
-    );
-
-
-    /* =====================================================
-       COMERCIAIS
-    ====================================================== */
-
-    const nomeComercial =
-        document.getElementById(
-            'nomeComercial'
-        );
-
-    const clienteComercial =
-        document.getElementById(
-            'clienteComercial'
-        );
-
-    const arquivoComercial =
-        document.getElementById(
-            'arquivoComercial'
-        );
-
-    const inicioCampanha =
-        document.getElementById(
-            'inicioCampanha'
-        );
-
-    const fimCampanha =
-        document.getElementById(
-            'fimCampanha'
-        );
-
-    const frequenciaCampanha =
-        document.getElementById(
-            'frequenciaCampanha'
-        );
-
-    const campaignList =
-        document.getElementById(
-            'campaignList'
-        );
-
-    const commercialIdEditando =
-        document.getElementById(
-            'commercialIdEditando'
-        );
-
-    const commercialFormTitle =
-        document.getElementById(
-            'commercialFormTitle'
-        );
-
-    const btnSalvarComercial =
-        document.getElementById(
-            'btnSalvarComercial'
-        );
-
-    const btnCancelarComercial =
-        document.getElementById(
-            'btnCancelarComercial'
-        );
-
-    const arquivoAtualInfo =
-        document.getElementById(
-            'arquivoAtualInfo'
-        );
-
-    const uploadProgress =
-        document.getElementById(
-            'uploadProgress'
-        );
-
-    const uploadProgressBar =
-        document.getElementById(
-            'uploadProgressBar'
-        );
-
-    const uploadProgressText =
-        document.getElementById(
-            'uploadProgressText'
-        );
-
+    const nomeComercial = document.getElementById('nomeComercial');
+    const clienteComercial = document.getElementById('clienteComercial');
+    const arquivoComercial = document.getElementById('arquivoComercial');
+    const inicioCampanha = document.getElementById('inicioCampanha');
+    const fimCampanha = document.getElementById('fimCampanha');
+    const frequenciaCampanha = document.getElementById('frequenciaCampanha');
+    const campaignList = document.getElementById('campaignList');
+    const commercialIdEditando = document.getElementById('commercialIdEditando');
+    const commercialFormTitle = document.getElementById('commercialFormTitle');
+    const btnSalvarComercial = document.getElementById('btnSalvarComercial');
+    const btnCancelarComercial = document.getElementById('btnCancelarComercial');
+    const arquivoAtualInfo = document.getElementById('arquivoAtualInfo');
+    const uploadProgress = document.getElementById('uploadProgress');
+    const uploadProgressBar = document.getElementById('uploadProgressBar');
+    const uploadProgressText = document.getElementById('uploadProgressText');
 
     let campanhasGlobal = [];
-
     let clientesGlobal = [];
-
     let destinoCampanha = "todos";
-
     let arquivoAtualUrl = "";
-
     let arquivoAtualStoragePath = "";
-
     let tipoMidiaAtual = "audio";
 
-
-    /* =====================================================
-       TIPO DA MÍDIA
-    ====================================================== */
-
-    document
-        .querySelectorAll(
-            'input[name="tipoMidia"]'
-        )
-        .forEach(input => {
-
-            input.addEventListener(
-                'change',
-                () => {
-
-                    tipoMidiaAtual =
-                        input.value;
-
-
-                    if (
-                        tipoMidiaAtual ===
-                        'video'
-                    ) {
-
-                        arquivoComercial.accept =
-                            "video/*";
-
-                    } else {
-
-                        arquivoComercial.accept =
-                            "audio/*";
-
-                    }
-
-                }
-            );
-
+    document.querySelectorAll('input[name="tipoMidia"]').forEach(input => {
+        input.addEventListener('change', () => {
+            tipoMidiaAtual = input.value;
+            arquivoComercial.accept = tipoMidiaAtual === 'video' ? "video/*" : "audio/*";
         });
+    });
 
+    const targetTodos = document.getElementById('targetTodos');
+    const targetClientes = document.getElementById('targetClientes');
+    const clientsPanel = document.getElementById('clientsPanel');
 
-    /* =====================================================
-       DESTINO
-    ====================================================== */
+    targetTodos.addEventListener('click', () => {
+        destinoCampanha = "todos";
+        targetTodos.classList.add('active');
+        targetClientes.classList.remove('active');
+        clientsPanel.classList.remove('show');
+    });
 
-    const targetTodos =
-        document.getElementById(
-            'targetTodos'
-        );
-
-    const targetClientes =
-        document.getElementById(
-            'targetClientes'
-        );
-
-    const clientsPanel =
-        document.getElementById(
-            'clientsPanel'
-        );
-
-
-    targetTodos.addEventListener(
-        'click',
-        () => {
-
-            destinoCampanha =
-                "todos";
-
-            targetTodos.classList.add(
-                'active'
-            );
-
-            targetClientes.classList.remove(
-                'active'
-            );
-
-            clientsPanel.classList.remove(
-                'show'
-            );
-
-        }
-    );
-
-
-    targetClientes.addEventListener(
-        'click',
-        () => {
-
-            destinoCampanha =
-                "clientes";
-
-            targetClientes.classList.add(
-                'active'
-            );
-
-            targetTodos.classList.remove(
-                'active'
-            );
-
-            clientsPanel.classList.add(
-                'show'
-            );
-
-            carregarClientes();
-
-        }
-    );
-
-
-    /* =====================================================
-       CLIENTES
-    ====================================================== */
+    targetClientes.addEventListener('click', () => {
+        destinoCampanha = "clientes";
+        targetClientes.classList.add('active');
+        targetTodos.classList.remove('active');
+        clientsPanel.classList.add('show');
+        carregarClientes();
+    });
 
     async function carregarClientes() {
-
-        const clientsList =
-            document.getElementById(
-                'clientsList'
-            );
-
-
-        clientsList.innerHTML =
-            `
-                <div
-                    style="
-                        font-size:11px;
-                        color:#64748b;
-                    "
-                >
-                    Carregando clientes...
-                </div>
-            `;
-
-
-        const caminhos = [
-
-            'ouvintes',
-
-            'ouvintes_cadastrados',
-
-            'usuarios',
-
-            'usuarios_cadastrados',
-
-            'clientes',
-
-            'ouvintes_preferencias'
-
-        ];
-
-
-        const mapaClientes =
-            new Map();
-
+        const clientsList = document.getElementById('clientsList');
+        clientsList.innerHTML = `<div style="font-size:11px;color:#64748b;">Carregando clientes...</div>`;
+        const caminhos = ['ouvintes', 'ouvintes_cadastrados', 'usuarios', 'clientes'];
+        const mapaClientes = new Map();
 
         try {
-
-            for (
-                const caminho of caminhos
-            ) {
-
+            for (const caminho of caminhos) {
                 try {
-
-                    const snapshot =
-                        await get(
-                            ref(
-                                db,
-                                caminho
-                            )
-                        );
-
-
-                    if (
-                        snapshot.exists()
-                    ) {
-
-                        snapshot.forEach(
-                            child => {
-
-                                const dados =
-                                    child.val();
-
-
-                                const id =
-                                    child.key;
-
-
-                                let nome =
-                                    id;
-
-
-                                if (
-                                    typeof dados ===
-                                    'object' &&
-                                    dados !== null
-                                ) {
-
-                                    nome =
-                                        dados.nome ||
-                                        dados.nomeUsuario ||
-                                        dados.usuario ||
-                                        dados.username ||
-                                        dados.email ||
-                                        id;
-
-                                }
-
-
-                                mapaClientes.set(
-                                    id,
-                                    {
-                                        id,
-                                        nome
-                                    }
-                                );
-
+                    const snapshot = await get(ref(db, caminho));
+                    if (snapshot.exists()) {
+                        snapshot.forEach(child => {
+                            const dados = child.val();
+                            const id = child.key;
+                            let nome = id;
+                            if (typeof dados === 'object' && dados !== null) {
+                                nome = dados.nome || dados.nomeUsuario || dados.usuario || dados.username || dados.email || id;
                             }
-                        );
-
+                            mapaClientes.set(id, { id, nome });
+                        });
                     }
-
-                }
-                catch (erroInterno) {
-
-                    console.warn(
-                        "Não foi possível ler:",
-                        caminho
-                    );
-
-                }
-
+                } catch (erroInterno) { console.warn("Erro ao ler:", caminho); }
             }
-
-
-            clientesGlobal =
-                Array.from(
-                    mapaClientes.values()
-                );
-
-
+            clientesGlobal = Array.from(mapaClientes.values());
             renderizarClientes();
-
-
+        } catch (erro) {
+            clientsList.innerHTML = `<div style="color:#f87171;font-size:11px;">Não foi possível carregar os clientes.</div>`;
         }
-        catch (erro) {
-
-            console.error(
-                "Erro ao carregar clientes:",
-                erro
-            );
-
-
-            clientsList.innerHTML =
-                `
-                    <div
-                        style="
-                            color:#f87171;
-                            font-size:11px;
-                        "
-                    >
-                        Não foi possível carregar os clientes.
-                    </div>
-                `;
-
-        }
-
     }
 
+    function renderizarClientes(filtro = "") {
+        const clientsList = document.getElementById('clientsList');
+        const termo = filtro.toLowerCase().trim();
+        const lista = clientesGlobal.filter(cliente => cliente.nome.toLowerCase().includes(termo));
 
-    function renderizarClientes(
-        filtro = ""
-    ) {
-
-        const clientsList =
-            document.getElementById(
-                'clientsList'
-            );
-
-
-        const termo =
-            filtro
-                .toLowerCase()
-                .trim();
-
-
-        const lista =
-            clientesGlobal.filter(
-                cliente =>
-                    cliente.nome
-                        .toLowerCase()
-                        .includes(termo)
-            );
-
-
-        if (
-            lista.length === 0
-        ) {
-
-            clientsList.innerHTML =
-                `
-                    <div
-                        style="
-                            color:#64748b;
-                            font-size:11px;
-                        "
-                    >
-                        Nenhum cliente encontrado.
-                    </div>
-                `;
-
+        if (lista.length === 0) {
+            clientsList.innerHTML = `<div style="color:#64748b;font-size:11px;">Nenhum cliente encontrado.</div>`;
             return;
-
         }
 
-
-        clientsList.innerHTML =
-            "";
-
-
-        lista.forEach(
-            cliente => {
-
-                const item =
-                    document.createElement(
-                        'label'
-                    );
-
-
-                item.className =
-                    'client-item';
-
-
-                item.innerHTML =
-                    `
-                        <input
-                            type="checkbox"
-                            value="${escapeAttribute(cliente.id)}"
-                            data-client-id="${escapeAttribute(cliente.id)}"
-                        >
-
-                        <span>
-                            ${escapeHtml(cliente.nome)}
-                        </span>
-                    `;
-
-
-                clientsList.appendChild(
-                    item
-                );
-
-            }
-        );
-
+        clientsList.innerHTML = "";
+        lista.forEach(cliente => {
+            const item = document.createElement('label');
+            item.className = 'client-item';
+            item.innerHTML = `
+                <input type="checkbox" value="${escapeAttribute(cliente.id)}" data-client-id="${escapeAttribute(cliente.id)}">
+                <span>${escapeHtml(cliente.nome)}</span>
+            `;
+            clientsList.appendChild(item);
+        });
     }
 
+    document.getElementById('buscaCliente').addEventListener('input', e => {
+        renderizarClientes(e.target.value);
+    });
 
-    document
-        .getElementById('buscaCliente')
-        .addEventListener(
-            'input',
-            e => {
-
-                renderizarClientes(
-                    e.target.value
-                );
-
-            }
-        );
-
-
-    /* =====================================================
-       SALVAR COMERCIAL
-    ====================================================== */
-
-    btnSalvarComercial.addEventListener(
-        'click',
-        salvarComercial
-    );
-
+    btnSalvarComercial.addEventListener('click', salvarComercial);
 
     async function salvarComercial() {
+        const nome = nomeComercial.value.trim();
+        const cliente = clienteComercial.value.trim();
+        const inicio = inicioCampanha.value;
+        const fim = fimCampanha.value;
+        const frequencia = Number(frequenciaCampanha.value);
 
-        const nome =
-            nomeComercial.value.trim();
-
-        const cliente =
-            clienteComercial.value.trim();
-
-        const inicio =
-            inicioCampanha.value;
-
-        const fim =
-            fimCampanha.value;
-
-        const frequencia =
-            Number(
-                frequenciaCampanha.value
-            );
-
-
-        if (!nome) {
-
-            alert(
-                "Digite o nome do comercial."
-            );
-
+        if (!nome || !cliente || !inicio || !fim) {
+            alert("Por favor, preencha todos os campos obrigatórios da campanha.");
             return;
-
         }
 
-
-        if (!cliente) {
-
-            alert(
-                "Digite o nome do cliente/anunciante."
-            );
-
+        const inicioDate = new Date(inicio);
+        const fimDate = new Date(fim);
+        if (fimDate <= inicioDate) {
+            alert("A data de término precisa ser posterior à data de início.");
             return;
-
         }
 
-
-        if (!inicio || !fim) {
-
-            alert(
-                "Informe a data e hora de início e término da campanha."
-            );
-
+        const idEdicao = commercialIdEditando.value;
+        const arquivo = arquivoComercial.files[0];
+        if (!idEdicao && !arquivo) {
+            alert("Selecione o arquivo de áudio ou vídeo.");
             return;
-
         }
-
-
-        const inicioDate =
-            new Date(inicio);
-
-        const fimDate =
-            new Date(fim);
-
-
-        if (
-            fimDate <= inicioDate
-        ) {
-
-            alert(
-                "A data de término precisa ser posterior à data de início."
-            );
-
-            return;
-
-        }
-
-
-        const idEdicao =
-            commercialIdEditando.value;
-
-
-        const arquivo =
-            arquivoComercial.files[0];
-
-
-        if (
-            !idEdicao &&
-            !arquivo
-        ) {
-
-            alert(
-                "Selecione o arquivo de áudio ou vídeo."
-            );
-
-            return;
-
-        }
-
-
-        if (
-            destinoCampanha ===
-            "clientes"
-        ) {
-
-            const selecionados =
-                Array.from(
-                    document.querySelectorAll(
-                        '#clientsList input[type="checkbox"]:checked'
-                    )
-                )
-                .map(
-                    input =>
-                        input.value
-                );
-
-
-            if (
-                selecionados.length === 0
-            ) {
-
-                alert(
-                    "Selecione pelo menos um cliente."
-                );
-
-                return;
-
-            }
-
-        }
-
 
         try {
+            btnSalvarComercial.disabled = true;
+            btnSalvarComercial.innerText = "SALVANDO...";
 
-            btnSalvarComercial.disabled =
-                true;
-
-            btnSalvarComercial.innerText =
-                "SALVANDO...";
-
-
-            let idCampanha =
-                idEdicao;
-
-
-            if (!idCampanha) {
-
-                const novaRef =
-                    push(
-                        ref(
-                            db,
-                            'comerciais'
-                        )
-                    );
-
-                idCampanha =
-                    novaRef.key;
-
-            }
-
-
-            let downloadUrl =
-                arquivoAtualUrl;
-
-            let storagePath =
-                arquivoAtualStoragePath;
-
+            let idCampanha = idEdicao || push(ref(db, 'comerciais')).key;
+            let downloadUrl = arquivoAtualUrl;
+            let storagePath = arquivoAtualStoragePath;
 
             if (arquivo) {
+                storagePath = `comerciais/${idCampanha}/${Date.now()}_${sanitizarNomeArquivo(arquivo.name)}`;
+                const arquivoRef = storageRef(storage, storagePath);
+                uploadProgress.style.display = "block";
+                const uploadTask = uploadBytesResumable(arquivoRef, arquivo, { contentType: arquivo.type });
 
-                const extensao =
-                    arquivo.name
-                        .split('.')
-                        .pop()
-                        .toLowerCase();
-
-
-                storagePath =
-                    `comerciais/${idCampanha}/${Date.now()}_${sanitizarNomeArquivo(arquivo.name)}`;
-
-
-                const arquivoRef =
-                    storageRef(
-                        storage,
-                        storagePath
-                    );
-
-
-                uploadProgress.style.display =
-                    "block";
-
-                uploadProgressBar.style.width =
-                    "0%";
-
-                uploadProgressText.innerText =
-                    "Enviando mídia para a nuvem...";
-
-
-                const uploadTask =
-                    uploadBytesResumable(
-                        arquivoRef,
-                        arquivo,
-                        {
-                            contentType:
-                                arquivo.type
+                await new Promise((resolve, reject) => {
+                    uploadTask.on('state_changed', 
+                        snapshot => {
+                            const pct = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            uploadProgressBar.style.width = pct + "%";
+                            uploadProgressText.innerText = `Enviando mídia... ${Math.round(pct)}%`;
+                        }, 
+                        error => reject(error), 
+                        async () => {
+                            downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
+                            resolve();
                         }
                     );
-
-
-                await new Promise(
-                    (
-                        resolve,
-                        reject
-                    ) => {
-
-                        uploadTask.on(
-                            'state_changed',
-
-                            snapshot => {
-
-                                const percentual =
-                                    (
-                                        snapshot.bytesTransferred /
-                                        snapshot.totalBytes
-                                    ) * 100;
-
-
-                                uploadProgressBar.style.width =
-                                    percentual + "%";
-
-
-                                uploadProgressText.innerText =
-                                    `Enviando mídia... ${Math.round(percentual)}%`;
-
-                            },
-
-                            error => {
-
-                                reject(error);
-
-                            },
-
-                            async () => {
-
-                                try {
-
-                                    downloadUrl =
-                                        await getDownloadURL(
-                                            uploadTask.snapshot.ref
-                                        );
-
-                                    resolve();
-
-                                }
-                                catch (erro) {
-
-                                    reject(
-                                        erro
-                                    );
-
-                                }
-
-                            }
-
-                        );
-
-                    }
-                );
-
+                });
             }
 
-
-            let clientesSelecionados =
-                [];
-
-
-            if (
-                destinoCampanha ===
-                "clientes"
-            ) {
-
-                clientesSelecionados =
-                    Array.from(
-                        document.querySelectorAll(
-                            '#clientsList input[type="checkbox"]:checked'
-                        )
-                    )
-                    .map(
-                        input =>
-                            input.value
-                    );
-
+            let clientesSelecionados = [];
+            if (destinoCampanha === "clientes") {
+                clientesSelecionados = Array.from(document.querySelectorAll('#clientsList input[type="checkbox"]:checked')).map(input => input.value);
             }
-
 
             const dadosCampanha = {
-
                 nome: nome,
-
                 cliente: cliente,
-
                 tipo: tipoMidiaAtual,
-
                 arquivoUrl: downloadUrl,
-
                 storagePath: storagePath,
-
                 inicio: inicioDate.getTime(),
-
                 fim: fimDate.getTime(),
-
-                frequenciaMinutos:
-                    frequencia,
-
-                destino:
-                    destinoCampanha,
-
-                clientes:
-                    clientesSelecionados,
-
-                ativa:
-                    true,
-
-                criadaEm:
-                    Date.now(),
-
-                atualizadaEm:
-                    Date.now()
-
+                frequenciaMinutos: frequencia,
+                destino: destinoCampanha,
+                clientes: clientesSelecionados,
+                ativa: true,
+                criadaEm: Date.now(),
+                atualizadaEm: Date.now()
             };
 
-
-            if (
-                idEdicao
-            ) {
-
-                await update(
-                    ref(
-                        db,
-                        'comerciais/' +
-                        idCampanha
-                    ),
-                    dadosCampanha
-                );
-
-            } else {
-
-                await set(
-                    ref(
-                        db,
-                        'comerciais/' +
-                        idCampanha
-                    ),
-                    dadosCampanha
-                );
-
-            }
-
-
-            uploadProgress.style.display =
-                "none";
-
-
+            await set(ref(db, 'comerciais/' + idCampanha), dadosCampanha);
+            uploadProgress.style.display = "none";
             limparFormularioComercial();
-
-
             await carregarCampanhas();
-
-
-            alert(
-                idEdicao
-                    ? "Campanha atualizada com sucesso!"
-                    : "Campanha cadastrada com sucesso!"
-            );
-
+            alert(idEdicao ? "Campanha atualizada com sucesso!" : "Campanha cadastrada com sucesso!");
+        } catch (erro) {
+            console.error("Erro ao salvar comercial:", erro);
+            alert("Não foi possível salvar a campanha.");
+        } finally {
+            btnSalvarComercial.disabled = false;
+            btnSalvarComercial.innerText = commercialIdEditando.value ? "ATUALIZAR CAMPANHA" : "📢 CADASTRAR CAMPANHA";
         }
-        catch (erro) {
-
-            console.error(
-                "Erro ao salvar comercial:",
-                erro
-            );
-
-
-            alert(
-                "Não foi possível salvar a campanha.\n\nVerifique se o Firebase Storage está habilitado e se as regras permitem o upload."
-            );
-
-        }
-        finally {
-
-            btnSalvarComercial.disabled =
-                false;
-
-            btnSalvarComercial.innerText =
-                commercialIdEditando.value
-                    ? "ATUALIZAR CAMPANHA"
-                    : "📢 CADASTRAR CAMPANHA";
-
-        }
-
     }
-
-
-    /* =====================================================
-       CARREGAR CAMPANHAS
-    ====================================================== */
 
     async function carregarCampanhas() {
-
         try {
-
-            const campanhasRef =
-                ref(
-                    db,
-                    'comerciais'
-                );
-
-
-            const snapshot =
-                await get(
-                    campanhasRef
-                );
-
-
-            campanhasGlobal =
-                [];
-
-
-            if (
-                snapshot.exists()
-            ) {
-
-                snapshot.forEach(
-                    child => {
-
-                        campanhasGlobal.push({
-
-                            id:
-                                child.key,
-
-                            ...child.val()
-
-                        });
-
-                    }
-                );
-
+            const snapshot = await get(ref(db, 'comerciais'));
+            campanhasGlobal = [];
+            if (snapshot.exists()) {
+                snapshot.forEach(child => {
+                    campanhasGlobal.push({ id: child.key, ...child.val() });
+                });
             }
-
-
-            campanhasGlobal.sort(
-                (a, b) =>
-                    Number(a.fim || 0) -
-                    Number(b.fim || 0)
-            );
-
-
+            campanhasGlobal.sort((a, b) => Number(a.fim || 0) - Number(b.fim || 0));
             renderizarCampanhas();
-
+        } catch (erro) {
+            campaignList.innerHTML = `<div class="empty-campaigns">Erro ao carregar campanhas.</div>`;
         }
-        catch (erro) {
-
-            console.error(
-                "Erro ao carregar campanhas:",
-                erro
-            );
-
-
-            campaignList.innerHTML =
-                `
-                    <div
-                        class="empty-campaigns"
-                    >
-                        Erro ao carregar campanhas.
-                    </div>
-                `;
-
-        }
-
     }
-
-
-    /* =====================================================
-       RENDERIZAR CAMPANHAS
-    ====================================================== */
 
     function renderizarCampanhas() {
-
-        campaignList.innerHTML =
-            "";
-
-
-        if (
-            campanhasGlobal.length === 0
-        ) {
-
-            campaignList.innerHTML =
-                `
-                    <div
-                        class="empty-campaigns"
-                    >
-                        📢 Nenhum comercial cadastrado ainda.
-                    </div>
-                `;
-
+        campaignList.innerHTML = "";
+        if (campanhasGlobal.length === 0) {
+            campaignList.innerHTML = `<div class="empty-campaigns">📢 Nenhum comercial cadastrado ainda.</div>`;
             return;
-
         }
 
+        campanhasGlobal.forEach(campanha => {
+            const status = obterStatusCampanha(campanha);
+            const card = document.createElement('div');
+            card.className = `campaign-card ${status.classeCor}`;
+            const icone = campanha.tipo === "video" ? "🎬" : "🎧";
+            const destinoTexto = campanha.destino === "todos" ? "Todos os ouvintes" : `${(campanha.clientes || []).length} cliente(s) selecionado(s)`;
 
-        campanhasGlobal.forEach(
-            campanha => {
+            card.innerHTML = `
+                <div class="campaign-main">
+                    <div class="campaign-media-icon">${icone}</div>
+                    <div class="campaign-info">
+                        <h3>${escapeHtml(campanha.nome)}</h3>
+                        <p>
+                            <strong>Cliente:</strong> ${escapeHtml(campanha.cliente || "-")}<br>
+                            <strong>Período:</strong> ${formatarDataHora(campanha.inicio)} até ${formatarDataHora(campanha.fim)}<br>
+                            <strong>Público:</strong> ${destinoTexto}
+                        </p>
+                        <span class="campaign-status ${status.classeStatus}">${status.texto}</span>
+                    </div>
+                </div>
+                <div class="campaign-actions">
+                    <button class="campaign-action btn-preview-campaign" title="Ouvir" data-id="${campanha.id}">▶️</button>
+                    <button class="campaign-action btn-edit-campaign" title="Editar" data-id="${campanha.id}">✏️</button>
+                    <button class="campaign-action btn-delete-campaign" title="Excluir" data-id="${campanha.id}">🗑️</button>
+                </div>
+            `;
+            campaignList.appendChild(card);
+        });
 
-                atualizarStatusAutomaticamente(
-                    campanha
-                );
-
-
-                const status =
-                    obterStatusCampanha(
-                        campanha
-                    );
-
-
-                const card =
-                    document.createElement(
-                        'div'
-                    );
-
-
-                card.className =
-                    `campaign-card ${status.classeCor}`;
-
-
-                const icone =
-                    campanha.tipo ===
-                    "video"
-                        ? "🎬"
-                        : "🎧";
-
-
-                const destinoTexto =
-                    campanha.destino ===
-                    "todos"
-                        ? "Todos os ouvintes"
-                        : `${(campanha.clientes || []).length} cliente(s) selecionado(s)`;
-
-
-                const frequenciaTexto =
-                    `A cada ${campanha.frequenciaMinutos || 10} minutos`;
-
-
-                const inicioTexto =
-                    formatarDataHora(
-                        campanha.inicio
-                    );
-
-
-                const fimTexto =
-                    formatarDataHora(
-                        campanha.fim
-                    );
-
-
-                card.innerHTML =
-                    `
-
-                        <div class="campaign-main">
-
-                            <div
-                                class="campaign-media-icon"
-                            >
-                                ${icone}
-                            </div>
-
-                            <div
-                                class="campaign-info"
-                            >
-
-                                <h3>
-                                    ${escapeHtml(campanha.nome)}
-                                </h3>
-
-                                <p>
-                                    <strong>
-                                        Cliente:
-                                    </strong>
-                                    ${escapeHtml(campanha.cliente || "-")}
-                                    <br>
-
-                                    <strong>
-                                        Período:
-                                    </strong>
-                                    ${inicioTexto}
-                                    até
-                                    ${fimTexto}
-                                    <br>
-
-                                    <strong>
-                                        Frequência:
-                                    </strong>
-                                    ${frequenciaTexto}
-                                    <br>
-
-                                    <strong>
-                                        Público:
-                                    </strong>
-                                    ${destinoTexto}
-                                </p>
-
-                                <span
-                                    class="campaign-status ${status.classeStatus}"
-                                >
-                                    ${status.texto}
-                                </span>
-
-                            </div>
-
-                        </div>
-
-
-                        <div
-                            class="campaign-actions"
-                        >
-
-                            <button
-                                class="campaign-action btn-preview-campaign"
-                                title="Ouvir / visualizar"
-                                data-id="${campanha.id}"
-                            >
-                                ▶️
-                            </button>
-
-                            <button
-                                class="campaign-action btn-edit-campaign"
-                                title="Editar / reativar"
-                                data-id="${campanha.id}"
-                            >
-                                ✏️
-                            </button>
-
-                            <button
-                                class="campaign-action btn-delete-campaign"
-                                title="Excluir campanha"
-                                data-id="${campanha.id}"
-                            >
-                                🗑️
-                            </button>
-
-                        </div>
-
-                    `;
-
-
-                campaignList.appendChild(
-                    card
-                );
-
-            }
-        );
-
-
-        document
-            .querySelectorAll(
-                '.btn-edit-campaign'
-            )
-            .forEach(btn => {
-
-                btn.addEventListener(
-                    'click',
-                    () =>
-                        editarCampanha(
-                            btn.dataset.id
-                        )
-                );
-
-            });
-
-
-        document
-            .querySelectorAll(
-                '.btn-delete-campaign'
-            )
-            .forEach(btn => {
-
-                btn.addEventListener(
-                    'click',
-                    () =>
-                        excluirCampanha(
-                            btn.dataset.id
-                        )
-                );
-
-            });
-
-
-        document
-            .querySelectorAll(
-                '.btn-preview-campaign'
-            )
-            .forEach(btn => {
-
-                btn.addEventListener(
-                    'click',
-                    () =>
-                        visualizarCampanha(
-                            btn.dataset.id
-                        )
-                );
-
-            });
-
+        document.querySelectorAll('.btn-edit-campaign').forEach(btn => btn.addEventListener('click', () => editarCampanha(btn.dataset.id)));
+        document.querySelectorAll('.btn-delete-campaign').forEach(btn => btn.addEventListener('click', () => excluirCampanha(btn.dataset.id)));
+        document.querySelectorAll('.btn-preview-campaign').forEach(btn => btn.addEventListener('click', () => visualizarCampanha(btn.dataset.id)));
     }
 
-
-    /* =====================================================
-       STATUS
-    ====================================================== */
-
-    function obterStatusCampanha(
-        campanha
-    ) {
-
-        const agora =
-            Date.now();
-
-
-        if (
-            campanha.ativa === false
-        ) {
-
-            return {
-
-                classeCor:
-                    "red",
-
-                classeStatus:
-                    "status-paused",
-
-                texto:
-                    "PAUSADA MANUALMENTE"
-
-            };
-
-        }
-
-
-        if (
-            agora >
-            Number(campanha.fim)
-        ) {
-
-            return {
-
-                classeCor:
-                    "red",
-
-                classeStatus:
-                    "status-expired",
-
-                texto:
-                    "CAMPANHA ENCERRADA"
-
-            };
-
-        }
-
-
-        if (
-            agora <
-            Number(campanha.inicio)
-        ) {
-
-            return {
-
-                classeCor:
-                    "",
-
-                classeStatus:
-                    "status-paused",
-
-                texto:
-                    "AGUARDANDO INÍCIO"
-
-            };
-
-        }
-
-
-        const diasRestantes =
-            (
-                Number(campanha.fim) -
-                agora
-            ) /
-            (
-                1000 *
-                60 *
-                60 *
-                24
-            );
-
-
-        if (
-            diasRestantes < 5
-        ) {
-
-            return {
-
-                classeCor:
-                    "yellow",
-
-                classeStatus:
-                    "status-yellow",
-
-                texto:
-                    `ATIVA • ${Math.max(0, Math.ceil(diasRestantes))} DIA(S)`
-
-            };
-
-        }
-
-
-        return {
-
-            classeCor:
-                "",
-
-            classeStatus:
-                "status-active",
-
-            texto:
-                `ATIVA • ${Math.ceil(diasRestantes)} DIA(S)`
-
-        };
-
+    function obterStatusCampanha(campanha) {
+        const agora = Date.now();
+        if (campanha.ativa === false) return { classeCor: "red", classeStatus: "status-paused", texto: "PAUSADA MANUALMENTE" };
+        if (agora > Number(campanha.fim)) return { classeCor: "red", classeStatus: "status-expired", texto: "CAMPANHA ENCERRADA" };
+        if (agora < Number(campanha.inicio)) return { classeCor: "", classeStatus: "status-paused", texto: "AGUARDANDO INÍCIO" };
+        const diasRestantes = (Number(campanha.fim) - agora) / (1000 * 60 * 60 * 24);
+        return { classeCor: diasRestantes < 5 ? "yellow" : "", classeStatus: diasRestantes < 5 ? "status-yellow" : "status-active", texto: `ATIVA • ${Math.ceil(diasRestantes)} DIA(S)` };
     }
-
-
-    /* =====================================================
-       STATUS AUTOMÁTICO
-    ====================================================== */
-
-    async function atualizarStatusAutomaticamente(
-        campanha
-    ) {
-
-        if (
-            campanha.ativa === false
-        ) return;
-
-
-        if (
-            Date.now() >
-            Number(campanha.fim)
-        ) {
-
-            try {
-
-                campanha.ativa =
-                    false;
-
-
-                await update(
-                    ref(
-                        db,
-                        'comerciais/' +
-                        campanha.id
-                    ),
-                    {
-                        ativa: false,
-                        encerradaAutomaticamenteEm:
-                            Date.now()
-                    }
-                );
-
-            }
-            catch (erro) {
-
-                console.error(
-                    "Erro ao atualizar status:",
-                    erro
-                );
-
-            }
-
-        }
-
-    }
-
-
-    /* =====================================================
-       EDITAR / REATIVAR CAMPANHA
-    ====================================================== */
 
     function editarCampanha(id) {
-
-        const campanha =
-            campanhasGlobal.find(
-                item =>
-                    item.id === id
-            );
-
-
+        const campanha = campanhasGlobal.find(item => item.id === id);
         if (!campanha) return;
 
+        commercialIdEditando.value = campanha.id;
+        nomeComercial.value = campanha.nome || "";
+        clienteComercial.value = campanha.cliente || "";
+        inicioCampanha.value = converterTimestampParaInput(campanha.inicio);
+        fimCampanha.value = converterTimestampParaInput(campanha.fim);
+        frequenciaCampanha.value = campanha.frequenciaMinutos || 10;
+        arquivoAtualUrl = campanha.arquivoUrl || "";
+        arquivoAtualStoragePath = campanha.storagePath || "";
+        tipoMidiaAtual = campanha.tipo || "audio";
 
-        commercialIdEditando.value =
-            campanha.id;
+        document.querySelectorAll('input[name="tipoMidia"]').forEach(input => {
+            input.checked = input.value === tipoMidiaAtual;
+        });
 
-
-        nomeComercial.value =
-            campanha.nome || "";
-
-
-        clienteComercial.value =
-            campanha.cliente || "";
-
-
-        inicioCampanha.value =
-            converterTimestampParaInput(
-                campanha.inicio
-            );
-
-
-        fimCampanha.value =
-            converterTimestampParaInput(
-                campanha.fim
-            );
-
-
-        frequenciaCampanha.value =
-            campanha.frequenciaMinutos ||
-            10;
-
-
-        arquivoAtualUrl =
-            campanha.arquivoUrl ||
-            "";
-
-
-        arquivoAtualStoragePath =
-            campanha.storagePath ||
-            "";
-
-
-        arquivoAtualInfo.innerText =
-            campanha.arquivoUrl
-                ? "Arquivo atual mantido. Selecione outro arquivo apenas se quiser substituí-lo."
-                : "";
-
-
-        tipoMidiaAtual =
-            campanha.tipo ||
-            "audio";
-
-
-        document
-            .querySelectorAll(
-                'input[name="tipoMidia"]'
-            )
-            .forEach(
-                input => {
-
-                    input.checked =
-                        input.value ===
-                        tipoMidiaAtual;
-
-                }
-            );
-
-
-        arquivoComercial.accept =
-            tipoMidiaAtual ===
-            "video"
-                ? "video/*"
-                : "audio/*";
-
-
-        destinoCampanha =
-            campanha.destino ||
-            "todos";
-
-
-        if (
-            destinoCampanha ===
-            "clientes"
-        ) {
-
-            targetClientes.classList.add(
-                'active'
-            );
-
-            targetTodos.classList.remove(
-                'active'
-            );
-
-            clientsPanel.classList.add(
-                'show'
-            );
-
-            carregarClientes()
-                .then(() => {
-
-                    marcarClientesSelecionados(
-                        campanha.clientes ||
-                        []
-                    );
-
-                });
-
+        destinoCampanha = campanha.destino || "todos";
+        if (destinoCampanha === "clientes") {
+            targetClientes.classList.add('active');
+            targetTodos.classList.remove('active');
+            clientsPanel.classList.add('show');
+            carregarClientes().then(() => marcarClientesSelecionados(campanha.clientes || []));
         } else {
-
-            targetTodos.classList.add(
-                'active'
-            );
-
-            targetClientes.classList.remove(
-                'active'
-            );
-
-            clientsPanel.classList.remove(
-                'show'
-            );
-
+            targetTodos.classList.add('active');
+            targetClientes.classList.remove('active');
+            clientsPanel.classList.remove('show');
         }
 
-
-        commercialFormTitle.innerText =
-            "Editar / Reativar Campanha";
-
-
-        btnSalvarComercial.innerText =
-            "ATUALIZAR CAMPANHA";
-
-
-        btnCancelarComercial.classList.remove(
-            'hidden'
-        );
-
-
-        document
-            .querySelector('.commercial-section')
-            .scrollIntoView({
-                behavior: 'smooth'
-            });
-
+        commercialFormTitle.innerText = "Editar / Reativar Campanha";
+        btnSalvarComercial.innerText = "ATUALIZAR CAMPANHA";
+        btnCancelarComercial.classList.remove('hidden');
+        document.querySelector('.commercial-section').scrollIntoView({ behavior: 'smooth' });
     }
 
-
-    function marcarClientesSelecionados(
-        ids
-    ) {
-
-        document
-            .querySelectorAll(
-                '#clientsList input[type="checkbox"]'
-            )
-            .forEach(
-                checkbox => {
-
-                    checkbox.checked =
-                        ids.includes(
-                            checkbox.value
-                        );
-
-                }
-            );
-
+    function marcarClientesSelecionados(ids) {
+        document.querySelectorAll('#clientsList input[type="checkbox"]').forEach(checkbox => {
+            checkbox.checked = ids.includes(checkbox.value);
+        });
     }
 
-
-    /* =====================================================
-       EXCLUIR CAMPANHA
-    ====================================================== */
-
-    async function excluirCampanha(
-        id
-    ) {
-
-        const campanha =
-            campanhasGlobal.find(
-                item =>
-                    item.id === id
-            );
-
-
-        if (!campanha) return;
-
-
-        const confirmou =
-            confirm(
-                `Tem certeza que deseja excluir a campanha "${campanha.nome}"?\n\nO arquivo de mídia também poderá ser removido do Firebase Storage.`
-            );
-
-
-        if (!confirmou) return;
-
-
+    async function excluirCampanha(id) {
+        if (!confirm("Tem certeza que deseja excluir esta campanha?")) return;
         try {
-
-            if (
-                campanha.storagePath
-            ) {
-
-                try {
-
-                    await deleteObject(
-                        storageRef(
-                            storage,
-                            campanha.storagePath
-                        )
-                    );
-
-                }
-                catch (
-                    erroStorage
-                ) {
-
-                    console.warn(
-                        "Arquivo não encontrado ou já removido:",
-                        erroStorage
-                    );
-
-                }
-
+            const campanha = campanhasGlobal.find(item => item.id === id);
+            if (campanha && campanha.storagePath) {
+                try { await deleteObject(storageRef(storage, campanha.storagePath)); } catch(e){}
             }
-
-
-            await remove(
-                ref(
-                    db,
-                    'comerciais/' +
-                    id
-                )
-            );
-
-
+            await remove(ref(db, 'comerciais/' + id));
             await carregarCampanhas();
-
-
-            alert(
-                "Campanha excluída com sucesso."
-            );
-
+            alert("Campanha excluída com sucesso.");
+        } catch (erro) {
+            alert("Não foi possível excluir a campanha.");
         }
-        catch (erro) {
-
-            console.error(
-                erro
-            );
-
-
-            alert(
-                "Não foi possível excluir a campanha."
-            );
-
-        }
-
     }
 
-
-    /* =====================================================
-       VISUALIZAR CAMPANHA
-    ====================================================== */
-
-    function visualizarCampanha(
-        id
-    ) {
-
-        const campanha =
-            campanhasGlobal.find(
-                item =>
-                    item.id === id
-            );
-
-
-        if (!campanha) return;
-
-
-        if (
-            !campanha.arquivoUrl
-        ) {
-
-            alert(
-                "Esta campanha não possui arquivo."
-            );
-
-            return;
-
-        }
-
-
-        if (
-            campanha.tipo ===
-            "video"
-        ) {
-
-            const janela =
-                window.open(
-                    "",
-                    "_blank",
-                    "width=800,height=600"
-                );
-
-
-            if (!janela) {
-
-                alert(
-                    "O navegador bloqueou a janela de visualização."
-                );
-
-                return;
-
-            }
-
-
-            janela.document.write(`
-
-                <!DOCTYPE html>
-
-                <html>
-
-                <head>
-
-                    <title>
-                        Visualizar Comercial
-                    </title>
-
-                    <style>
-
-                        body{
-                            margin:0;
-                            background:#000;
-                            display:flex;
-                            align-items:center;
-                            justify-content:center;
-                            height:100vh;
-                        }
-
-                        video{
-                            max-width:95%;
-                            max-height:95%;
-                        }
-
-                    </style>
-
-                </head>
-
-                <body>
-
-                    <video
-                        controls
-                        autoplay
-                        src="${campanha.arquivoUrl}"
-                    ></video>
-
-                </body>
-
-                </html>
-
-            `);
-
-        }
-        else {
-
-            const audio =
-                new Audio(
-                    campanha.arquivoUrl
-                );
-
+    function visualizarCampanha(id) {
+        const campanha = campanhasGlobal.find(item => item.id === id);
+        if (!campanha || !campanha.arquivoUrl) return;
+        if (campanha.tipo === "video") {
+            const janela = window.open("", "_blank", "width=800,height=600");
+            janela.document.write(`<body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;height:100vh;"><video controls autoplay src="${campanha.arquivoUrl}" style="max-width:95%;max-height:95%;"></video></body>`);
+        } else {
+            const audio = new Audio(campanha.arquivoUrl);
             audio.controls = true;
-
-            audio.play()
-                .catch(() => {});
-
-
-            alert(
-                `Reproduzindo: ${campanha.nome}`
-            );
-
+            audio.play().catch(() => {});
+            alert(`Reproduzindo: ${campanha.nome}`);
         }
-
     }
 
-
-    /* =====================================================
-       CANCELAR EDIÇÃO
-    ====================================================== */
-
-    btnCancelarComercial.addEventListener(
-        'click',
-        limparFormularioComercial
-    );
-
+    btnCancelarComercial.addEventListener('click', limparFormularioComercial);
 
     function limparFormularioComercial() {
-
-        commercialIdEditando.value =
-            "";
-
-
-        nomeComercial.value =
-            "";
-
-        clienteComercial.value =
-            "";
-
-
-        arquivoComercial.value =
-            "";
-
-
-        inicioCampanha.value =
-            "";
-
-        fimCampanha.value =
-            "";
-
-
-        frequenciaCampanha.value =
-            "10";
-
-
-        arquivoAtualUrl =
-            "";
-
-        arquivoAtualStoragePath =
-            "";
-
-
-        arquivoAtualInfo.innerText =
-            "";
-
-
-        destinoCampanha =
-            "todos";
-
-
-        targetTodos.classList.add(
-            'active'
-        );
-
-        targetClientes.classList.remove(
-            'active'
-        );
-
-        clientsPanel.classList.remove(
-            'show'
-        );
-
-
-        document
-            .querySelectorAll(
-                '#clientsList input[type="checkbox"]'
-            )
-            .forEach(
-                checkbox =>
-                    checkbox.checked = false
-            );
-
-
-        tipoMidiaAtual =
-            "audio";
-
-
-        document
-            .querySelectorAll(
-                'input[name="tipoMidia"]'
-            )
-            .forEach(
-                input => {
-
-                    input.checked =
-                        input.value ===
-                        "audio";
-
-                }
-            );
-
-
-        arquivoComercial.accept =
-            "audio/*";
-
-
-        commercialFormTitle.innerText =
-            "Cadastrar Novo Comercial";
-
-
-        btnSalvarComercial.innerText =
-            "📢 CADASTRAR CAMPANHA";
-
-
-        btnCancelarComercial.classList.add(
-            'hidden'
-        );
-
-
-        uploadProgress.style.display =
-            "none";
-
-
-        uploadProgressText.innerText =
-            "";
-
+        commercialIdEditando.value = "";
+        nomeComercial.value = "";
+        clienteComercial.value = "";
+        arquivoComercial.value = "";
+        inicioCampanha.value = "";
+        fimCampanha.value = "";
+        frequenciaCampanha.value = "10";
+        arquivoAtualUrl = "";
+        arquivoAtualStoragePath = "";
+        arquivoAtualInfo.innerText = "";
+        destinoCampanha = "todos";
+        targetTodos.classList.add('active');
+        targetClientes.classList.remove('active');
+        clientsPanel.classList.remove('show');
+        tipoMidiaAtual = "audio";
+        commercialFormTitle.innerText = "Cadastrar Novo Comercial";
+        btnSalvarComercial.innerText = "📢 CADASTRAR CAMPANHA";
+        btnCancelarComercial.classList.add('hidden');
+        uploadProgress.style.display = "none";
     }
 
-
-    /* =====================================================
-       UTILITÁRIOS
-    ====================================================== */
-
-    function formatarDataHora(
-        timestamp
-    ) {
-
+    function formatarDataHora(timestamp) {
         if (!timestamp) return "-";
-
-
-        const data =
-            new Date(
-                Number(timestamp)
-            );
-
-
-        return data.toLocaleString(
-            'pt-BR',
-            {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            }
-        );
-
+        return new Date(Number(timestamp)).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     }
 
-
-    function converterTimestampParaInput(
-        timestamp
-    ) {
-
+    function converterTimestampParaInput(timestamp) {
         if (!timestamp) return "";
-
-
-        const data =
-            new Date(
-                Number(timestamp)
-            );
-
-
-        const ano =
-            data.getFullYear();
-
-
-        const mes =
-            String(
-                data.getMonth() + 1
-            )
-            .padStart(2, '0');
-
-
-        const dia =
-            String(
-                data.getDate()
-            )
-            .padStart(2, '0');
-
-
-        const hora =
-            String(
-                data.getHours()
-            )
-            .padStart(2, '0');
-
-
-        const minuto =
-            String(
-                data.getMinutes()
-            )
-            .padStart(2, '0');
-
-
+        const data = new Date(Number(timestamp));
+        const ano = data.getFullYear();
+        const mes = String(data.getMonth() + 1).padStart(2, '0');
+        const dia = String(data.getDate()).padStart(2, '0');
+        const hora = String(data.getHours()).padStart(2, '0');
+        const minuto = String(data.getMinutes()).padStart(2, '0');
         return `${ano}-${mes}-${dia}T${hora}:${minuto}`;
-
     }
 
-
-    function sanitizarNomeArquivo(
-        nome
-    ) {
-
-        return nome
-            .normalize('NFD')
-            .replace(
-                /[\u0300-\u036f]/g,
-                ''
-            )
-            .replace(
-                /[^a-zA-Z0-9._-]/g,
-                '_'
-            );
-
+    function sanitizarNomeArquivo(nome) {
+        return nome.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9._-]/g, '_');
     }
 
-
-    function escapeHtml(
-        texto
-    ) {
-
-        return String(
-            texto ?? ""
-        )
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
+    function escapeHtml(texto) {
+        return String(texto ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
-
-    function escapeAttribute(
-        texto
-    ) {
-
-        return escapeHtml(
-            texto
-        );
-
+    function escapeAttribute(texto) {
+        return escapeHtml(texto);
     }
-
-
-    /* =====================================================
-       ATUALIZA STATUS PERIODICAMENTE
-    ====================================================== */
-
-    setInterval(
-        () => {
-
-            if (
-                campanhasGlobal.length > 0
-            ) {
-
-                renderizarCampanhas();
-
-            }
-
-        },
-        60000
-    );
-
-
 </script>
 
 </body>
