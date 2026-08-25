@@ -369,6 +369,147 @@
         }
         .btn-send-msg:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(147, 51, 234, 0.4); }
 
+        /* =========================================================
+           CHAT DO OUVINTE NA MESMA TELA — ESTILO MSN
+           ========================================================= */
+        .listener-msn-chat {
+            padding: 0;
+            overflow: hidden;
+        }
+        .listener-msn-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 14px;
+            background: linear-gradient(135deg, rgba(2,132,199,.28), rgba(59,130,246,.12));
+            border-bottom: 1px solid rgba(56,189,248,.20);
+        }
+        .listener-msn-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0f172a;
+            border: 1px solid #334155;
+            font-size: 17px;
+            flex-shrink: 0;
+        }
+        .listener-msn-contact { min-width: 0; flex: 1; }
+        .listener-msn-contact strong {
+            display: block;
+            color: #38bdf8;
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .listener-msn-contact span {
+            display: block;
+            color: #94a3b8;
+            font-size: 9px;
+            margin-top: 2px;
+        }
+        .listener-msn-status-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 8px rgba(34,197,94,.7);
+            flex-shrink: 0;
+        }
+        .listener-msn-history {
+            height: 245px;
+            overflow-y: auto;
+            padding: 12px;
+            background: rgba(15,23,42,.78);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            scrollbar-width: thin;
+            scrollbar-color: #475569 #0f172a;
+        }
+        .listener-msn-history::-webkit-scrollbar { width: 8px; }
+        .listener-msn-history::-webkit-scrollbar-track { background: #0f172a; }
+        .listener-msn-history::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+        .listener-msn-empty {
+            margin: auto;
+            color: #64748b;
+            font-size: 11px;
+            text-align: center;
+            line-height: 1.5;
+            padding: 20px 8px;
+        }
+        .listener-msn-msg {
+            max-width: 88%;
+            padding: 8px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            line-height: 1.45;
+            word-break: break-word;
+            box-shadow: 0 3px 10px rgba(0,0,0,.16);
+        }
+        .listener-msn-msg.recebida {
+            align-self: flex-start;
+            background: #1e293b;
+            color: #f8fafc;
+            border-left: 3px solid #38bdf8;
+            border-bottom-left-radius: 3px;
+        }
+        .listener-msn-msg.enviada {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            color: #fff;
+            border-right: 3px solid #c4b5fd;
+            border-bottom-right-radius: 3px;
+        }
+        .listener-msn-msg-remetente {
+            font-size: 9px;
+            font-weight: 800;
+            margin-bottom: 3px;
+            opacity: .9;
+        }
+        .listener-msn-msg-hora {
+            font-size: 8px;
+            opacity: .65;
+            margin-top: 4px;
+            text-align: right;
+        }
+        .listener-msn-compose {
+            padding: 11px;
+            background: rgba(23,31,53,.95);
+            border-top: 1px solid rgba(255,255,255,.06);
+        }
+        .listener-msn-compose textarea {
+            height: 62px;
+            margin-bottom: 8px;
+        }
+        .listener-msn-send-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .listener-msn-send-row small {
+            flex: 1;
+            color: #64748b;
+            font-size: 8px;
+            line-height: 1.3;
+        }
+        .listener-msn-send-row .btn-send-msg {
+            width: auto;
+            min-width: 92px;
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        @media (max-width: 760px) {
+            .listener-msn-history { height: 260px; }
+            .listener-msn-msg { max-width: 92%; }
+            .listener-msn-send-row { align-items: stretch; flex-direction: column; }
+            .listener-msn-send-row .btn-send-msg { width: 100%; }
+        }
+
         /* Modal de Personalização */
         .customizer-modal {
             position: fixed;
@@ -1155,10 +1296,27 @@
                     </div>
                 </div>
 
-                <div class="message-card">
-                    <h3>✉️ MANDE MENSAGEM PARA O ADM PARA PEDIR PARA ADICIONAR UMA RÁDIO QUE VOCÊ GOSTE</h3>
-                    <textarea id="msgAdminInput" placeholder="Escreva seu recado ou pedido de rádio aqui... (Enter envia)"></textarea>
-                    <button class="btn-send-msg" id="btnEnviarMsg">Enviar Mensagem</button>
+                <div class="message-card listener-msn-chat" id="chatOuvinteCard">
+                    <div class="listener-msn-header">
+                        <div class="listener-msn-avatar">👤</div>
+                        <div class="listener-msn-contact">
+                            <strong>ADMINISTRAÇÃO</strong>
+                            <span>Chat direto — somente você e o ADM</span>
+                        </div>
+                        <div class="listener-msn-status-dot" title="Canal de mensagens ativo"></div>
+                    </div>
+
+                    <div class="listener-msn-history" id="chatOuvinteHistorico">
+                        <div class="listener-msn-empty">Carregando sua conversa com a Administração...</div>
+                    </div>
+
+                    <div class="listener-msn-compose">
+                        <textarea id="msgAdminInput" placeholder="Escreva sua mensagem para o ADM... (Enter envia)"></textarea>
+                        <div class="listener-msn-send-row">
+                            <small id="chatOuvinteStatus">As mensagens ficam salvas nesta conversa.</small>
+                            <button class="btn-send-msg" id="btnEnviarMsg">Enviar</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1873,34 +2031,122 @@
 
         const btnEnviarMsg = document.getElementById('btnEnviarMsg');
         const msgAdminInput = document.getElementById('msgAdminInput');
+        const chatOuvinteHistorico = document.getElementById('chatOuvinteHistorico');
+        const chatOuvinteStatus = document.getElementById('chatOuvinteStatus');
+        let chatOuvinteEscutandoId = null;
+
+        function escapeChatOuvinte(valor) {
+            return String(valor ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function renderizarHistoricoChatOuvinte(snapshot) {
+            if (!chatOuvinteHistorico) return;
+
+            if (!snapshot.exists()) {
+                chatOuvinteHistorico.innerHTML = `
+                    <div class="listener-msn-empty">
+                        💬 Ainda não há mensagens nesta conversa.<br>
+                        Escreva abaixo para falar diretamente com a Administração.
+                    </div>`;
+                return;
+            }
+
+            const mensagens = [];
+            snapshot.forEach(child => {
+                mensagens.push({ id: child.key, ...(child.val() || {}) });
+            });
+            mensagens.sort((a, b) => Number(a.timestamp || 0) - Number(b.timestamp || 0));
+
+            chatOuvinteHistorico.innerHTML = '';
+            mensagens.slice(-100).forEach(msg => {
+                const ehAdm = String(msg.remetente || '').toLowerCase() === 'adm';
+                const bloco = document.createElement('div');
+                bloco.className = `listener-msn-msg ${ehAdm ? 'recebida' : 'enviada'}`;
+
+                const hora = msg.timestamp
+                    ? new Date(Number(msg.timestamp)).toLocaleString('pt-BR', {
+                        day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+                    })
+                    : '';
+
+                bloco.innerHTML = `
+                    <div class="listener-msn-msg-remetente">${ehAdm ? 'ADMINISTRAÇÃO' : 'VOCÊ'}</div>
+                    <div>${escapeChatOuvinte(msg.texto || msg.mensagem || '')}</div>
+                    <div class="listener-msn-msg-hora">${escapeChatOuvinte(hora)}</div>`;
+
+                chatOuvinteHistorico.appendChild(bloco);
+            });
+
+            chatOuvinteHistorico.scrollTop = chatOuvinteHistorico.scrollHeight;
+        }
+
+        async function iniciarChatOuvinteNaTela() {
+            try {
+                const id = await resolverIdentidadeChatOuvinte();
+                if (!id || chatOuvinteEscutandoId === id) return;
+
+                chatOuvinteEscutandoId = id;
+                if (chatOuvinteStatus) chatOuvinteStatus.textContent = 'Conversa conectada ao Firebase em tempo real.';
+
+                const mensagensRef = ref(db, `ouvintes_chat/${id}/mensagens`);
+                onValue(mensagensRef, renderizarHistoricoChatOuvinte, (erro) => {
+                    console.error('Erro ao receber mensagens do ADM:', erro);
+                    if (chatOuvinteStatus) chatOuvinteStatus.textContent = 'Não foi possível carregar a conversa.';
+                });
+            } catch (erro) {
+                console.error('Erro ao iniciar o chat do ouvinte:', erro);
+                if (chatOuvinteStatus) chatOuvinteStatus.textContent = 'Erro ao conectar o chat.';
+            }
+        }
 
         async function enviarMensagemParaAdm() {
             const texto = msgAdminInput.value.trim();
-            if (!texto) {
-                alert("Digite uma mensagem antes de enviar.");
-                return;
-            }
+            if (!texto) return;
+
+            btnEnviarMsg.disabled = true;
+            btnEnviarMsg.textContent = 'Enviando...';
+
             try {
-                const msgsRef = ref(db, 'mensagens_ouvintes');
-                await set(push(msgsRef), {
-                    remetente: localStorage.getItem('usuarioLogado') || "Ouvinte Anônimo",
-                    mensagem: texto,
-                    data: new Date().toLocaleString()
+                const id = await resolverIdentidadeChatOuvinte();
+                if (!id) throw new Error('Ouvinte não identificado.');
+
+                await update(ref(db, `ouvintes_chat/${id}/perfil`), {
+                    nome: chatOuvinteNome || localStorage.getItem('usuarioNome') || localStorage.getItem('usuarioLogado') || 'Ouvinte'
                 });
-                alert("Mensagem enviada com sucesso para o Administrador!");
-                msgAdminInput.value = "";
+
+                await set(push(ref(db, `ouvintes_chat/${id}/mensagens`)), {
+                    remetente: 'ouvinte',
+                    texto: texto,
+                    timestamp: Date.now()
+                });
+
+                msgAdminInput.value = '';
+                if (chatOuvinteStatus) chatOuvinteStatus.textContent = 'Mensagem enviada para a Administração.';
+                msgAdminInput.focus();
             } catch (err) {
-                console.error("Erro ao enviar mensagem:", err);
+                console.error('Erro ao enviar mensagem para o ADM:', err);
+                if (chatOuvinteStatus) chatOuvinteStatus.textContent = 'Não foi possível enviar. Verifique sua conexão.';
+                alert('Não foi possível enviar a mensagem para o Administrador.');
+            } finally {
+                btnEnviarMsg.disabled = false;
+                btnEnviarMsg.textContent = 'Enviar';
             }
         }
 
         btnEnviarMsg.addEventListener('click', enviarMensagemParaAdm);
-        msgAdminInput.addEventListener('keypress', (e) => {
+        msgAdminInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 enviarMensagemParaAdm();
             }
         });
+
+        iniciarChatOuvinteNaTela();
 
         // ==========================================
         // SISTEMA DO MODO RÁDIO RETRÔ INTERATIVO
