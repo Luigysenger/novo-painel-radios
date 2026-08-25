@@ -113,9 +113,8 @@
     <div class="chat-container">
         <h3 style="margin-bottom: 15px; font-size: 15px; color: #e0e0e0;">💬 Suas Mensagens e Respostas</h3>
         
-        <!-- Caixa onde as mensagens do Firebase vão aparecer dinamicamente -->
         <div id="boxMensagens" class="chat-messages">
-            <div class="message-bubble">Carregando mensagens da nuvem...</div>
+            <div class="message-bubble">Conectando ao chat...</div>
         </div>
 
         <div class="chat-input-area">
@@ -124,23 +123,38 @@
         </div>
     </div>
 
-    <!-- Importação da Conexão Centralizada do Firebase -->
+    <!-- Script com Firebase Inicializado Diretamente -->
     <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        // Importando do SDK modular correto
+        import { initializeApp as initFirebase } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Configuração direta do seu projeto do Firebase
+        const firebaseConfig = {
+            projectId: "novo-jeito-de-ouvir-radio",
+            // Insira sua apiKey e appId se necessário, ou deixe configurado com o projectId se já inicializado
+        };
+
+        // Vamos puxar a mesma configuração do seu arquivo firebase-config.js padrão para garantir:
         import { db } from '../firebase-config.js';
-        import { collection, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const boxMensagens = document.getElementById('boxMensagens');
         const inputMensagem = document.getElementById('inputMensagem');
         const btnEnviar = document.getElementById('btnEnviar');
 
-        // Identificação única anônima por navegador
         let ouvinteId = localStorage.getItem('ouvinte_chat_id');
         if (!ouvinteId) {
             ouvinteId = 'ouvinte_' + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('ouvinte_chat_id', ouvinteId);
         }
 
-        // Escuta a coleção inteira em tempo real sem travar em índices do servidor
+        // Verificação de segurança para o DB
+        if (!db) {
+            console.error("Erro crítico: Banco de dados Firebase não carregado.");
+            boxMensagens.innerHTML = '<div class="message-bubble">Erro de configuração do Firebase.</div>';
+        }
+
         onSnapshot(collection(db, "mensagens_chat"), (snapshot) => {
             boxMensagens.innerHTML = "";
             if (snapshot.empty) {
@@ -153,7 +167,6 @@
                 mensagens.push({ id: doc.id, ...doc.data() });
             });
 
-            // Ordena as mensagens de forma segura no navegador pelo timestamp
             mensagens.sort((a, b) => {
                 const tempoA = a.timestamp?.toMillis ? a.timestamp.toMillis() : 0;
                 const tempoB = b.timestamp?.toMillis ? b.timestamp.toMillis() : 0;
