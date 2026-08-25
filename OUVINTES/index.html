@@ -1430,30 +1430,60 @@
         let timerPresencaChat = null;
 
         async function resolverIdentidadeChatOuvinte() {
-            if (chatOuvinteId) return chatOuvinteId;
+            // IMPORTANTE: não confia cegamente em usuarioKey/userId antigos.
+            // Primeiro confirma qual conta corresponde ao nome/login atualmente exibido no painel.
+            // Isso evita que LAISA ou SUZI acabem usando por engano a chave do ADMINISTRADOR.
+            const alvoAtual = String(
+                localStorage.getItem('usuarioLogado') ||
+                localStorage.getItem('usuarioNome') ||
+                nomeUsuarioId || ''
+            ).trim().toLowerCase();
+
+            let idConfirmado = null;
+            let nomeConfirmado = null;
 
             try {
                 const contasSnap = await get(ref(db, 'contas'));
                 if (contasSnap.exists()) {
-                    const alvo = String(localStorage.getItem('usuarioLogado') || localStorage.getItem('usuarioNome') || '').trim().toLowerCase();
                     contasSnap.forEach(child => {
-                        if (chatOuvinteId) return;
+                        if (idConfirmado) return;
                         const conta = child.val() || {};
-                        const candidatos = [conta.nome, conta.email, conta.login].filter(Boolean).map(v => String(v).trim().toLowerCase());
-                        if (alvo && candidatos.includes(alvo)) {
-                            chatOuvinteId = child.key;
-                            chatOuvinteNome = conta.nome || chatOuvinteNome;
+                        const candidatos = [conta.nome, conta.email, conta.login]
+                            .filter(Boolean)
+                            .map(v => String(v).trim().toLowerCase());
+
+                        if (alvoAtual && candidatos.includes(alvoAtual)) {
+                            idConfirmado = child.key;
+                            nomeConfirmado = conta.nome || localStorage.getItem('usuarioLogado') || 'Ouvinte';
                         }
                     });
+
+                    // Se o nome/login não encontrou, só aceita a chave salva se ela realmente existir
+                    // e não for uma conta administrativa.
+                    if (!idConfirmado && chatOuvinteId) {
+                        const contaPelaChave = contasSnap.child(chatOuvinteId);
+                        if (contaPelaChave.exists()) {
+                            const conta = contaPelaChave.val() || {};
+                            const perfil = String(conta.perfil || '').trim().toLowerCase();
+                            const nomeConta = String(conta.nome || '').trim().toLowerCase();
+                            const ehAdmin = ['adm','admin','administrador'].includes(perfil) || nomeConta === 'administrador';
+                            if (!ehAdmin) {
+                                idConfirmado = chatOuvinteId;
+                                nomeConfirmado = conta.nome || chatOuvinteNome;
+                            }
+                        }
+                    }
                 }
             } catch (erro) {
-                console.warn('Não foi possível localizar a conta do ouvinte para o chat:', erro);
+                console.warn('Não foi possível localizar a conta correta do ouvinte para o chat:', erro);
             }
 
-            if (!chatOuvinteId) chatOuvinteId = chaveFirebaseUser;
+            chatOuvinteId = idConfirmado || chaveFirebaseUser;
+            chatOuvinteNome = nomeConfirmado || localStorage.getItem('usuarioLogado') || chatOuvinteNome || 'Ouvinte';
+
             localStorage.setItem('usuarioKey', chatOuvinteId);
             localStorage.setItem('userId', chatOuvinteId);
-            if (chatOuvinteNome) localStorage.setItem('usuarioNome', chatOuvinteNome);
+            localStorage.setItem('usuarioNome', chatOuvinteNome);
             return chatOuvinteId;
         }
 
@@ -1566,9 +1596,16 @@
             audioElement.pause();
             try {
                 const id = await resolverIdentidadeChatOuvinte();
-                if (id) await update(ref(db, `ouvintes_chat/${id}/presenca`), { status: 'offline', lastSeen: Date.now() });
+                if (id) {
+                    const agoraSaida = Date.now();
+                    await update(ref(db, `ouvintes_chat/${id}/presenca`), { status: 'offline', lastSeen: agoraSaida });
+                    await update(ref(db, `contas/${id}`), { status: 'offline', lastSeen: agoraSaida });
+                }
             } catch (e) {}
             localStorage.removeItem('usuarioLogado');
+            localStorage.removeItem('usuarioNome');
+            localStorage.removeItem('usuarioKey');
+            localStorage.removeItem('userId');
             window.location.href = "../index.html";
         });
 
