@@ -1,328 +1,122 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat ao Vivo - Painel do Ouvinte</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-        }
-        body {
-            background: linear-gradient(135deg, #07030d 0%, #120924 100%);
-            color: #ffffff;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-        }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 800px;
-            width: 100%;
-            margin: 0 auto 20px auto;
-            background: rgba(20, 13, 36, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 15px 25px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-        }
-        .logo-area h1 {
-            color: #ff2a85;
-            font-size: 20px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .logo-area p {
-            color: #94a3b8;
-            font-size: 12px;
-            margin-top: 2px;
-        }
-        .btn-voltar {
-            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
-        }
-        .btn-voltar:hover {
-            transform: translateY(-2px);
-            opacity: 0.95;
-        }
-        .chat-container {
-            max-width: 800px;
-            width: 100%;
-            height: calc(100vh - 150px);
-            margin: 0 auto;
-            background: rgba(18, 11, 31, 0.85);
-            backdrop-filter: blur(16px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
-            overflow: hidden;
-        }
-        .chat-header-info {
-            padding: 15px 25px;
-            background: rgba(25, 15, 45, 0.5);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 13px;
-            color: #cbd5e1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .chat-header-info span {
-            color: #ff2a85;
-            font-weight: 600;
-        }
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            scroll-behavior: smooth;
-        }
-        .message-bubble {
-            background: rgba(31, 18, 53, 0.8);
-            padding: 12px 16px;
-            border-radius: 14px;
-            font-size: 14px;
-            max-width: 75%;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            word-break: break-word;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .message-bubble.me {
-            background: linear-gradient(135deg, #ff2a85 0%, #e01e73 100%);
-            border: none;
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
-            box-shadow: 0 4px 15px rgba(255, 42, 133, 0.3);
-        }
-        .msg-author {
-            font-size: 11px;
-            font-weight: 600;
-            color: #d8b4fe;
-        }
-        .message-bubble.me .msg-author {
-            color: rgba(255, 255, 255, 0.85);
-        }
-        .msg-text {
-            font-size: 14px;
-        }
-        .msg-time {
-            font-size: 10px;
-            color: #94a3b8;
-            align-self: flex-end;
-            margin-top: 2px;
-        }
-        .message-bubble.me .msg-time {
-            color: rgba(255, 255, 255, 0.7);
-        }
-        .chat-input-area {
-            padding: 20px;
-            background: rgba(20, 13, 36, 0.9);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-        .chat-input {
-            flex: 1;
-            background: rgba(11, 7, 19, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 14px 18px;
-            border-radius: 12px;
-            color: white;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-        .chat-input:focus {
-            border-color: #ff2a85;
-            box-shadow: 0 0 0 3px rgba(255, 42, 133, 0.15);
-        }
-        .btn-enviar {
-            background: linear-gradient(135deg, #ff2a85 0%, #e01e73 100%);
-            color: white;
-            border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            font-size: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 42, 133, 0.3);
-        }
-        .btn-enviar:hover {
-            transform: scale(1.05);
-            opacity: 0.95;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat com a Administração</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+body{min-height:100vh;background:linear-gradient(135deg,#090d16 0%,#17153a 100%);color:#f8fafc;padding:20px}
+.chat-page{max-width:900px;margin:0 auto}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px;padding:16px 18px;background:rgba(23,31,53,.85);border:1px solid rgba(255,255,255,.08);border-radius:16px}
+.topbar h1{font-size:20px;color:#38bdf8}.topbar p{font-size:12px;color:#94a3b8;margin-top:4px}
+.btn-voltar{border:0;border-radius:9px;padding:10px 15px;background:#475569;color:#fff;font-weight:700;cursor:pointer}
+.chat-box{background:rgba(23,31,53,.78);border:1px solid rgba(56,189,248,.18);border-radius:18px;padding:18px;box-shadow:0 10px 35px rgba(0,0,0,.25)}
+.status{font-size:11px;color:#4ade80;margin-bottom:12px;font-weight:700}
+.messages{height:55vh;min-height:330px;overflow-y:auto;background:#0f172a;border:1px solid #334155;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:80%;padding:10px 12px;border-radius:12px;line-height:1.45;font-size:13px;word-break:break-word}.msg.ouvinte{align-self:flex-end;background:#6d28d9}.msg.adm{align-self:flex-start;background:#1e293b;border:1px solid #334155}.msg small{display:block;margin-top:5px;font-size:9px;color:#cbd5e1;opacity:.8}
+.empty{text-align:center;color:#64748b;margin:auto;font-size:12px}
+.send{display:flex;gap:8px;margin-top:12px}.send textarea{flex:1;min-height:54px;max-height:120px;resize:vertical;background:#0f172a;border:1px solid #334155;border-radius:10px;color:#fff;padding:11px;outline:none}.send textarea:focus{border-color:#38bdf8}.send button{border:0;border-radius:10px;padding:0 18px;background:#0284c7;color:#fff;font-weight:800;cursor:pointer}
+@media(max-width:600px){body{padding:10px}.topbar{align-items:flex-start;flex-direction:column}.messages{height:60vh}.msg{max-width:92%}.send{flex-direction:column}.send button{min-height:44px}}
+</style>
 </head>
 <body>
-
-    <header>
-        <div class="logo-area">
-            <h1><i class="fa-solid fa-comments"></i> Chat ao Vivo com a Rádio</h1>
-            <p>Envie sua mensagem ou pedido musical em tempo real</p>
-        </div>
-        <div>
-            <a href="ouvinte_cards_radio.html" class="btn-voltar"><i class="fa-solid fa-arrow-left"></i> Voltar</a>
-        </div>
-    </header>
-
-    <div class="chat-container">
-        <div class="chat-header-info">
-            <span><i class="fa-solid fa-circle" style="color: #10b981; font-size: 10px;"></i> Conectado com o ADM</span>
-            <div id="nomeOuvinteDisplay" style="font-size: 12px; color: #cbd5e1;">Identificação: Ouvinte</div>
-        </div>
-        
-        <div id="boxMensagens" class="chat-messages">
-            <div class="message-bubble" style="text-align: center; background: transparent; border: none; color: #94a3b8;">
-                <i class="fa-solid fa-spinner fa-spin"></i> Carregando conversa...
-            </div>
-        </div>
-
-        <div class="chat-input-area">
-            <input type="text" id="inputMensagem" class="chat-input" placeholder="Digite seu recado ou pedido de rádio...">
-            <button id="btnEnviar" class="btn-enviar"><i class="fa-solid fa-paper-plane"></i></button>
-        </div>
+<div class="chat-page">
+  <div class="topbar">
+    <div><h1>💬 Chat com a Administração</h1><p id="nomeOuvinte">Identificando ouvinte...</p></div>
+    <button class="btn-voltar" id="btnVoltar">← Voltar ao Painel</button>
+  </div>
+  <div class="chat-box">
+    <div class="status" id="statusChat">● Conectando...</div>
+    <div class="messages" id="mensagensChat"><div class="empty">Carregando conversa...</div></div>
+    <div class="send">
+      <textarea id="textoMensagem" placeholder="Escreva sua mensagem para a administração..."></textarea>
+      <button id="btnEnviar">Enviar</button>
     </div>
+  </div>
+</div>
+<script type="module">
+import { db } from '../firebase-config.js';
+import { ref, get, push, set, update, onValue, onDisconnect } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
 
-    <!-- Script unificado para a coleção 'mensagens' -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+let ouvinteId = localStorage.getItem('usuarioKey') || localStorage.getItem('userId') || null;
+let ouvinteNome = localStorage.getItem('usuarioNome') || localStorage.getItem('usuarioLogado') || 'Ouvinte';
+let timerPresenca = null;
 
-        const firebaseConfig = {
-            projectId: "novo-jeito-de-ouvir-radio"
-        };
+const mensagensEl=document.getElementById('mensagensChat');
+const textoEl=document.getElementById('textoMensagem');
+const statusEl=document.getElementById('statusChat');
+const nomeEl=document.getElementById('nomeOuvinte');
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+function escapeHtml(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
 
-        const boxMensagens = document.getElementById('boxMensagens');
-        const inputMensagem = document.getElementById('inputMensagem');
-        const btnEnviar = document.getElementById('btnEnviar');
-        const nomeOuvinteDisplay = document.getElementById('nomeOuvinteDisplay');
+async function resolverUsuario(){
+  if(!ouvinteId){
+    try{
+      const snap=await get(ref(db,'contas'));
+      const alvo=String(localStorage.getItem('usuarioLogado')||localStorage.getItem('usuarioNome')||'').trim().toLowerCase();
+      if(snap.exists()) snap.forEach(child=>{
+        if(ouvinteId) return;
+        const c=child.val()||{};
+        const candidatos=[c.nome,c.email,c.login].filter(Boolean).map(v=>String(v).trim().toLowerCase());
+        if(alvo && candidatos.includes(alvo)){ouvinteId=child.key;ouvinteNome=c.nome||ouvinteNome;}
+      });
+    }catch(e){console.warn(e)}
+  }
+  if(!ouvinteId){
+    const base=String(localStorage.getItem('usuarioLogado')||'ouvinte_anonimo');
+    ouvinteId=base.replace(/[^a-zA-Z0-9_-]/g,'_');
+  }
+  localStorage.setItem('usuarioKey',ouvinteId);
+  localStorage.setItem('userId',ouvinteId);
+  localStorage.setItem('usuarioNome',ouvinteNome);
+  nomeEl.textContent='Olá, '+ouvinteNome;
+}
 
-        let nomeOuvinte = localStorage.getItem('usuario_logado_nome') || localStorage.getItem('ouvinte_nome') || 'Ouvinte';
-        let ouvinteId = localStorage.getItem('ouvinte_chat_id');
-        if (!ouvinteId) {
-            ouvinteId = 'ouvinte_' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('ouvinte_chat_id', ouvinteId);
-        }
+async function ativarPresenca(){
+  const perfilRef=ref(db,`ouvintes_chat/${ouvinteId}/perfil`);
+  const presencaRef=ref(db,`ouvintes_chat/${ouvinteId}/presenca`);
+  await update(perfilRef,{nome:ouvinteNome});
+  await update(presencaRef,{status:'online',lastSeen:Date.now()});
+  try{await onDisconnect(presencaRef).set({status:'offline',lastSeen:Date.now()})}catch(e){}
+  if(timerPresenca) clearInterval(timerPresenca);
+  timerPresenca=setInterval(()=>update(presencaRef,{status:'online',lastSeen:Date.now()}).catch(()=>{}),20000);
+  statusEl.textContent='● Online — mensagens em tempo real';
+}
 
-        nomeOuvinteDisplay.textContent = `Logado como: ${nomeOuvinte}`;
+function ouvirConversa(){
+  onValue(ref(db,`ouvintes_chat/${ouvinteId}/mensagens`),snap=>{
+    const lista=[];
+    if(snap.exists()) snap.forEach(child=>lista.push({id:child.key,...(child.val()||{})}));
+    lista.sort((a,b)=>Number(a.timestamp||0)-Number(b.timestamp||0));
+    mensagensEl.innerHTML='';
+    if(!lista.length){mensagensEl.innerHTML='<div class="empty">Nenhuma mensagem ainda. Escreva para a administração quando precisar.</div>';return}
+    lista.slice(-100).forEach(m=>{
+      const div=document.createElement('div');
+      div.className='msg '+(m.remetente==='adm'?'adm':'ouvinte');
+      const hora=m.timestamp?new Date(Number(m.timestamp)).toLocaleString('pt-BR'):'';
+      div.innerHTML=`${escapeHtml(m.texto||'')}<small>${m.remetente==='adm'?'Administração':'Você'} • ${escapeHtml(hora)}</small>`;
+      mensagensEl.appendChild(div);
+    });
+    mensagensEl.scrollTop=mensagensEl.scrollHeight;
+  },erro=>{statusEl.textContent='Erro ao conectar ao chat';console.error(erro)});
+}
 
-        // Lendo da coleção 'mensagens' (mesma do painel ADM)
-        onSnapshot(collection(db, "mensagens"), (snapshot) => {
-            boxMensagens.innerHTML = "";
-            if (snapshot.empty) {
-                boxMensagens.innerHTML = '<div class="message-bubble" style="text-align: center; background: transparent; border: none; color: #94a3b8;">Nenhuma mensagem enviada ainda. Seja o primeiro a mandar um alô!</div>';
-                return;
-            }
+async function enviar(){
+  const texto=textoEl.value.trim(); if(!texto)return;
+  try{
+    await set(push(ref(db,`ouvintes_chat/${ouvinteId}/mensagens`)),{remetente:'ouvinte',texto,timestamp:Date.now()});
+    textoEl.value='';textoEl.focus();
+  }catch(e){console.error(e);alert('Não foi possível enviar a mensagem. Verifique a conexão e as regras do Firebase.')}
+}
 
-            let mensagens = [];
-            snapshot.forEach((doc) => {
-                mensagens.push({ id: doc.id, ...doc.data() });
-            });
+document.getElementById('btnEnviar').addEventListener('click',enviar);
+textoEl.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();enviar()}});
+document.getElementById('btnVoltar').addEventListener('click',()=>{window.location.href='index.html'});
 
-            mensagens.sort((a, b) => {
-                const tempoA = a.timestamp?.toMillis ? a.timestamp.toMillis() : 0;
-                const tempoB = b.timestamp?.toMillis ? b.timestamp.toMillis() : 0;
-                return tempoA - tempoB;
-            });
-
-            mensagens.forEach((dados) => {
-                const div = document.createElement('div');
-                
-                const isMe = dados.remetenteId === ouvinteId || dados.autor === nomeOuvinte;
-                div.className = isMe ? 'message-bubble me' : 'message-bubble';
-
-                let horaFormatada = "Agora";
-                if (dados.timestamp && dados.timestamp.toDate) {
-                    horaFormatada = dados.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                }
-
-                const autorNome = dados.autor || dados.nomeOuvinte || "Ouvinte";
-                const textoMsg = dados.texto || dados.mensagem || "Mensagem vazia";
-
-                div.innerHTML = `
-                    <span class="msg-author">${autorNome}</span>
-                    <span class="msg-text">${textoMsg}</span>
-                    <span class="msg-time">${horaFormatada}</span>
-                `;
-
-                boxMensagens.appendChild(div);
-            });
-
-            boxMensagens.scrollTop = boxMensagens.scrollHeight;
-        }, (error) => {
-            console.error("Erro ao carregar chat: ", error);
-            boxMensagens.innerHTML = '<div class="message-bubble" style="text-align: center; color: #ef4444;">Erro ao conectar com o chat em tempo real.</div>';
-        });
-
-        async function enviarMensagem() {
-            const textoMensagem = inputMensagem.value.trim();
-            if (textoMensagem === "") return;
-
-            btnEnviar.disabled = true;
-
-            try {
-                // Salvando na coleção 'mensagens' para o painel ADM receber instantaneamente
-                await addDoc(collection(db, "mensagens"), {
-                    texto: textoMensagem,
-                    autor: nomeOuvinte,
-                    remetenteId: ouvinteId,
-                    timestamp: serverTimestamp()
-                });
-                inputMensagem.value = "";
-                inputMensagem.focus();
-            } catch (erro) {
-                console.error("Erro ao enviar mensagem: ", erro);
-                alert("Erro ao enviar mensagem. Verifique a conexão.");
-            } finally {
-                btnEnviar.disabled = false;
-            }
-        }
-
-        btnEnviar.addEventListener('click', enviarMensagem);
-
-        inputMensagem.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                enviarMensagem();
-            }
-        });
-    </script>
-
+await resolverUsuario();
+await ativarPresenca();
+ouvirConversa();
+</script>
 </body>
 </html>
