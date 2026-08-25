@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat ao Vivo - Painel do Ouvinte</title>
-    <!-- Google Fonts para tipografia moderna -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <!-- FontAwesome para ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -118,11 +116,6 @@
             border: 1px solid rgba(255, 255, 255, 0.06);
             word-break: break-word;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            animation: fadeIn 0.3s ease forwards;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
         }
         .message-bubble.me {
             background: linear-gradient(135deg, #ff2a85 0%, #e01e73 100%);
@@ -130,12 +123,6 @@
             align-self: flex-end;
             border-bottom-right-radius: 4px;
             box-shadow: 0 4px 15px rgba(255, 42, 133, 0.3);
-        }
-        .message-bubble.admin {
-            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-            border: none;
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
         }
         .chat-input-area {
             padding: 20px;
@@ -179,9 +166,6 @@
             transform: scale(1.05);
             opacity: 0.95;
         }
-        .btn-enviar:active {
-            transform: scale(0.95);
-        }
     </style>
 </head>
 <body>
@@ -213,11 +197,18 @@
         </div>
     </div>
 
-    <!-- Script Corrigido e Conectado ao Firebase -->
+    <!-- Firebase Inicializado Autônomo e Direto -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { db } from '../firebase-config.js';
+
+        // Configuração direta do projeto Firestore para evitar erros de caminhos de pastas
+        const firebaseConfig = {
+            projectId: "novo-jeito-de-ouvir-radio"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
         const boxMensagens = document.getElementById('boxMensagens');
         const inputMensagem = document.getElementById('inputMensagem');
@@ -229,7 +220,7 @@
             localStorage.setItem('ouvinte_chat_id', ouvinteId);
         }
 
-        // Ouvinte em tempo real no Firestore
+        // Tempo real ativado
         onSnapshot(collection(db, "mensagens_chat"), (snapshot) => {
             boxMensagens.innerHTML = "";
             if (snapshot.empty) {
@@ -238,11 +229,10 @@
             }
 
             let mensagens = [];
-            snapshot.export?.() || snapshot.forEach((doc) => {
+            snapshot.forEach((doc) => {
                 mensagens.push({ id: doc.id, ...doc.data() });
             });
 
-            // Ordenação segura por data
             mensagens.sort((a, b) => {
                 const tempoA = a.timestamp?.toMillis ? a.timestamp.toMillis() : 0;
                 const tempoB = b.timestamp?.toMillis ? b.timestamp.toMillis() : 0;
@@ -251,14 +241,11 @@
 
             mensagens.forEach((dados) => {
                 const div = document.createElement('div');
-                
-                // Se a mensagem foi enviada por este mesmo navegador, ganha estilo próprio ("me")
                 if (dados.remetenteId === ouvinteId) {
                     div.className = 'message-bubble me';
                 } else {
                     div.className = 'message-bubble';
                 }
-
                 div.textContent = dados.texto || "Mensagem vazia";
                 boxMensagens.appendChild(div);
             });
