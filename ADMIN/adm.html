@@ -726,18 +726,36 @@
         }
 
         .chat-msg-item {
-            background: rgba(30, 41, 59, 0.8);
             padding: 10px 12px;
-            border-radius: 8px;
-            border-left: 4px solid #38bdf8;
+            border-radius: 12px;
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             gap: 10px;
+            width: fit-content;
+            max-width: 76%;
+            min-width: 140px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+        }
+
+        /* ESTILO TIPO WHATSAPP: OUVINTE À ESQUERDA / ADM À DIREITA */
+        .chat-msg-item.ouvinte-msg {
+            align-self: flex-start;
+            background: rgba(30, 41, 59, 0.92);
+            border: 1px solid rgba(56, 189, 248, 0.32);
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-msg-item.adm-msg {
+            align-self: flex-end;
+            background: rgba(91, 33, 182, 0.72);
+            border: 1px solid rgba(167, 139, 250, 0.38);
+            border-bottom-right-radius: 4px;
         }
 
         .chat-msg-content {
             flex: 1;
+            min-width: 0;
             word-break: break-word;
         }
 
@@ -2057,10 +2075,9 @@
         chatMessagesContainer.innerHTML = '';
         mensagens.slice(-100).forEach(msg => {
             const item = document.createElement('div');
-            item.className = 'chat-msg-item';
             const ehAdm = msg.remetente === 'adm';
+            item.className = 'chat-msg-item ' + (ehAdm ? 'adm-msg' : 'ouvinte-msg');
             const hora = msg.timestamp ? new Date(Number(msg.timestamp)).toLocaleString('pt-BR') : '';
-            item.style.borderLeftColor = ehAdm ? '#a78bfa' : '#38bdf8';
             item.innerHTML = `
                 <div class="chat-msg-content">
                     <div class="chat-msg-user" style="color:${ehAdm ? '#c4b5fd' : '#38bdf8'};">${ehAdm ? 'Administrador' : escapeChat(nomeDoOuvinteChat(ouvinteSelecionadoChat))}</div>
