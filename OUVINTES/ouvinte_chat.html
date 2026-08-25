@@ -76,11 +76,20 @@ async function resolverUsuario(){
 async function ativarPresenca(){
   const perfilRef=ref(db,`ouvintes_chat/${ouvinteId}/perfil`);
   const presencaRef=ref(db,`ouvintes_chat/${ouvinteId}/presenca`);
+  const contaRef=ref(db,`contas/${ouvinteId}`);
   await update(perfilRef,{nome:ouvinteNome});
   await update(presencaRef,{status:'online',lastSeen:Date.now()});
-  try{await onDisconnect(presencaRef).set({status:'offline',lastSeen:Date.now()})}catch(e){}
+  await update(contaRef,{status:'online',lastSeen:Date.now()});
+  try{
+    await onDisconnect(presencaRef).set({status:'offline',lastSeen:Date.now()});
+    await onDisconnect(contaRef).update({status:'offline',lastSeen:Date.now()});
+  }catch(e){}
   if(timerPresenca) clearInterval(timerPresenca);
-  timerPresenca=setInterval(()=>update(presencaRef,{status:'online',lastSeen:Date.now()}).catch(()=>{}),20000);
+  timerPresenca=setInterval(()=>{
+    const agora=Date.now();
+    update(presencaRef,{status:'online',lastSeen:agora}).catch(()=>{});
+    update(contaRef,{status:'online',lastSeen:agora}).catch(()=>{});
+  },20000);
   statusEl.textContent='● Online — mensagens em tempo real';
 }
 
