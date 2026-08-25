@@ -2102,10 +2102,16 @@
                     const perfil = String(dados.perfil || '').trim().toLowerCase();
                     const nome = String(dados.nome || '').trim().toLowerCase();
                     const email = String(dados.email || dados.login || '').trim().toLowerCase();
+                    const chaveConta = String(child.key || '').trim().toLowerCase();
 
-                    // Mostra todo cadastro de ouvinte e também cadastros antigos sem campo perfil.
-                    // Exclui somente contas administrativas.
-                    const ehAdmin = ['adm','admin','administrador'].includes(perfil) || nome === 'administrador' || email === 'administrador';
+                    // A lista mostra apenas ouvintes cadastrados.
+                    // Também exclui cadastros administrativos antigos que não tenham o campo perfil correto.
+                    const ehAdmin =
+                        ['adm','admin','administrador'].includes(perfil) ||
+                        nome === 'administrador' ||
+                        email === 'administrador' ||
+                        ['adm','admin','administrador'].includes(chaveConta);
+
                     if (!ehAdmin) {
                         ouvintesCadastradosChat[child.key] = dados;
                     }
