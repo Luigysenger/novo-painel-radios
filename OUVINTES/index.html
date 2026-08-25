@@ -1305,19 +1305,24 @@
 
             const perfilRef = ref(db, `ouvintes_chat/${id}/perfil`);
             const presencaRef = ref(db, `ouvintes_chat/${id}/presenca`);
+            const contaRef = ref(db, `contas/${id}`);
 
             await update(perfilRef, { nome: chatOuvinteNome || 'Ouvinte' });
             await update(presencaRef, { status: 'online', lastSeen: Date.now() });
+            await update(contaRef, { status: 'online', lastSeen: Date.now() });
 
             try {
                 await onDisconnect(presencaRef).set({ status: 'offline', lastSeen: Date.now() });
+                await onDisconnect(contaRef).update({ status: 'offline', lastSeen: Date.now() });
             } catch (erro) {
                 console.warn('onDisconnect indisponível para presença:', erro);
             }
 
             if (timerPresencaChat) clearInterval(timerPresencaChat);
             timerPresencaChat = setInterval(() => {
-                update(presencaRef, { status: 'online', lastSeen: Date.now() }).catch(() => {});
+                const agoraPresenca = Date.now();
+                update(presencaRef, { status: 'online', lastSeen: agoraPresenca }).catch(() => {});
+                update(contaRef, { status: 'online', lastSeen: agoraPresenca }).catch(() => {});
             }, 20000);
         }
 
