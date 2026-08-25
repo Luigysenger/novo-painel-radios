@@ -617,9 +617,50 @@
             border: 1px solid #334155;
             border-radius: 10px;
             padding: 15px;
+            height: 420px;
             max-height: 420px;
             overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: #475569 #0f172a;
         }
+
+        .ouvintes-sidebar::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .ouvintes-sidebar::-webkit-scrollbar-track {
+            background: #0f172a;
+            border-radius: 10px;
+        }
+
+        .ouvintes-sidebar::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 10px;
+            border: 2px solid #0f172a;
+        }
+
+        .ouvintes-sidebar::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        .msn-grupo-titulo {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            padding: 7px 8px;
+            margin: 8px 0 6px;
+            border-radius: 6px;
+            background: #111827;
+            border: 1px solid #334155;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .7px;
+            text-transform: uppercase;
+        }
+
+        .msn-grupo-titulo.online { color: #4ade80; }
+        .msn-grupo-titulo.offline { color: #f87171; }
 
         .ouvintes-sidebar h3 {
             font-size: 12px;
@@ -1906,44 +1947,70 @@
     function renderizarListaOuvintesChat() {
         if (!listaOuvintesStatus) return;
 
-        const ids = new Set([
-            ...Object.keys(ouvintesCadastradosChat || {}),
-            ...Object.keys(dadosChatOuvintes || {})
-        ]);
+        // A lista do MSN vem SOMENTE de quem realmente está cadastrado em "contas".
+        // Assim, registros antigos do chat não criam pessoas extras na lista.
+        const ids = Object.keys(ouvintesCadastradosChat || {});
 
-        if (ids.size === 0) {
+        if (ids.length === 0) {
             listaOuvintesStatus.innerHTML = '<div style="font-size:11px;color:#64748b;text-align:center;padding:10px;">Nenhum ouvinte cadastrado.</div>';
             return;
         }
 
         const agora = Date.now();
-        const ordenados = Array.from(ids).sort((a, b) =>
-            nomeDoOuvinteChat(a).localeCompare(nomeDoOuvinteChat(b), 'pt-BR')
-        );
+        const onlineIds = [];
+        const offlineIds = [];
+
+        ids.forEach(id => {
+            const conta = ouvintesCadastradosChat[id] || {};
+            const chat = dadosChatOuvintes[id] || {};
+            const presencaChat = chat.presenca || {};
+
+            const statusConta = String(conta.status || '').toLowerCase();
+            const ultimaConta = Number(conta.lastSeen || conta.ultimaAtividade || conta.ultimoAcesso || 0);
+            const statusChat = String(presencaChat.status || '').toLowerCase();
+            const ultimaChat = Number(presencaChat.lastSeen || presencaChat.ultimaAtividade || 0);
+
+            // Só fica verde com heartbeat recente. Se a aba travar/fechar, em até 60s fica offline.
+            const contaOnline = statusConta === 'online' && ultimaConta > 0 && (agora - ultimaConta) < 60000;
+            const chatOnline = statusChat === 'online' && ultimaChat > 0 && (agora - ultimaChat) < 60000;
+            const online = contaOnline || chatOnline;
+
+            (online ? onlineIds : offlineIds).push(id);
+        });
+
+        const ordenarPorNome = (a, b) => nomeDoOuvinteChat(a).localeCompare(nomeDoOuvinteChat(b), 'pt-BR', { sensitivity: 'base' });
+        onlineIds.sort(ordenarPorNome);
+        offlineIds.sort(ordenarPorNome);
+
+        const montarItem = (id, online) => {
+            const nome = nomeDoOuvinteChat(id);
+            const selecionado = ouvinteSelecionadoChat === id;
+            return `
+                <div class="ouvinte-status-item" data-ouvinte="${escapeChat(id)}" style="${selecionado ? 'background:rgba(56,189,248,.25);' : ''}">
+                    <span class="msn-icon">${online ? '🟢' : '🔴'}</span>
+                    <span class="ouvinte-nome ${online ? 'status-online' : 'status-offline'}">${escapeChat(nome)}</span>
+                    <span style="font-size:9px;color:${online ? '#4ade80' : '#f87171'};font-weight:bold;">${online ? 'Online' : 'Offline'}</span>
+                </div>`;
+        };
 
         let html = `<div class="ouvinte-status-item" data-ouvinte="todos" style="border:1px dashed #38bdf8;">
             <span class="msn-icon">👥</span>
             <span class="ouvinte-nome" style="color:#38bdf8;">💬 Enviar para Todos</span>
         </div>`;
 
-        ordenados.forEach(id => {
-            const conta = ouvintesCadastradosChat[id] || {};
-            if (conta.perfil && String(conta.perfil).toLowerCase() !== 'ouvinte') return;
+        html += `<div class="msn-grupo-titulo online">▼ Online (${onlineIds.length})</div>`;
+        if (onlineIds.length) {
+            onlineIds.forEach(id => { html += montarItem(id, true); });
+        } else {
+            html += '<div style="font-size:10px;color:#64748b;padding:5px 8px 10px;">Nenhum ouvinte online agora.</div>';
+        }
 
-            const chat = dadosChatOuvintes[id] || {};
-            const presenca = chat.presenca || {};
-            const ultimaAtividade = Number(presenca.lastSeen || presenca.ultimaAtividade || 0);
-            const online = presenca.status === 'online' && (agora - ultimaAtividade) < 60000;
-            const nome = nomeDoOuvinteChat(id);
-            const selecionado = ouvinteSelecionadoChat === id;
-
-            html += `
-                <div class="ouvinte-status-item" data-ouvinte="${escapeChat(id)}" style="${selecionado ? 'background:rgba(56,189,248,.25);' : ''}">
-                    <span class="msn-icon">👤</span>
-                    <span class="ouvinte-nome ${online ? 'status-online' : 'status-offline'}">${escapeChat(nome)}</span>
-                    <span style="font-size:9px;color:${online ? '#4ade80' : '#f87171'};font-weight:bold;">${online ? 'Online' : 'Offline'}</span>
-                </div>`;
-        });
+        html += `<div class="msn-grupo-titulo offline">▼ Offline (${offlineIds.length})</div>`;
+        if (offlineIds.length) {
+            offlineIds.forEach(id => { html += montarItem(id, false); });
+        } else {
+            html += '<div style="font-size:10px;color:#64748b;padding:5px 8px 10px;">Nenhum ouvinte offline.</div>';
+        }
 
         listaOuvintesStatus.innerHTML = html;
 
@@ -2032,7 +2099,14 @@
             if (snapshot.exists()) {
                 snapshot.forEach(child => {
                     const dados = child.val() || {};
-                    if (!dados.perfil || String(dados.perfil).toLowerCase() === 'ouvinte') {
+                    const perfil = String(dados.perfil || '').trim().toLowerCase();
+                    const nome = String(dados.nome || '').trim().toLowerCase();
+                    const email = String(dados.email || dados.login || '').trim().toLowerCase();
+
+                    // Mostra todo cadastro de ouvinte e também cadastros antigos sem campo perfil.
+                    // Exclui somente contas administrativas.
+                    const ehAdmin = ['adm','admin','administrador'].includes(perfil) || nome === 'administrador' || email === 'administrador';
+                    if (!ehAdmin) {
                         ouvintesCadastradosChat[child.key] = dados;
                     }
                 });
@@ -2040,6 +2114,15 @@
             renderizarListaOuvintesChat();
         }, erro => console.error('Erro ao carregar ouvintes cadastrados:', erro));
     }
+
+    // Reavalia o Online/Offline automaticamente, mesmo sem nova gravação no Firebase.
+    // Isso faz o contato descer para Offline quando o último heartbeat envelhecer.
+    setInterval(() => {
+        if (Object.keys(ouvintesCadastradosChat || {}).length) {
+            renderizarListaOuvintesChat();
+        }
+    }, 10000);
+
 
     async function enviarMensagemAdmin() {
         const texto = inputMsgAdm.value.trim();
@@ -2057,10 +2140,7 @@
             };
 
             if (ouvinteSelecionadoChat === 'todos') {
-                const ids = Object.keys(ouvintesCadastradosChat).filter(id => {
-                    const c = ouvintesCadastradosChat[id] || {};
-                    return !c.perfil || String(c.perfil).toLowerCase() === 'ouvinte';
-                });
+                const ids = Object.keys(ouvintesCadastradosChat);
                 await Promise.all(ids.map(id => set(push(ref(db, `ouvintes_chat/${id}/mensagens`)), mensagem)));
             } else {
                 await set(push(ref(db, `ouvintes_chat/${ouvinteSelecionadoChat}/mensagens`)), mensagem);
