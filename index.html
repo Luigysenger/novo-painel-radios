@@ -3,363 +3,2516 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Sistema de Rádios</title>
+    <title>Painel do Ouvinte - Sistema de Rádios</title>
     <style>
+        /* ESTILO DO BALÃO DE NOTIFICAÇÃO */
+        #balaoAviso {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #a855f7, #6d28d9);
+            color: #ffffff;
+            padding: 16px 30px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(109, 40, 217, 0.5);
+            z-index: 9999;
+            text-align: center;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.2);
+            animation: slideDown 0.5s ease-out;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translate(-50%, -50px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            background: linear-gradient(135deg, #090d16 0%, #17153a 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 140px;
+        }
+        .main-container {
+            max-width: 1350px;
+            margin: 0 auto;
+        }
+        .listener-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding-bottom: 15px;
+        }
+        .listener-info h1 {
+            font-size: 22px;
+            color: #f472b6;
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+        .listener-info p {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        .listener-widgets {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 13px;
+            color: #cbd5e1;
+        }
+        
+        .btn-retro-mode {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 12px;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+            transition: all 0.2s ease;
+        }
+        .btn-retro-mode:hover { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(245, 158, 11, 0.6); }
+
+        .btn-sair {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+            transition: all 0.2s ease;
+        }
+        .btn-sair:hover { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(239, 68, 68, 0.4); }
+
+        .banner-title {
+            text-align: center;
+            color: #f472b6;
+            font-size: 15px;
+            margin-bottom: 25px;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 310px 1fr 340px;
+            gap: 20px;
+        }
+
+        /* Coluna 1: Lista Lateral */
+        .sidebar-panel {
+            background: rgba(23, 31, 53, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 18px;
+            max-height: 580px;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        .sidebar-panel h3 {
+            font-size: 12px;
+            color: #cbd5e1;
+            margin-bottom: 14px;
+            letter-spacing: 0.8px;
+            font-weight: 700;
+        }
+        .radio-side-item {
+            background: rgba(30, 27, 75, 0.6);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            padding: 10px 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .radio-side-item:hover {
+            border-color: rgba(99, 102, 241, 0.5);
+            background: rgba(30, 27, 75, 0.9);
+        }
+        .radio-side-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow: hidden;
+        }
+        .radio-side-info span {
+            font-size: 12px;
+            color: #f8fafc;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .btn-action-col {
+            border: none;
+            width: 30px; height: 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+            transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        .btn-action-col.btn-plus { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+        .btn-action-col.btn-plus:hover { transform: scale(1.05); }
+        .btn-action-col.btn-minus { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
+        .btn-action-col.btn-minus:hover { transform: scale(1.05); }
+
+        /* Coluna 2: Grid Central */
+        .center-panel {
+            background: rgba(23, 31, 53, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 20px;
+            min-height: 580px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        .center-panel h3 {
+            font-size: 12px;
+            color: #cbd5e1;
+            margin-bottom: 6px;
+            text-align: center;
+            letter-spacing: 0.8px;
+            font-weight: 700;
+        }
+        .radios-grid-user {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            min-height: 450px;
+            margin-top: 15px;
+        }
+        .radio-card-user {
+            background-color: var(--card-bg, #64748b);
+            border-radius: 14px;
+            padding: 15px 12px;
+            height: 140px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            text-align: center;
+            cursor: grab;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border 0.15s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+        .radio-card-user:hover { transform: translateY(-3px); box-shadow: 0 10px 22px rgba(0,0,0,0.35); }
+        .radio-card-user:active { cursor: grabbing; }
+        .radio-card-user.dragging { opacity: 0.4; }
+        .radio-card-user.drag-over {
+            border: 2px dashed #f472b6 !important;
+            transform: scale(1.03);
+            background-color: rgba(244, 114, 182, 0.2) !important;
+        }
+        .radio-card-user.active-neon {
+            border-color: #ffffff;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.8), inset 0 0 12px rgba(255,255,255,0.5);
+        }
+        .card-top-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            flex: 1;
+            justify-content: center;
+            pointer-events: none;
+        }
+        .radio-card-user .icon {
+            font-size: 32px;
+            margin-bottom: 6px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+        .radio-card-user h4 {
+            font-size: 12px;
+            color: #0f172a;
+            font-weight: 800;
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .card-bottom-bar {
+            display: flex;
+            justify-content: flex-end;
+            width: 100%;
+            border-top: 1px solid rgba(0,0,0,0.12);
+            padding-top: 6px;
+        }
+        .btn-pincel {
+            background: rgba(255,255,255,0.3);
+            border: none;
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .btn-pincel:hover { transform: scale(1.15); background: rgba(255,255,255,0.6); }
+
+        /* Coluna 3: Mensagem para um Dia Melhor */
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .mensagem-dia-card, .message-card {
+            background: rgba(23, 31, 53, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        .mensagem-dia-card h3 {
+            font-size: 12px;
+            color: #f472b6;
+            margin-bottom: 12px;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .bible-options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .bible-btn {
+            background: rgba(30, 27, 75, 0.8);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 10px 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #e2e8f0;
+            font-weight: 700;
+            font-size: 11px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .bible-btn:hover { background: #4338ca; color: #fff; border-color: #818cf8; transform: translateY(-1px); }
+        .mensagem-dia-text {
+            font-size: 11px;
+            color: #cbd5e1;
+            text-align: center;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+            line-height: 1.4;
+        }
+
+        .message-card h3 {
+            font-size: 11px;
+            color: #cbd5e1;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            font-weight: 700;
+        }
+        .message-card textarea {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 10px;
+            color: #fff;
+            font-size: 12px;
+            resize: none;
+            height: 75px;
+            outline: none;
+            margin-bottom: 10px;
+            transition: border-color 0.2s;
+        }
+        .message-card textarea:focus { border-color: #a855f7; }
+        .btn-send-msg {
+            background: linear-gradient(135deg, #9333ea, #7e22ce);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+            transition: all 0.2s;
+        }
+        .btn-send-msg:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(147, 51, 234, 0.4); }
+
+        /* =========================================================
+           CHAT DO OUVINTE NA MESMA TELA — ESTILO MSN
+           ========================================================= */
+        .listener-msn-chat {
+            padding: 0;
+            overflow: hidden;
+        }
+        .listener-msn-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 14px;
+            background: linear-gradient(135deg, rgba(2,132,199,.28), rgba(59,130,246,.12));
+            border-bottom: 1px solid rgba(56,189,248,.20);
+        }
+        .listener-msn-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0f172a;
+            border: 1px solid #334155;
+            font-size: 17px;
+            flex-shrink: 0;
+        }
+        .listener-msn-contact { min-width: 0; flex: 1; }
+        .listener-msn-contact strong {
+            display: block;
+            color: #38bdf8;
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .listener-msn-contact span {
+            display: block;
+            color: #94a3b8;
+            font-size: 9px;
+            margin-top: 2px;
+        }
+        .listener-msn-status-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 8px rgba(34,197,94,.7);
+            flex-shrink: 0;
+        }
+        .listener-msn-history {
+            height: 245px;
+            overflow-y: auto;
+            padding: 12px;
+            background: rgba(15,23,42,.78);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            scrollbar-width: thin;
+            scrollbar-color: #475569 #0f172a;
+        }
+        .listener-msn-history::-webkit-scrollbar { width: 8px; }
+        .listener-msn-history::-webkit-scrollbar-track { background: #0f172a; }
+        .listener-msn-history::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+        .listener-msn-empty {
+            margin: auto;
+            color: #64748b;
+            font-size: 11px;
+            text-align: center;
+            line-height: 1.5;
+            padding: 20px 8px;
+        }
+        .listener-msn-msg {
+            max-width: 88%;
+            padding: 8px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            line-height: 1.45;
+            word-break: break-word;
+            box-shadow: 0 3px 10px rgba(0,0,0,.16);
+        }
+        .listener-msn-msg.recebida {
+            align-self: flex-start;
+            background: #1e293b;
+            color: #f8fafc;
+            border-left: 3px solid #38bdf8;
+            border-bottom-left-radius: 3px;
+        }
+        .listener-msn-msg.enviada {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            color: #fff;
+            border-right: 3px solid #c4b5fd;
+            border-bottom-right-radius: 3px;
+        }
+        .listener-msn-msg-remetente {
+            font-size: 9px;
+            font-weight: 800;
+            margin-bottom: 3px;
+            opacity: .9;
+        }
+        .listener-msn-msg-hora {
+            font-size: 8px;
+            opacity: .65;
+            margin-top: 4px;
+            text-align: right;
+        }
+        .listener-msn-compose {
+            padding: 11px;
+            background: rgba(23,31,53,.95);
+            border-top: 1px solid rgba(255,255,255,.06);
+        }
+        .listener-msn-compose textarea {
+            height: 62px;
+            margin-bottom: 8px;
+        }
+        .listener-msn-send-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .listener-msn-send-row small {
+            flex: 1;
+            color: #64748b;
+            font-size: 8px;
+            line-height: 1.3;
+        }
+        .listener-msn-send-row .btn-send-msg {
+            width: auto;
+            min-width: 92px;
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        @media (max-width: 760px) {
+            .listener-msn-history { height: 260px; }
+            .listener-msn-msg { max-width: 92%; }
+            .listener-msn-send-row { align-items: stretch; flex-direction: column; }
+            .listener-msn-send-row .btn-send-msg { width: 100%; }
+        }
+
+        /* Modal de Personalização */
+        .customizer-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            padding: 20px;
+            z-index: 1000;
         }
-        .login-card {
-            background: rgba(30, 41, 59, 0.85);
-            backdrop-filter: blur(10px);
-            padding: 40px 30px;
+        .customizer-content {
+            background: #1e293b;
+            padding: 25px;
             border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
             width: 100%;
-            max-width: 420px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            overflow: hidden;
+            max-width: 480px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
-        .login-card h2 {
-            text-align: center;
-            color: #f8fafc;
-            margin-bottom: 30px;
-            font-size: 24px;
-            letter-spacing: 0.5px;
+        .customizer-content h3 {
+            margin-bottom: 15px;
+            color: #a78bfa;
+            font-size: 18px;
+            font-weight: 700;
         }
-        .form-group {
+        .color-picker-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
             margin-bottom: 20px;
         }
-        .form-group label {
-            display: block;
-            font-size: 11px;
-            font-weight: bold;
-            color: #94a3b8;
-            margin-bottom: 8px;
-            letter-spacing: 1px;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            font-size: 14px;
-            color: #f8fafc;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .form-group input:focus {
-            border-color: #8b5cf6;
-        }
-        .btn-submit {
-            width: 100%;
-            background: #7c3aed;
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 8px;
-            font-weight: bold;
+        .color-dot {
+            width: 36px; height: 36px;
+            border-radius: 50%;
             cursor: pointer;
-            font-size: 15px;
-            margin-top: 10px;
-            transition: background 0.2s;
-            text-decoration: none;
-            display: block;
+            border: 2px solid transparent;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .color-dot:hover { transform: scale(1.15); }
+        .color-dot.selected { border-color: #fff; transform: scale(1.2); box-shadow: 0 0 12px #fff; }
+
+        .icons-grid-picker {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            max-height: 140px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 8px;
+            background: #0f172a;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .icon-option {
+            font-size: 22px;
             text-align: center;
+            padding: 6px;
+            cursor: pointer;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            transition: background 0.2s;
         }
-        .btn-submit:hover {
-            background: #6d28d9;
+        .icon-option:hover { background: #334155; }
+        .icon-option.selected { background: #7c3aed; border-color: #c4b5fd; }
+
+        /* Modal da Bíblia */
+        .bible-modal-content {
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 550px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            color: #f8fafc;
+            max-height: 80vh;
+            overflow-y: auto;
         }
-        .actions-links {
+        .bible-text-display {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.08);
+            margin-top: 15px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #e2e8f0;
+            min-height: 120px;
+        }
+
+        /* PLAYER PROFISSIONAL INFERIOR */
+        .car-player-bar {
+            position: fixed;
+            bottom: 0; left: 0; width: 100%;
+            background: rgba(13, 18, 30, 0.95);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 14px 40px;
             display: flex;
             justify-content: space-between;
-            margin-top: 20px;
-            font-size: 13px;
+            align-items: center;
+            z-index: 900;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.6);
         }
-        .actions-links a {
-            color: #a78bfa;
-            text-decoration: none;
-            transition: color 0.2s;
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            min-width: 280px;
+        }
+        .player-icon-box {
+            font-size: 32px;
+            background: rgba(124, 58, 237, 0.15);
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .player-text-details h4 {
+            font-size: 14px;
+            color: #f8fafc;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+        .player-status-sub {
+            font-size: 11px;
+            color: #38bdf8;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        .control-btn {
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            font-size: 14px;
             cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s ease;
         }
-        .actions-links a:hover {
-            color: #c4b5fd;
-            text-decoration: underline;
+        .control-btn:hover { background: rgba(124, 58, 237, 0.4); border-color: #7c3aed; transform: scale(1.08); }
+        
+        .control-btn.main-play {
+            width: 52px; height: 52px;
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            border: none;
+            font-size: 18px;
+            box-shadow: 0 4px 15px rgba(109, 40, 217, 0.4);
         }
-        .hidden { display: none !important; }
-        .slide-down { animation: slideDownAnim 0.4s ease-out forwards; }
-        @keyframes slideDownAnim {
-            from { opacity: 0; transform: translateY(-15px); }
-            to { opacity: 1; transform: translateY(0); }
+        .control-btn.main-play:hover {
+            background: linear-gradient(135deg, #7c3aed, #5b21b6);
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(109, 40, 217, 0.6);
         }
-        .success-text {
+
+        .player-spacer {
+            min-width: 280px;
+        }
+
+        /* ==========================================
+           MODO RÁDIO RETRÔ — RESPONSIVO / TELA CHEIA
+           ========================================== */
+        #retroRadioContainer {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            height: 100dvh;
+            min-height: 100vh;
+            background: radial-gradient(circle at center, #2c1d11 0%, #110904 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999999;
+            padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+            overflow: hidden;
+            overscroll-behavior: contain;
+        }
+
+        .retro-cabinet {
+            background: linear-gradient(135deg, #4a2e18 0%, #2b180a 100%);
+            border: clamp(4px, 0.8vw, 8px) solid #1a0e05;
+            border-radius: clamp(14px, 2.4vw, 25px);
+            width: min(94vw, 760px);
+            height: min(94dvh, 900px);
+            min-width: 0;
+            min-height: 0;
+            padding: clamp(10px, 2.5vw, 25px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.8), inset 0 0 40px rgba(0,0,0,0.6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .retro-top-panel {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            align-items: center;
+            margin-bottom: clamp(4px, 1vh, 10px);
+            flex: 0 0 auto;
+        }
+
+        .retro-led {
+            width: clamp(10px, 2vw, 14px);
+            height: clamp(10px, 2vw, 14px);
+            background-color: #550000;
+            border-radius: 50%;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
+            transition: all 0.3s ease;
+        }
+
+        .retro-led.on {
+            background-color: #ff3333;
+            box-shadow: 0 0 12px #ff0000, 0 0 20px #ff3333, inset 0 2px 4px rgba(255,255,255,0.6);
+        }
+
+        .btn-exit-retro {
+            background: rgba(0,0,0,0.4);
+            color: #fcd34d;
+            border: 1px solid rgba(252, 211, 77, 0.3);
+            padding: clamp(5px, 1.1vw, 7px) clamp(10px, 2vw, 14px);
+            border-radius: 20px;
+            font-size: clamp(9px, 1.8vw, 11px);
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+            white-space: nowrap;
+            touch-action: manipulation;
+        }
+        .btn-exit-retro:hover { background: rgba(252, 211, 77, 0.2); }
+        .btn-exit-retro:active { transform: scale(.97); }
+
+        .retro-dial-glass {
+            background: linear-gradient(180deg, #080b08 0%, #020402 100%);
+            border: clamp(2px, .5vw, 4px) inset #191007;
+            border-radius: 12px;
+            width: 100%;
+            padding: clamp(8px, 2vw, 15px);
             text-align: center;
-            color: #4ade80;
-            font-size: 15px;
-            line-height: 1.5;
-            margin-bottom: 20px;
-            font-weight: bold;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.9), 0 4px 12px rgba(0,0,0,0.35);
+            margin: clamp(3px, 1vh, 10px) 0;
+            flex: 0 0 auto;
         }
+
+        .retro-station-title {
+            font-size: clamp(14px, 3vw, 22px);
+            color: #fbbf24;
+            font-weight: 800;
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Modulador / display digital inspirado nos rádios dos anos 90 */
+        .retro-digital-tuner {
+            width: 100%;
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr) auto;
+            align-items: center;
+            gap: clamp(5px, 1.2vw, 10px);
+            margin-top: 6px;
+        }
+
+        .retro-tuner-label {
+            color: #fbbf24;
+            font-family: "Courier New", monospace;
+            font-size: clamp(8px, 1.7vw, 11px);
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-shadow: 0 0 6px rgba(251,191,36,.45);
+        }
+
+        .retro-digital-display {
+            min-width: 0;
+            width: 100%;
+            min-height: clamp(38px, 7vh, 58px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 10px;
+            border-radius: 5px;
+            background: #020402;
+            border: 2px solid #151a15;
+            color: #78ff4a;
+            font-family: "Courier New", monospace;
+            font-size: clamp(16px, 4vw, 30px);
+            font-weight: 900;
+            letter-spacing: clamp(1px, .6vw, 4px);
+            text-shadow: 0 0 5px #78ff4a, 0 0 12px rgba(120,255,74,.65);
+            box-shadow: inset 0 0 14px rgba(0,0,0,.95), 0 0 8px rgba(120,255,74,.12);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .retro-level-meter {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 2px;
+            height: clamp(28px, 5vh, 36px);
+            padding: 3px 5px;
+            background: #020402;
+            border: 1px solid #151b15;
+            border-radius: 5px;
+            box-shadow: inset 0 0 8px rgba(0,0,0,.8);
+        }
+
+        .retro-level-bar {
+            width: clamp(3px, .75vw, 6px);
+            height: var(--h);
+            background: linear-gradient(to top, #22c55e 0 60%, #facc15 60% 82%, #ef4444 82%);
+            box-shadow: 0 0 4px rgba(34,197,94,.6);
+            animation: tunerPulse .9s ease-in-out infinite alternate;
+            animation-delay: var(--d);
+        }
+
+        @keyframes tunerPulse {
+            from { opacity: .55; transform: scaleY(.72); }
+            to { opacity: 1; transform: scaleY(1); }
+        }
+
+        .retro-speaker-grille {
+            width: 100%;
+            flex: 1 1 auto;
+            min-height: 90px;
+            background: repeating-linear-gradient(0deg, #160d05, #160d05 6px, #0b0602 6px, #0b0602 12px);
+            border-radius: 12px;
+            border: 4px solid #110904;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: clamp(4px, 1.2vh, 10px) 0;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+        }
+
+        .retro-brand-badge {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            color: #fff;
+            padding: clamp(5px, 1.2vw, 7px) clamp(12px, 3vw, 18px);
+            border-radius: 6px;
+            font-weight: 900;
+            font-size: clamp(9px, 2.2vw, 13px);
+            letter-spacing: 2px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            border: 1px solid #f59e0b;
+        }
+
+        .retro-controls-row {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            align-items: center;
+            gap: clamp(18px, 8vw, 70px);
+            margin-top: clamp(4px, 1.2vh, 10px);
+            flex: 0 0 auto;
+            padding-bottom: 2px;
+        }
+
+        .retro-knob-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+        .retro-knob-container:active { cursor: grabbing; }
+
+        .retro-knob {
+            width: clamp(58px, 14vw, 82px);
+            height: clamp(58px, 14vw, 82px);
+            background: radial-gradient(circle, #332211 40%, #150e07 90%);
+            border: clamp(4px, .8vw, 5px) solid #0a0502;
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 0 8px 20px rgba(0,0,0,.8), inset 0 2px 5px rgba(255,255,255,.15);
+            transition: transform .05s ease-out;
+        }
+
+        .retro-knob-indicator {
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 3px;
+            height: clamp(17px, 4vw, 22px);
+            background-color: #fbbf24;
+            border-radius: 2px;
+            box-shadow: 0 0 6px #fbbf24;
+        }
+
+        .retro-knob-label {
+            font-size: clamp(9px, 1.8vw, 11px);
+            color: #d1d5db;
+            margin-top: 7px;
+            font-weight: 700;
+            letter-spacing: .5px;
+        }
+
+        /* Celulares: o aparelho usa praticamente toda a tela */
+        @media (max-width: 700px) {
+            #retroRadioContainer {
+                padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            }
+            .retro-cabinet {
+                width: 100%;
+                height: 100%;
+                border-width: 4px;
+                border-radius: 12px;
+                padding: clamp(9px, 2.8vw, 14px);
+            }
+            .retro-speaker-grille {
+                min-height: 0;
+            }
+        }
+
+        /* Tablets */
+        @media (min-width: 701px) and (max-width: 1100px) {
+            .retro-cabinet {
+                width: min(94vw, 760px);
+                height: min(94dvh, 900px);
+            }
+        }
+
+        /* Paisagem em celulares/tablets: vira um rádio largo */
+        @media (max-height: 600px) and (orientation: landscape) {
+            #retroRadioContainer {
+                padding: 5px 8px;
+            }
+            .retro-cabinet {
+                width: min(98vw, 1050px);
+                height: 96dvh;
+                padding: 7px 14px;
+                border-radius: 12px;
+            }
+            .retro-top-panel { margin-bottom: 2px; }
+            .retro-dial-glass { margin: 2px 0; padding: 5px 8px; }
+            .retro-station-title { font-size: clamp(12px, 3vh, 18px); }
+            .retro-digital-tuner { margin-top: 3px; }
+            .retro-speaker-grille { min-height: 45px; margin: 3px 0; }
+            .retro-controls-row { margin-top: 3px; }
+            .retro-knob { width: clamp(48px, 12vh, 68px); height: clamp(48px, 12vh, 68px); }
+        }
+
+        @media (min-width: 1200px) {
+            .retro-cabinet {
+                width: min(70vw, 820px);
+                height: min(94dvh, 900px);
+            }
+        }
+
+
+        /* =========================================================
+           PAINEL PRINCIPAL RESPONSIVO + ORDENACAO POR TOQUE
+           ========================================================= */
+        .radio-card-user {
+            touch-action: pan-y;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .radio-card-user.touch-dragging {
+            opacity: 0.18 !important;
+            transform: none !important;
+            pointer-events: none;
+        }
+        .radio-card-touch-placeholder {
+            border: 2px dashed rgba(244, 114, 182, 0.85);
+            border-radius: 14px;
+            background: rgba(244, 114, 182, 0.10);
+            min-width: 0;
+            min-height: 100px;
+        }
+        .radio-card-touch-clone {
+            position: fixed !important;
+            z-index: 999999 !important;
+            pointer-events: none !important;
+            margin: 0 !important;
+            transition: none !important;
+            opacity: 0.96 !important;
+            transform: scale(1.04);
+            box-shadow: 0 18px 40px rgba(0,0,0,0.45) !important;
+        }
+        .mobile-drag-hint {
+            display: none;
+        }
+
+        @media (max-width: 1100px) {
+            .dashboard-grid {
+                grid-template-columns: 260px minmax(0, 1fr);
+            }
+            .right-panel {
+                grid-column: 1 / -1;
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 760px) {
+            body {
+                padding: 12px;
+                padding-bottom: 110px;
+                overflow-x: hidden;
+            }
+            .main-container {
+                width: 100%;
+                max-width: 100%;
+            }
+            .listener-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+                margin-bottom: 16px;
+            }
+            .listener-info h1 {
+                font-size: 20px;
+            }
+            .listener-widgets {
+                width: 100%;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .btn-retro-mode {
+                flex: 1 1 100%;
+                min-height: 40px;
+            }
+            .banner-title {
+                font-size: 12px;
+                margin-bottom: 16px;
+                line-height: 1.4;
+            }
+            .dashboard-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 14px;
+            }
+            .center-panel {
+                order: 1;
+                min-height: auto;
+                padding: 14px;
+            }
+            .sidebar-panel {
+                order: 2;
+                max-height: none;
+                padding: 14px;
+            }
+            .right-panel {
+                order: 3;
+                display: flex;
+                gap: 14px;
+            }
+            .center-panel h3 {
+                font-size: 11px;
+            }
+            .radios-grid-user {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+                min-height: 0;
+                margin-top: 10px;
+            }
+            .radio-card-user {
+                width: 100%;
+                height: clamp(112px, 31vw, 145px);
+                min-width: 0;
+                padding: 10px 8px;
+                border-radius: 12px;
+            }
+            .radio-card-user .icon {
+                font-size: clamp(25px, 8vw, 34px);
+                margin-bottom: 4px;
+            }
+            .radio-card-user h4 {
+                font-size: clamp(9px, 2.7vw, 12px);
+            }
+            .btn-pincel {
+                width: 26px;
+                height: 26px;
+                font-size: 12px;
+            }
+            .mobile-drag-hint {
+                display: block;
+                font-size: 10px;
+                color: #94a3b8;
+                text-align: center;
+                margin-top: 4px;
+            }
+            .bible-options-grid {
+                gap: 6px;
+            }
+            .car-player-bar {
+                padding: 9px 12px;
+            }
+            .player-info {
+                min-width: 0;
+                gap: 8px;
+                max-width: 58%;
+            }
+            .player-icon-box {
+                font-size: 22px;
+                padding: 7px;
+            }
+            .player-text-details h4 {
+                font-size: 11px;
+                max-width: 160px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .player-status-sub {
+                font-size: 9px;
+            }
+            .player-controls {
+                gap: 7px;
+            }
+            .control-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 12px;
+            }
+            .control-btn.main-play {
+                width: 44px;
+                height: 44px;
+                font-size: 15px;
+            }
+            .player-spacer {
+                display: none;
+            }
+            .customizer-content, .bible-modal-content {
+                width: calc(100% - 24px);
+                max-height: 88vh;
+                padding: 18px;
+            }
+            .color-picker-grid {
+                gap: 7px;
+            }
+            .color-dot {
+                width: 30px;
+                height: 30px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            body {
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+            .center-panel {
+                padding: 10px;
+            }
+            .radios-grid-user {
+                gap: 7px;
+            }
+            .radio-card-user {
+                height: 108px;
+                padding: 8px 6px;
+            }
+            .radio-card-user .icon {
+                font-size: 25px;
+            }
+            .radio-card-user h4 {
+                font-size: 9px;
+            }
+        }
+
+        .hidden { display: none !important; }
+
     </style>
 </head>
 <body>
 
-    <div class="login-card">
-        <h2 id="cardTitle">Entrar no Sistema</h2>
-        
-        <!-- FLUXO DE LOGIN NORMAL -->
-        <div id="secaoLogin">
-            <div class="form-group">
-                <label>E-MAIL</label>
-                <input type="email" id="emailLogin" placeholder="seu@email.com" autocomplete="off">
+    <!-- ELEMENTO DO BALÃO DE AVISO -->
+    <div id="balaoAviso">
+        Eiiii Ligadão! Tem Rádio nova adicionada pelo adm, Curta sem moderação.
+    </div>
+
+    <!-- MODO RÁDIO RETRÔ TELA CHEIA -->
+    <div id="retroRadioContainer" class="hidden">
+        <div class="retro-cabinet">
+            <div class="retro-top-panel">
+                <div class="retro-led" id="retroLedIndicator"></div>
+                <button class="btn-exit-retro" id="btnSairRetro">Voltar ao Painel Normal</button>
             </div>
 
-            <div class="form-group">
-                <label>SENHA</label>
-                <input type="password" id="senhaLogin" placeholder="••••••••" autocomplete="current-password">
-            </div>
-
-            <button id="btnLogin" class="btn-submit">ACESSAR PAINEL</button>
-
-            <div class="actions-links">
-                <a href="#" id="btnEsqueciSenha">Esqueci a senha</a>
-                <a href="cadastro.html">Não tenho cadastro</a>
-            </div>
-        </div>
-
-        <!-- FLUXO DE RECUPERAÇÃO EM ETAPAS -->
-        <div id="secaoRecuperacao" class="hidden">
-            <div id="recEtapa1">
-                <div class="form-group">
-                    <label>DIGITE SEU E-MAIL</label>
-                    <input type="email" id="emailRec" placeholder="seu@email.com" autocomplete="off">
+            <div class="retro-dial-glass">
+                <div class="retro-station-title" id="retroTitleDisplay">Nenhuma Rádio Selecionada</div>
+                <div class="retro-digital-tuner" aria-label="Modulador digital do rádio retrô">
+                    <span class="retro-tuner-label">STEREO</span>
+                    <div class="retro-digital-display" id="retroFreqDisplay">FM --.-</div>
+                    <div class="retro-level-meter" aria-label="Nível do sinal">
+                        <span class="retro-level-bar" style="--h:8px;--d:0s"></span>
+                        <span class="retro-level-bar" style="--h:12px;--d:.08s"></span>
+                        <span class="retro-level-bar" style="--h:16px;--d:.16s"></span>
+                        <span class="retro-level-bar" style="--h:20px;--d:.24s"></span>
+                        <span class="retro-level-bar" style="--h:24px;--d:.32s"></span>
+                        <span class="retro-level-bar" style="--h:28px;--d:.40s"></span>
+                        <span class="retro-level-bar" style="--h:22px;--d:.48s"></span>
+                        <span class="retro-level-bar" style="--h:17px;--d:.56s"></span>
+                    </div>
                 </div>
-                <button id="btnAvancarRec1" class="btn-submit">AVANÇAR</button>
             </div>
 
-            <div id="recEtapa2" class="hidden">
-                <div class="form-group">
-                    <label>DATA DE NASCIMENTO</label>
-                    <input type="text" id="nascimentoRec" placeholder="DD/MM/AAAA" maxlength="10" autocomplete="off" oninput="mascaraData(this)">
+            <div class="retro-speaker-grille">
+                <div class="retro-brand-badge">VINTAGE SOUND</div>
+            </div>
+
+            <div class="retro-controls-row">
+                <!-- Botão Giratório de Sintonia / Passar Rádio -->
+                <div class="retro-knob-container" id="knobSintonia" title="Deslize para trocar de rádio">
+                    <div class="retro-knob" id="dialSintonia">
+                        <div class="retro-knob-indicator"></div>
+                    </div>
+                    <span class="retro-knob-label">SINTONIA</span>
                 </div>
-                <button id="btnAvancarRec2" class="btn-submit">VERIFICAR</button>
-            </div>
 
-            <div id="recEtapa3" class="hidden">
-                <div class="form-group">
-                    <label>DIGITE SUA NOVA SENHA</label>
-                    <input type="password" id="novaSenhaRec" placeholder="Digite a nova senha" autocomplete="new-password">
+                <!-- Botão Giratório de Volume / Ligar Desligar (0 a 30) -->
+                <div class="retro-knob-container" id="knobVolume" title="Deslize para ajustar volume (0-30) ou clique para desligar">
+                    <div class="retro-knob" id="dialVolume">
+                        <div class="retro-knob-indicator"></div>
+                    </div>
+                    <span class="retro-knob-label" id="labelVolumeText">VOL: 0</span>
                 </div>
-                <div class="form-group">
-                    <label>CONFIRME A NOVA SENHA</label>
-                    <input type="password" id="confirmaSenhaRec" placeholder="Repita a nova senha" autocomplete="new-password">
-                </div>
-                <button id="btnAtualizarSenha" class="btn-submit">ATUALIZAR SENHA</button>
-            </div>
-
-            <div id="recEtapa4" class="hidden">
-                <p class="success-text">Pronto, agora basta fazer seu login e curtir suas rádios preferidas!</p>
-                <a href="#" id="btnIrParaLogin" class="btn-submit">FAZER LOGIN</a>
-            </div>
-
-            <div class="actions-links" style="justify-content: center; margin-top: 15px;">
-                <a href="#" id="btnVoltarLogin">Voltar ao Login</a>
             </div>
         </div>
     </div>
 
+    <div class="main-container">
+        <div class="listener-header">
+            <div class="listener-info">
+                <h1>Painel do Ouvinte</h1>
+                <p id="nomeOuvinteDisplay">Olá, Ouvinte</p>
+            </div>
+            <div class="listener-widgets">
+                <button class="btn-retro-mode" id="btnAbrirRetro">📻 Mudar para o Painel Rádio Retrô</button>
+                <span id="relogioDigital">00:00:00</span>
+                <span id="climaInfo">Curitiba: carregando...</span>
+                <button class="btn-sair" id="btnSair">SAIR</button>
+            </div>
+        </div>
+
+        <div class="banner-title">🎧 CURTA AQUI SUAS RÁDIOS PREFERIDAS</div>
+
+        <div class="dashboard-grid">
+            
+            <!-- Coluna 1: Gerenciar Rádios com botões + e - -->
+            <div class="sidebar-panel">
+                <h3>GERENCIAR SUAS RÁDIOS PREFERIDAS</h3>
+                <div style="font-size: 11px; color: #94a3b8; margin-bottom: 12px; font-weight: 600;">1. ADICIONE SUAS RÁDIOS</div>
+                <div id="sidebarRadioList"></div>
+            </div>
+
+            <!-- Coluna 2: Grid Central de Preferidas -->
+            <div class="center-panel">
+                <h3>GERENCIAR SUAS RÁDIOS PREFERIDAS</h3>
+                <div style="font-size: 11px; color: #94a3b8; margin-bottom: 15px; text-align: center; font-weight: 600;">2. ARRASTE E SOLTE SOBRE OUTRO CARD PARA TROCAR DE LUGAR <span class="mobile-drag-hint">📱 No celular: segure o card por um instante e arraste</span></div>
+                <div class="radios-grid-user" id="centerRadiosGrid"></div>
+            </div>
+
+            <!-- Coluna 3: Mensagem para um Dia Melhor -->
+            <div class="right-panel">
+                <div class="mensagem-dia-card" id="mensagemDiaCard">
+                    <h3>💬 MENSAGEM PARA UM DIA MELHOR</h3>
+                    <div class="mensagem-dia-text" id="mensagemDiaText">
+                        Carregando mensagem...
+                    </div>
+                </div>
+
+                <div class="message-card listener-msn-chat" id="chatOuvinteCard">
+                    <div class="listener-msn-header">
+                        <div class="listener-msn-avatar">👤</div>
+                        <div class="listener-msn-contact">
+                            <strong>ADMINISTRAÇÃO</strong>
+                            <span>Chat direto — somente você e o ADM</span>
+                        </div>
+                        <div class="listener-msn-status-dot" title="Canal de mensagens ativo"></div>
+                    </div>
+
+                    <div class="listener-msn-history" id="chatOuvinteHistorico">
+                        <div class="listener-msn-empty">Carregando sua conversa com a Administração...</div>
+                    </div>
+
+                    <div class="listener-msn-compose">
+                        <textarea id="msgAdminInput" placeholder="Escreva sua mensagem para o ADM... (Enter envia)"></textarea>
+                        <div class="listener-msn-send-row">
+                            <small id="chatOuvinteStatus">As mensagens ficam salvas nesta conversa.</small>
+                            <button class="btn-send-msg" id="btnEnviarMsg">Enviar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL DE PERSONALIZAÇÃO -->
+    <div id="modalPersonalizacaoOuvinte" class="customizer-modal hidden">
+        <div class="customizer-content">
+            <h3>Personalizar Rádio</h3>
+            <input type="hidden" id="customRadioIdOuvinte">
+            
+            <label style="font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 8px; display: block;">ESCOLHA A COR DO CARD (20 OPÇÕES)</label>
+            <div class="color-picker-grid" id="colorPickerGridOuvinte">
+                <div class="color-dot" style="background: #a3e635;" data-color="#a3e635"></div>
+                <div class="color-dot" style="background: #bef264;" data-color="#bef264"></div>
+                <div class="color-dot" style="background: #86efac;" data-color="#86efac"></div>
+                <div class="color-dot" style="background: #6ee7b7;" data-color="#6ee7b7"></div>
+                <div class="color-dot" style="background: #5eead4;" data-color="#5eead4"></div>
+                <div class="color-dot" style="background: #7dd3fc;" data-color="#7dd3fc"></div>
+                <div class="color-dot" style="background: #93c5fd;" data-color="#93c5fd"></div>
+                <div class="color-dot" style="background: #c4b5fd;" data-color="#c4b5fd"></div>
+                <div class="color-dot" style="background: #f472b6;" data-color="#f472b6"></div>
+                <div class="color-dot" style="background: #fda4af;" data-color="#fda4af"></div>
+                <div class="color-dot" style="background: #fcd34d;" data-color="#fcd34d"></div>
+                <div class="color-dot" style="background: #fde047;" data-color="#fde047"></div>
+                <div class="color-dot" style="background: #fb923c;" data-color="#fb923c"></div>
+                <div class="color-dot" style="background: #d8b4fe;" data-color="#d8b4fe"></div>
+                <div class="color-dot" style="background: #a5b4fc;" data-color="#a5b4fc"></div>
+                <div class="color-dot" style="background: #cbd5e1;" data-color="#cbd5e1"></div>
+                <div class="color-dot" style="background: #94a3b8;" data-color="#94a3b8"></div>
+                <div class="color-dot" style="background: #64748b;" data-color="#64748b"></div>
+                <div class="color-dot" style="background: #e2e8f0;" data-color="#e2e8f0"></div>
+                <div class="color-dot" style="background: #fbcfe8;" data-color="#fbcfe8"></div>
+            </div>
+
+            <label style="font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 8px; display: block;">ESCOLHA UM ÍCONE</label>
+            <div class="icons-grid-picker" id="iconsGridPickerOuvinte">
+                <div class="icon-option" data-icon="📻">📻</div>
+                <div class="icon-option" data-icon="🎵">🎵</div>
+                <div class="icon-option" data-icon="🎶">🎶</div>
+                <div class="icon-option" data-icon="🎧">🎧</div>
+                <div class="icon-option" data-icon="🎙️">🎙️</div>
+                <div class="icon-option" data-icon="🎸">🎸</div>
+                <div class="icon-option" data-icon="🎷">🎷</div>
+                <div class="icon-option" data-icon="🎺">🎺</div>
+                <div class="icon-option" data-icon="🎻">🎻</div>
+                <div class="icon-option" data-icon="🎹">🎹</div>
+                <div class="icon-option" data-icon="🎤">🎤</div>
+                <div class="icon-option" data-icon="⚡">⚡</div>
+                <div class="icon-option" data-icon="🔥">🔥</div>
+                <div class="icon-option" data-icon="⭐">⭐</div>
+                <div class="icon-option" data-icon="🚀">🚀</div>
+                <div class="icon-option" data-icon="💎">💎</div>
+                <div class="icon-option" data-icon="🌍">🌍</div>
+                <div class="icon-option" data-icon="🎯">🎯</div>
+                <div class="icon-option" data-icon="💡">💡</div>
+                <div class="icon-option" data-icon="🔊">🔊</div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button type="button" id="btnSalvarPincelOuvinte" class="btn-send-msg" style="flex: 1; background: #7c3aed;">SALVAR</button>
+                <button type="button" id="btnFecharModalOuvinte" class="btn-send-msg" style="background: #475569; flex: 1;">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Player Fixo Inferior Profissional -->
+    <div class="car-player-bar hidden" id="carPlayerBar">
+        <div class="player-info">
+            <div class="player-icon-box" id="playerIconDisplay">📻</div>
+            <div class="player-text-details">
+                <h4 id="playerNameDisplay">Nenhuma rádio selecionada</h4>
+                <div class="player-status-sub" id="playerStatusText">Pronto para tocar</div>
+            </div>
+        </div>
+        
+        <div class="player-controls">
+            <button class="control-btn" id="btnAnterior" title="Rádio Anterior">⏮️</button>
+            <button class="control-btn main-play" id="btnPlayPause" title="Tocar / Parar">▶️</button>
+            <button class="control-btn" id="btnProximo" title="Próxima Rádio">⏭️</button>
+        </div>
+
+        <div class="player-spacer"></div>
+    </div>
+
+    <audio id="audioStreaming" preload="none"></audio>
+
     <script>
-        window.mascaraData = function(elemento) {
-            let v = elemento.value.replace(/\D/g, '');
-            if (v.length > 8) v = v.slice(0, 8);
-            if (v.length > 4) { elemento.value = v.slice(0, 2) + '/' + v.slice(2, 4) + '/' + v.slice(4, 8); }
-            else if (v.length > 2) { elemento.value = v.slice(0, 2) + '/' + v.slice(2); }
-            else { elemento.value = v; }
-        };
+        setInterval(() => {
+            const agora = new Date();
+            document.getElementById('relogioDigital').innerText = agora.toLocaleTimeString();
+        }, 1000);
+
+        // =====================================================
+        // CLIMA — 4 CAPITAIS DO SUL/SUDESTE
+        // Exibe uma capital por vez no mesmo espaço onde aparecia Salvador.
+        // Fonte gratuita: Open-Meteo (não exige chave de API).
+        // =====================================================
+        const capitaisClima = [
+            { nome: 'Curitiba', lat: -25.4284, lon: -49.2733 },
+            { nome: 'São Paulo', lat: -23.5505, lon: -46.6333 },
+            { nome: 'Porto Alegre', lat: -30.0346, lon: -51.2177 },
+            { nome: 'Florianópolis', lat: -27.5954, lon: -48.5480 }
+        ];
+
+        let indiceCapitalClima = 0;
+        const temperaturasCapitais = new Map();
+
+        async function buscarTemperaturaCapital(cidade) {
+            try {
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${cidade.lat}&longitude=${cidade.lon}&current=temperature_2m&timezone=America%2FSao_Paulo`;
+                const resposta = await fetch(url);
+                if (!resposta.ok) throw new Error('Falha ao consultar clima');
+
+                const dados = await resposta.json();
+                const temperatura = dados?.current?.temperature_2m;
+
+                if (typeof temperatura === 'number') {
+                    temperaturasCapitais.set(cidade.nome, Math.round(temperatura));
+                    return Math.round(temperatura);
+                }
+            } catch (erro) {
+                console.warn(`Não foi possível atualizar o clima de ${cidade.nome}:`, erro);
+            }
+
+            return temperaturasCapitais.get(cidade.nome) ?? null;
+        }
+
+        async function atualizarClimaCapital() {
+            const climaInfo = document.getElementById('climaInfo');
+            if (!climaInfo) return;
+
+            const cidade = capitaisClima[indiceCapitalClima];
+            const temperatura = await buscarTemperaturaCapital(cidade);
+
+            climaInfo.innerText = temperatura !== null
+                ? `${cidade.nome}: ${temperatura}°C`
+                : `${cidade.nome}: --°C`;
+
+            indiceCapitalClima = (indiceCapitalClima + 1) % capitaisClima.length;
+        }
+
+        atualizarClimaCapital();
+        setInterval(atualizarClimaCapital, 6000);
     </script>
 
     <script type="module">
-        import { db } from './firebase-config.js';
-        import { ref, get, child, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { db } from '../firebase-config.js';
+        import { ref, get, push, set, update, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        const inputEmail = document.getElementById('emailLogin');
-        const inputSenha = document.getElementById('senhaLogin');
-        const btnLogin = document.getElementById('btnLogin');
-        const btnEsqueciSenha = document.getElementById('btnEsqueciSenha');
+        let nomeUsuarioId = localStorage.getItem('usuarioLogado') || "ouvinte_anonimo";
+        let chaveFirebaseUser = nomeUsuarioId.replace(/[^a-zA-Z0-9]/g, "_");
 
-        const secaoLogin = document.getElementById('secaoLogin');
-        const secaoRecuperacao = document.getElementById('secaoRecuperacao');
-        const cardTitle = document.getElementById('cardTitle');
-        const recEtapa1 = document.getElementById('recEtapa1');
-        const recEtapa2 = document.getElementById('recEtapa2');
-        const recEtapa3 = document.getElementById('recEtapa3');
-        const recEtapa4 = document.getElementById('recEtapa4');
 
-        let usuarioRecuperandoKey = null;
-        let dadosUsuarioRec = null;
+        // =====================================================
+        // IDENTIDADE + PRESENÇA PARA O CHAT — CHAVE ÚNICA PELO NOME
+        // O chat NÃO depende mais de userId/usuarioKey para localizar a conversa.
+        // Assim LAISA sempre conversa no mesmo canal "chat_laisa" no ADM e no Ouvinte.
+        // =====================================================
+        let chatOuvinteNome = localStorage.getItem('usuarioLogado') || localStorage.getItem('usuarioNome') || nomeUsuarioId || 'Ouvinte';
+        let chatOuvinteId = null;
+        let timerPresencaChat = null;
+
+        function criarChaveChatPorNome(nome) {
+            let base = String(nome || 'ouvinte')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .trim()
+                .toLowerCase()
+                .replace(/[^a-z0-9_-]+/g, '_')
+                .replace(/^_+|_+$/g, '');
+            if (!base) base = 'ouvinte';
+            return 'chat_' + base;
+        }
+
+        async function resolverIdentidadeChatOuvinte() {
+            // A fonte de verdade do chat é o nome realmente logado/exibido no painel.
+            // Isso impede que uma chave antiga de outro usuário seja reaproveitada pelo navegador.
+            chatOuvinteNome = String(
+                localStorage.getItem('usuarioLogado') ||
+                localStorage.getItem('usuarioNome') ||
+                nomeUsuarioId ||
+                'Ouvinte'
+            ).trim() || 'Ouvinte';
+
+            chatOuvinteId = criarChaveChatPorNome(chatOuvinteNome);
+            localStorage.setItem('chatOuvinteId', chatOuvinteId);
+            localStorage.setItem('usuarioNome', chatOuvinteNome);
+            return chatOuvinteId;
+        }
+
+        async function ativarPresencaChatOuvinte() {
+            const id = await resolverIdentidadeChatOuvinte();
+            if (!id) return;
+
+            const perfilRef = ref(db, `ouvintes_chat/${id}/perfil`);
+            const presencaRef = ref(db, `ouvintes_chat/${id}/presenca`);
+
+            // Atualiza o perfil do chat e marca online imediatamente.
+            await update(perfilRef, {
+                nome: chatOuvinteNome || 'Ouvinte',
+                atualizadoEm: Date.now()
+            });
+
+            await set(presencaRef, {
+                status: 'online',
+                lastSeen: Date.now()
+            });
+
+            // Se a aba/navegador cair ou fechar, o Firebase marca offline.
+            try {
+                await onDisconnect(presencaRef).set({
+                    status: 'offline',
+                    lastSeen: Date.now()
+                });
+            } catch (erro) {
+                console.warn('onDisconnect indisponível para presença:', erro);
+            }
+
+            if (timerPresencaChat) clearInterval(timerPresencaChat);
+            timerPresencaChat = setInterval(() => {
+                set(presencaRef, {
+                    status: 'online',
+                    lastSeen: Date.now()
+                }).catch(() => {});
+            }, 15000);
+        }
+
+        const balaoAviso = document.getElementById('balaoAviso');
+
+        async function verificarNotificacaoRadioNova() {
+            try {
+                const configRef = ref(db, 'configuracoes/ultima_radio_add');
+                const snapshot = await get(configRef);
+                
+                if (snapshot.exists()) {
+                    const dataNovaRadio = snapshot.val();
+                    const ultimaVista = localStorage.getItem('jaViuUltimaRadio');
+
+                    if (dataNovaRadio !== ultimaVista) {
+                        balaoAviso.style.display = 'block';
+                    }
+                }
+            } catch (err) {
+                console.error("Erro ao verificar nova rádio:", err);
+            }
+        }
+
+        // MONITORAMENTO EM TEMPO REAL DA MENSAGEM PARA UM DIA MELHOR
+        function monitorarMensagemDoDia() {
+            const mensagemRef = ref(db, 'configuracoes/mensagemDoDia');
+            const mensagemCard = document.getElementById('mensagemDiaCard');
+            const mensagemTexto = document.getElementById('mensagemDiaText');
+
+            onValue(mensagemRef, (snapshot) => {
+                if (!mensagemCard || !mensagemTexto) return;
+
+                if (!snapshot.exists()) {
+                    mensagemCard.style.display = 'none';
+                    return;
+                }
+
+                const dados = snapshot.val() || {};
+                const texto = typeof dados === 'string' ? dados : (dados.texto || '');
+                const ativa = typeof dados === 'object' && dados.ativa !== undefined
+                    ? dados.ativa === true || dados.ativa === 'true'
+                    : true;
+
+                if (ativa && texto.trim()) {
+                    mensagemTexto.textContent = texto;
+                    mensagemCard.style.display = '';
+                } else {
+                    mensagemCard.style.display = 'none';
+                }
+            }, (erro) => {
+                console.error('Erro ao monitorar a Mensagem para um Dia Melhor:', erro);
+                if (mensagemCard) mensagemCard.style.display = 'none';
+            });
+        }
+
+        document.addEventListener('click', (e) => {
+            if (balaoAviso.style.display === 'block') {
+                balaoAviso.style.display = 'none';
+                get(ref(db, 'configuracoes/ultima_radio_add')).then((snap) => {
+                    if (snap.exists()) {
+                        localStorage.setItem('jaViuUltimaRadio', snap.val());
+                    }
+                });
+            }
+        });
+
+        window.addEventListener('focus', () => {
+            verificarNotificacaoRadioNova();
+        });
 
         window.addEventListener('DOMContentLoaded', () => {
-            inputEmail.value = "";
-            inputSenha.value = "";
+            if (localStorage.getItem('usuarioLogado')) {
+                document.getElementById('nomeOuvinteDisplay').innerText = "Olá, " + localStorage.getItem('usuarioLogado');
+            }
+            carregarDadosDoPainel();
+            verificarNotificacaoRadioNova();
+            monitorarComerciaisOuvinte();
+            monitorarMensagemDoDia(); // Inicializa o ouvinte em tempo real da mensagem do dia
+            ativarPresencaChatOuvinte();
         });
 
-        async function realizarLogin() {
-            const email = inputEmail.value.trim();
-            const senha = inputSenha.value.trim();
-
-            if (!email || !senha) {
-                alert("Por favor, preencha o e-mail e a senha.");
-                return;
-            }
-
-            // ACESSO DIRETO DO ADMINISTRADOR APONTANDO PARA ADMIN/adm.html
-            if (email === "senger.luigy@gmail.com" && senha === "104528") {
-                localStorage.setItem('adminLogado', 'true');
-                window.location.href = "ADMIN/adm.html";
-                return;
-            }
-
+        document.getElementById('btnSair').addEventListener('click', async () => {
+            audioElement.pause();
             try {
-                const dbRef = ref(db);
-                const snapshot = await get(child(dbRef, 'usuarios_cadastrados'));
+                const id = await resolverIdentidadeChatOuvinte();
+                if (id) {
+                    await set(ref(db, `ouvintes_chat/${id}/presenca`), {
+                        status: 'offline',
+                        lastSeen: Date.now()
+                    });
+                }
+            } catch (e) {
+                console.warn('Não foi possível registrar a saída do chat:', e);
+            }
+            localStorage.removeItem('usuarioLogado');
+            localStorage.removeItem('usuarioNome');
+            localStorage.removeItem('usuarioKey');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('chatOuvinteId');
+            window.location.href = "../index.html";
+        });
 
+        let todasRadiosGlobal = [];
+        let radiosFavoritasIds = [];
+        let customizacoesOuvinte = {};
+        let indiceRadioAtual = -1;
+        let rádioAtivaNomeGlobal = "";
+
+        const audioElement = document.getElementById('audioStreaming');
+        const carPlayerBar = document.getElementById('carPlayerBar');
+        const playerNameDisplay = document.getElementById('playerNameDisplay');
+        const playerIconDisplay = document.getElementById('playerIconDisplay');
+        const playerStatusText = document.getElementById('playerStatusText');
+        const btnPlayPause = document.getElementById('btnPlayPause');
+        const sidebarRadioList = document.getElementById('sidebarRadioList');
+        const centerRadiosGrid = document.getElementById('centerRadiosGrid');
+
+        let corSelecionadaOuvinte = "#86efac";
+        let iconeSelecionadoOuvinte = "📻";
+
+        document.querySelectorAll('#colorPickerGridOuvinte .color-dot').forEach(dot => {
+            dot.addEventListener('click', (e) => {
+                document.querySelectorAll('#colorPickerGridOuvinte .color-dot').forEach(d => d.classList.remove('selected'));
+                e.target.classList.add('selected');
+                corSelecionadaOuvinte = e.target.getAttribute('data-color');
+            });
+        });
+
+        document.querySelectorAll('#iconsGridPickerOuvinte .icon-option').forEach(opt => {
+            opt.addEventListener('click', (e) => {
+                document.querySelectorAll('#iconsGridPickerOuvinte .icon-option').forEach(o => o.classList.remove('selected'));
+                e.target.classList.add('selected');
+                iconeSelecionadoOuvinte = e.target.getAttribute('data-icon');
+            });
+        });
+
+        async function carregarDadosDoPainel() {
+            try {
+                const prefRef = ref(db, `ouvintes_preferencias/${chaveFirebaseUser}`);
+                const prefSnap = await get(prefRef);
+                if (prefSnap.exists()) {
+                    const dados = prefSnap.val();
+                    radiosFavoritasIds = dados.favoritas || [];
+                    customizacoesOuvinte = dados.customizacoes || {};
+                }
+
+                const radiosRef = ref(db, 'radios_cadastradas');
+                const snapshot = await get(radiosRef);
+
+                todasRadiosGlobal = [];
                 if (snapshot.exists()) {
-                    let usuarioEncontrado = false;
                     snapshot.forEach((childSnapshot) => {
-                        const dados = childSnapshot.val();
-                        if (dados.email === email && dados.senha === senha) {
-                            usuarioEncontrado = true;
-                            localStorage.setItem('usuarioLogado', dados.apelido);
+                        todasRadiosGlobal.push({ id: childSnapshot.key, ...childSnapshot.val() });
+                    });
+                }
+
+                renderizarTudo();
+            } catch (err) {
+                console.error("Erro ao carregar dados:", err);
+            }
+        }
+
+        async function salvarPreferenciasNoFirebase() {
+            try {
+                const prefRef = ref(db, `ouvintes_preferencias/${chaveFirebaseUser}`);
+                await set(prefRef, {
+                    favoritas: radiosFavoritasIds,
+                    customizacoes: customizacoesOuvinte
+                });
+            } catch (err) {
+                console.error("Erro ao salvar preferências:", err);
+            }
+        }
+
+        function renderizarTudo() {
+            sidebarRadioList.innerHTML = "";
+            if (todasRadiosGlobal.length === 0) {
+                sidebarRadioList.innerHTML = "<p style='font-size:11px; color:#94a3b8;'>Nenhuma rádio cadastrada pelo ADM.</p>";
+            } else {
+                todasRadiosGlobal.forEach(radio => {
+                    const estaNoCentro = radiosFavoritasIds.includes(radio.id);
+                    const custom = customizacoesOuvinte[radio.id] || {};
+                    const icone = custom.icone || radio.icone || "📻";
+
+                    const item = document.createElement('div');
+                    item.className = 'radio-side-item';
+                    item.innerHTML = `
+                        <div class="radio-side-info">
+                            <span style="font-size: 15px;">${icone}</span>
+                            <span title="${radio.nome}">${radio.nome}</span>
+                        </div>
+                        <button class="btn-action-col ${estaNoCentro ? 'btn-minus' : 'btn-plus'}" title="${estaNoCentro ? 'Remover do Centro' : 'Adicionar ao Centro'}">
+                            ${estaNoCentro ? '-' : '+'}
+                        </button>
+                    `;
+
+                    item.querySelector('button').addEventListener('click', () => {
+                        if (estaNoCentro) {
+                            radiosFavoritasIds = radiosFavoritasIds.filter(id => id !== radio.id);
+                        } else {
+                            radiosFavoritasIds.push(radio.id);
                         }
+                        salvarPreferenciasNoFirebase();
+                        renderizarTudo();
                     });
 
-                    if (usuarioEncontrado) {
-                        window.location.href = "OUVINTES/index.html";
-                    } else {
-                        alert("E-mail ou senha incorretos!");
-                    }
-                } else {
-                    alert("Nenhum usuário cadastrado encontrado no sistema.");
+                    sidebarRadioList.appendChild(item);
+                });
+            }
+
+            centerRadiosGrid.innerHTML = "";
+            const radiosAtivasNoCentro = radiosFavoritasIds.map(id => todasRadiosGlobal.find(r => r.id === id)).filter(Boolean);
+
+            if (radiosAtivasNoCentro.length === 0) {
+                centerRadiosGrid.innerHTML = "<p style='font-size:11px; color:#94a3b8; grid-column: span 3; text-align:center;'>Clique no botão [+] na barra ao lado para adicionar suas rádios preferidas aqui.</p>";
+                carPlayerBar.classList.add('hidden');
+                return;
+            }
+
+            radiosAtivasNoCentro.forEach((radio) => {
+                const custom = customizacoesOuvinte[radio.id] || {};
+                const corCard = custom.cor || radio.cor || "#86efac";
+                const iconeCard = custom.icone || radio.icone || "📻";
+
+                const card = document.createElement('div');
+                card.className = 'radio-card-user';
+                card.draggable = true;
+                card.dataset.id = radio.id;
+                card.style.setProperty('--card-bg', corCard);
+
+                if (radio.nome === rádioAtivaNomeGlobal && !audioElement.paused) {
+                    card.classList.add('active-neon');
                 }
-            } catch (erro) {
-                console.error("Erro ao fazer login:", erro);
-                alert("Erro ao conectar com o banco de dados.");
+
+                card.innerHTML = `
+                    <div class="card-top-content">
+                        <div class="icon">${iconeCard}</div>
+                        <h4 title="${radio.nome}">${radio.nome}</h4>
+                    </div>
+                    <div class="card-bottom-bar">
+                        <button class="btn-pincel" title="Personalizar Cores e Ícone" data-id="${radio.id}" data-cor="${corCard}" data-icone="${iconeCard}">🎨</button>
+                    </div>
+                `;
+
+                card.addEventListener('click', (e) => {
+                    if (e.target.closest('.btn-pincel')) return;
+                    tocarRadioPorObjeto(radio);
+                });
+
+                card.querySelector('.btn-pincel').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    abrirModalPincelOuvinte(radio.id, corCard, iconeCard);
+                });
+
+                // Arrastar no computador (mouse)
+                card.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', radio.id);
+                    e.dataTransfer.effectAllowed = 'move';
+                    card.classList.add('dragging');
+                });
+
+                card.addEventListener('dragend', () => {
+                    card.classList.remove('dragging');
+                    document.querySelectorAll('.radio-card-user').forEach(c => c.classList.remove('drag-over'));
+                });
+
+                card.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    card.classList.add('drag-over');
+                });
+
+                card.addEventListener('dragleave', () => {
+                    card.classList.remove('drag-over');
+                });
+
+                card.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    card.classList.remove('drag-over');
+                    const draggedId = e.dataTransfer.getData('text/plain');
+                    const targetId = radio.id;
+                    reordenarRadiosPorId(draggedId, targetId);
+                });
+
+                // Arrastar por toque no celular/tablet: exige pressionar e segurar
+                ativarArrastePorToque(card, radio.id);
+
+                centerRadiosGrid.appendChild(card);
+            });
+        }
+
+        function reordenarRadiosPorId(draggedId, targetId) {
+            if (!draggedId || !targetId || draggedId === targetId) return;
+
+            const oldIndex = radiosFavoritasIds.indexOf(draggedId);
+            const newIndex = radiosFavoritasIds.indexOf(targetId);
+
+            if (oldIndex === -1 || newIndex === -1) return;
+
+            radiosFavoritasIds.splice(oldIndex, 1);
+            const indiceDestinoAtualizado = radiosFavoritasIds.indexOf(targetId);
+            radiosFavoritasIds.splice(indiceDestinoAtualizado, 0, draggedId);
+
+            salvarPreferenciasNoFirebase();
+            renderizarTudo();
+        }
+
+        function ativarArrastePorToque(card, radioId) {
+            let timerPressao = null;
+            let arrastandoToque = false;
+            let inicioX = 0;
+            let inicioY = 0;
+            let clone = null;
+            let placeholder = null;
+            let larguraOriginal = 0;
+            let alturaOriginal = 0;
+
+            const TEMPO_PRESSAO = 380;
+            const DISTANCIA_CANCELAMENTO = 10;
+
+            card.addEventListener('touchstart', (e) => {
+                if (e.touches.length !== 1) return;
+                if (e.target.closest('button')) return;
+
+                const toque = e.touches[0];
+                inicioX = toque.clientX;
+                inicioY = toque.clientY;
+                arrastandoToque = false;
+
+                clearTimeout(timerPressao);
+                timerPressao = setTimeout(() => {
+                    iniciarArrasteToque(card, radioId, toque.clientX, toque.clientY);
+                }, TEMPO_PRESSAO);
+            }, { passive: true });
+
+            card.addEventListener('touchmove', (e) => {
+                if (!e.touches.length) return;
+                const toque = e.touches[0];
+                const dx = Math.abs(toque.clientX - inicioX);
+                const dy = Math.abs(toque.clientY - inicioY);
+
+                if (!arrastandoToque && (dx > DISTANCIA_CANCELAMENTO || dy > DISTANCIA_CANCELAMENTO)) {
+                    clearTimeout(timerPressao);
+                    return;
+                }
+
+                if (arrastandoToque) {
+                    e.preventDefault();
+                    moverArrasteToque(toque.clientX, toque.clientY);
+                }
+            }, { passive: false });
+
+            card.addEventListener('touchend', (e) => {
+                clearTimeout(timerPressao);
+                if (arrastandoToque) {
+                    e.preventDefault();
+                    finalizarArrasteToque();
+                }
+            }, { passive: false });
+
+            card.addEventListener('touchcancel', () => {
+                clearTimeout(timerPressao);
+                if (arrastandoToque) cancelarArrasteToque();
+            });
+
+            function iniciarArrasteToque(elemento, id, x, y) {
+                arrastandoToque = true;
+                elemento.classList.add('touch-dragging');
+
+                const rect = elemento.getBoundingClientRect();
+                larguraOriginal = rect.width;
+                alturaOriginal = rect.height;
+
+                placeholder = document.createElement('div');
+                placeholder.className = 'radio-card-touch-placeholder';
+                placeholder.style.width = larguraOriginal + 'px';
+                placeholder.style.height = alturaOriginal + 'px';
+                placeholder.dataset.id = id;
+                elemento.parentNode.insertBefore(placeholder, elemento);
+
+                clone = elemento.cloneNode(true);
+                clone.classList.remove('touch-dragging');
+                clone.classList.add('radio-card-touch-clone');
+                clone.style.width = larguraOriginal + 'px';
+                clone.style.height = alturaOriginal + 'px';
+                clone.style.left = (x - larguraOriginal / 2) + 'px';
+                clone.style.top = (y - alturaOriginal / 2) + 'px';
+                document.body.appendChild(clone);
+            }
+
+            function moverArrasteToque(x, y) {
+                if (!clone || !placeholder) return;
+
+                clone.style.left = (x - larguraOriginal / 2) + 'px';
+                clone.style.top = (y - alturaOriginal / 2) + 'px';
+
+                const alvo = document.elementFromPoint(x, y);
+                const cardAlvo = alvo ? alvo.closest('.radio-card-user') : null;
+
+                if (!cardAlvo || cardAlvo === card || cardAlvo.classList.contains('touch-dragging')) {
+                    return;
+                }
+
+                const rectAlvo = cardAlvo.getBoundingClientRect();
+                const antes = x < rectAlvo.left + rectAlvo.width / 2 || y < rectAlvo.top + rectAlvo.height / 2;
+
+                if (antes) {
+                    centerRadiosGrid.insertBefore(placeholder, cardAlvo);
+                } else {
+                    centerRadiosGrid.insertBefore(placeholder, cardAlvo.nextSibling);
+                }
+            }
+
+            function finalizarArrasteToque() {
+                if (!arrastandoToque) return;
+                arrastandoToque = false;
+
+                if (clone) {
+                    clone.remove();
+                    clone = null;
+                }
+
+                card.classList.remove('touch-dragging');
+
+                if (placeholder) {
+                    placeholder.parentNode.insertBefore(card, placeholder);
+                    placeholder.remove();
+                    placeholder = null;
+                }
+
+                const novaOrdem = Array.from(centerRadiosGrid.querySelectorAll('.radio-card-user'))
+                    .map(el => el.dataset.id)
+                    .filter(Boolean);
+
+                if (novaOrdem.length === radiosFavoritasIds.length) {
+                    radiosFavoritasIds = novaOrdem;
+                    salvarPreferenciasNoFirebase();
+                    renderizarTudo();
+                } else {
+                    renderizarTudo();
+                }
+            }
+
+            function cancelarArrasteToque() {
+                arrastandoToque = false;
+                if (clone) {
+                    clone.remove();
+                    clone = null;
+                }
+                card.classList.remove('touch-dragging');
+                if (placeholder) {
+                    placeholder.remove();
+                    placeholder = null;
+                }
             }
         }
 
-        async function executarEtapa1() {
-            const email = document.getElementById('emailRec').value.trim();
-            if (!email) { alert("Por favor, digite seu e-mail."); return; }
+        function tocarRadioPorObjeto(radio) {
+            const radiosAtivasNoCentro = radiosFavoritasIds.map(id => todasRadiosGlobal.find(r => r.id === id)).filter(Boolean);
+            indiceRadioAtual = radiosAtivasNoCentro.findIndex(r => r.id === radio.id);
+            rádioAtivaNomeGlobal = radio.nome;
 
-            usuarioRecuperandoKey = email.toLowerCase().replace(/[.#$\[\]]/g, "_");
-            const usuarioRef = ref(db, 'usuarios_cadastrados/' + usuarioRecuperandoKey);
+            document.querySelectorAll('.radio-card-user').forEach(c => {
+                if (c.dataset.id === radio.id) c.classList.add('active-neon');
+                else c.classList.remove('active-neon');
+            });
 
-            try {
-                const snapshot = await get(usuarioRef);
-                if (snapshot.exists()) {
-                    dadosUsuarioRec = snapshot.val();
-                    recEtapa1.classList.add('hidden');
-                    recEtapa2.classList.remove('hidden');
-                    recEtapa2.classList.add('slide-down');
-                    document.getElementById('nascimentoRec').value = "";
-                } else {
-                    alert("Este e-mail não foi encontrado no sistema.");
-                }
-            } catch (err) {
-                console.error(err);
-                alert("Erro ao verificar e-mail no banco de dados.");
-            }
+            const custom = customizacoesOuvinte[radio.id] || {};
+            carPlayerBar.classList.remove('hidden');
+            playerNameDisplay.innerText = radio.nome;
+            playerIconDisplay.innerText = custom.icone || radio.icone || "📻";
+            playerStatusText.innerText = `Ouvindo Rádio: ${radio.nome}`;
+            btnPlayPause.innerText = "⏹️";
+
+            audioElement.src = radio.url;
+            audioElement.play().catch(err => console.error("Erro no stream:", err));
+
+            atualizarTelaRetrô();
         }
 
-        function executarEtapa2() {
-            const nascimento = document.getElementById('nascimentoRec').value.trim();
-            if (!nascimento) { alert("Por favor, digite sua data de nascimento."); return; }
+        document.getElementById('btnProximo').addEventListener('click', () => {
+            proximaRadio();
+        });
 
-            if (nascimento === dadosUsuarioRec.nascimento) {
-                recEtapa2.classList.add('hidden');
-                recEtapa3.classList.remove('hidden');
-                recEtapa3.classList.add('slide-down');
-                document.getElementById('novaSenhaRec').value = "";
-                document.getElementById('confirmaSenhaRec').value = "";
+        document.getElementById('btnAnterior').addEventListener('click', () => {
+            radioAnterior();
+        });
+
+        function proximaRadio() {
+            const radiosAtivasNoCentro = radiosFavoritasIds.map(id => todasRadiosGlobal.find(r => r.id === id)).filter(Boolean);
+            if (radiosAtivasNoCentro.length === 0) return;
+            let proximo = indiceRadioAtual + 1;
+            if (proximo >= radiosAtivasNoCentro.length) proximo = 0;
+            tocarRadioPorObjeto(radiosAtivasNoCentro[proximo]);
+        }
+
+        function radioAnterior() {
+            const radiosAtivasNoCentro = radiosFavoritasIds.map(id => todasRadiosGlobal.find(r => r.id === id)).filter(Boolean);
+            if (radiosAtivasNoCentro.length === 0) return;
+            let anterior = indiceRadioAtual - 1;
+            if (anterior < 0) anterior = radiosAtivasNoCentro.length - 1;
+            tocarRadioPorObjeto(radiosAtivasNoCentro[anterior]);
+        }
+
+        btnPlayPause.addEventListener('click', () => {
+            const radiosAtivasNoCentro = radiosFavoritasIds.map(id => todasRadiosGlobal.find(r => r.id === id)).filter(Boolean);
+            if (audioElement.paused) {
+                if (indiceRadioAtual === -1 && radiosAtivasNoCentro.length > 0) {
+                    tocarRadioPorObjeto(radiosAtivasNoCentro[0]);
+                } else if (indiceRadioAtual !== -1) {
+                    audioElement.play();
+                    btnPlayPause.innerText = "⏹️";
+                    playerStatusText.innerText = `Ouvindo Rádio: ${rádioAtivaNomeGlobal}`;
+                }
             } else {
-                alert("Data de nascimento incorreta.");
+                audioElement.pause();
+                btnPlayPause.innerText = "▶️";
+                playerStatusText.innerText = "Rádio pausada";
+                document.querySelectorAll('.radio-card-user').forEach(c => c.classList.remove('active-neon'));
+            }
+            atualizarTelaRetrô();
+        });
+
+        const modalOuvinte = document.getElementById('modalPersonalizacaoOuvinte');
+        const customRadioIdOuvinteInput = document.getElementById('customRadioIdOuvinte');
+
+        function abrirModalPincelOuvinte(id, corAtual, iconeAtual) {
+            customRadioIdOuvinteInput.value = id;
+            corSelecionadaOuvinte = corAtual;
+            iconeSelecionadoOuvinte = iconeAtual;
+
+            document.querySelectorAll('#colorPickerGridOuvinte .color-dot').forEach(dot => {
+                if (dot.getAttribute('data-color') === corSelecionadaOuvinte) dot.classList.add('selected');
+                else dot.classList.remove('selected');
+            });
+
+            document.querySelectorAll('#iconsGridPickerOuvinte .icon-option').forEach(opt => {
+                if (opt.getAttribute('data-icon') === iconeSelecionadoOuvinte) opt.classList.add('selected');
+                else opt.classList.remove('selected');
+            });
+
+            modalOuvinte.classList.remove('hidden');
+        }
+
+        document.getElementById('btnFecharModalOuvinte').addEventListener('click', () => {
+            modalOuvinte.classList.add('hidden');
+        });
+
+        document.getElementById('btnSalvarPincelOuvinte').addEventListener('click', () => {
+            const id = customRadioIdOuvinteInput.value;
+            if (!customizacoesOuvinte[id]) customizacoesOuvinte[id] = {};
+            customizacoesOuvinte[id].cor = corSelecionadaOuvinte;
+            customizacoesOuvinte[id].icone = iconeSelecionadoOuvinte;
+
+            salvarPreferenciasNoFirebase();
+            modalOuvinte.classList.add('hidden');
+            renderizarTudo();
+        });
+
+        const btnEnviarMsg = document.getElementById('btnEnviarMsg');
+        const msgAdminInput = document.getElementById('msgAdminInput');
+        const chatOuvinteHistorico = document.getElementById('chatOuvinteHistorico');
+        const chatOuvinteStatus = document.getElementById('chatOuvinteStatus');
+        let chatOuvinteEscutandoId = null;
+
+        function escapeChatOuvinte(valor) {
+            return String(valor ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function renderizarHistoricoChatOuvinte(snapshot) {
+            if (!chatOuvinteHistorico) return;
+
+            if (!snapshot.exists()) {
+                chatOuvinteHistorico.innerHTML = `
+                    <div class="listener-msn-empty">
+                        💬 Ainda não há mensagens nesta conversa.<br>
+                        Escreva abaixo para falar diretamente com a Administração.
+                    </div>`;
+                return;
+            }
+
+            const mensagens = [];
+            snapshot.forEach(child => {
+                mensagens.push({ id: child.key, ...(child.val() || {}) });
+            });
+            mensagens.sort((a, b) => Number(a.timestamp || 0) - Number(b.timestamp || 0));
+
+            chatOuvinteHistorico.innerHTML = '';
+            mensagens.slice(-100).forEach(msg => {
+                const ehAdm = String(msg.remetente || '').toLowerCase() === 'adm';
+                const bloco = document.createElement('div');
+                bloco.className = `listener-msn-msg ${ehAdm ? 'recebida' : 'enviada'}`;
+
+                const hora = msg.timestamp
+                    ? new Date(Number(msg.timestamp)).toLocaleString('pt-BR', {
+                        day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+                    })
+                    : '';
+
+                bloco.innerHTML = `
+                    <div class="listener-msn-msg-remetente">${ehAdm ? 'ADMINISTRAÇÃO' : 'VOCÊ'}</div>
+                    <div>${escapeChatOuvinte(msg.texto || msg.mensagem || '')}</div>
+                    <div class="listener-msn-msg-hora">${escapeChatOuvinte(hora)}</div>`;
+
+                chatOuvinteHistorico.appendChild(bloco);
+            });
+
+            chatOuvinteHistorico.scrollTop = chatOuvinteHistorico.scrollHeight;
+        }
+
+        async function iniciarChatOuvinteNaTela() {
+            try {
+                const id = await resolverIdentidadeChatOuvinte();
+                if (!id || chatOuvinteEscutandoId === id) return;
+
+                chatOuvinteEscutandoId = id;
+                if (chatOuvinteStatus) chatOuvinteStatus.textContent = 'Conversa conectada ao Firebase em tempo real.';
+
+                const mensagensRef = ref(db, `ouvintes_chat/${id}/mensagens`);
+                onValue(mensagensRef, renderizarHistoricoChatOuvinte, (erro) => {
+                    console.error('Erro ao receber mensagens do ADM:', erro);
+                    if (chatOuvinteStatus) chatOuvinteStatus.textContent = 'Não foi possível carregar a conversa.';
+                });
+            } catch (erro) {
+                console.error('Erro ao iniciar o chat do ouvinte:', erro);
+                if (chatOuvinteStatus) chatOuvinteStatus.textContent = 'Erro ao conectar o chat.';
             }
         }
 
-        async function executarEtapa3() {
-            const novaSenha = document.getElementById('novaSenhaRec').value.trim();
-            const confirmaSenha = document.getElementById('confirmaSenhaRec').value.trim();
+        async function enviarMensagemParaAdm() {
+            const texto = msgAdminInput.value.trim();
+            if (!texto) return;
 
-            if (!novaSenha || !confirmaSenha) { alert("Preencha os campos de senha."); return; }
-            if (novaSenha !== confirmaSenha) { alert("As senhas não coincidem!"); return; }
+            btnEnviarMsg.disabled = true;
+            btnEnviarMsg.textContent = 'Enviando...';
 
             try {
-                const usuarioRef = ref(db, 'usuarios_cadastrados/' + usuarioRecuperandoKey);
-                await update(usuarioRef, { senha: novaSenha });
+                const id = await resolverIdentidadeChatOuvinte();
+                if (!id) throw new Error('Ouvinte não identificado.');
 
-                recEtapa3.classList.add('hidden');
-                recEtapa4.classList.remove('hidden');
-                recEtapa4.classList.add('slide-down');
+                await update(ref(db, `ouvintes_chat/${id}/perfil`), {
+                    nome: chatOuvinteNome || localStorage.getItem('usuarioNome') || localStorage.getItem('usuarioLogado') || 'Ouvinte'
+                });
+
+                await set(push(ref(db, `ouvintes_chat/${id}/mensagens`)), {
+                    remetente: 'ouvinte',
+                    texto: texto,
+                    timestamp: Date.now()
+                });
+
+                msgAdminInput.value = '';
+                if (chatOuvinteStatus) chatOuvinteStatus.textContent = 'Mensagem enviada para a Administração.';
+                msgAdminInput.focus();
             } catch (err) {
-                console.error(err);
-                alert("Erro ao atualizar a senha.");
+                console.error('Erro ao enviar mensagem para o ADM:', err);
+                if (chatOuvinteStatus) chatOuvinteStatus.textContent = 'Não foi possível enviar. Verifique sua conexão.';
+                alert('Não foi possível enviar a mensagem para o Administrador.');
+            } finally {
+                btnEnviarMsg.disabled = false;
+                btnEnviarMsg.textContent = 'Enviar';
             }
         }
 
-        btnEsqueciSenha.addEventListener('click', (e) => {
+        btnEnviarMsg.addEventListener('click', enviarMensagemParaAdm);
+        msgAdminInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                enviarMensagemParaAdm();
+            }
+        });
+
+        iniciarChatOuvinteNaTela();
+
+        // ==========================================
+        // SISTEMA DO MODO RÁDIO RETRÔ INTERATIVO
+        // ==========================================
+        const retroContainer = document.getElementById('retroRadioContainer');
+        const btnAbrirRetro = document.getElementById('btnAbrirRetro');
+        const btnSairRetro = document.getElementById('btnSairRetro');
+        const retroTitleDisplay = document.getElementById('retroTitleDisplay');
+        const retroLed = document.getElementById('retroLedIndicator');
+        const dialVolume = document.getElementById('dialVolume');
+        const dialSintonia = document.getElementById('dialSintonia');
+        const labelVolumeText = document.getElementById('labelVolumeText');
+        const knobVolumeContainer = document.getElementById('knobVolume');
+        const knobSintoniaContainer = document.getElementById('knobSintonia');
+
+        let volumeRetretroAtual = 15; // 0 a 30
+        let anguloVolume = (volumeRetretroAtual / 30) * 270 - 135;
+        let anguloSintonia = 0;
+
+        btnAbrirRetro.addEventListener('click', () => {
+            retroContainer.classList.remove('hidden');
+            atualizarTelaRetrô();
+        });
+
+        btnSairRetro.addEventListener('click', () => {
+            retroContainer.classList.add('hidden');
+        });
+
+        window.addEventListener('resize', () => {
+            if (!retroContainer.classList.contains('hidden')) {
+                atualizarTelaRetrô();
+            }
+        });
+
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                if (!retroContainer.classList.contains('hidden')) atualizarTelaRetrô();
+            }, 150);
+        });
+
+        function atualizarTelaRetrô() {
+            if (rádioAtivaNomeGlobal) {
+                retroTitleDisplay.innerText = rádioAtivaNomeGlobal;
+            } else {
+                retroTitleDisplay.innerText = "Selecione uma Rádio";
+            }
+
+            if (!audioElement.paused && volumeRetretroAtual > 0) {
+                retroLed.classList.add('on');
+            } else {
+                retroLed.classList.remove('on');
+            }
+
+            // Modulador digital visual: não altera a frequência real do streaming.
+            const numeroSintonia = todasRadiosGlobal.length > 0 && indiceRadioAtual >= 0
+                ? String(indiceRadioAtual + 1).padStart(2, '0')
+                : '--';
+            document.getElementById('retroFreqDisplay').innerText = `FM ${numeroSintonia}.0`;
+
+            audioElement.volume = volumeRetretroAtual / 30;
+            labelVolumeText.innerText = `VOL: ${volumeRetretroAtual}`;
+            dialVolume.style.transform = `rotate(${anguloVolume}deg)`;
+            dialSintonia.style.transform = `rotate(${anguloSintonia}deg)`;
+        }
+
+        // Interação por toque/arraste no Botão de Volume (0 a 30)
+        let arrastandoVolume = false;
+        let startXVol = 0;
+
+        knobVolumeContainer.addEventListener('mousedown', (e) => {
+            arrastandoVolume = true;
+            startXVol = e.clientX;
             e.preventDefault();
-            secaoLogin.classList.add('hidden');
-            secaoRecuperacao.classList.remove('hidden');
-            secaoRecuperacao.classList.add('slide-down');
-            cardTitle.innerText = "Recuperar Senha";
-            
-            recEtapa1.classList.remove('hidden');
-            recEtapa2.classList.add('hidden');
-            recEtapa3.classList.add('hidden');
-            recEtapa4.classList.add('hidden');
-            document.getElementById('emailRec').value = "";
         });
 
-        function voltarAoLogin(e) {
-            if (e) e.preventDefault();
-            secaoRecuperacao.classList.add('hidden');
-            secaoLogin.classList.remove('hidden');
-            secaoLogin.classList.add('slide-down');
-            cardTitle.innerText = "Entrar no Sistema";
-        }
+        window.addEventListener('mousemove', (e) => {
+            if (!arrastandoVolume) return;
+            const deltaX = e.clientX - startXVol;
+            startXVol = e.clientX;
 
-        document.getElementById('btnVoltarLogin').addEventListener('click', voltarAoLogin);
-        document.getElementById('btnIrParaLogin').addEventListener('click', voltarAoLogin);
+            if (deltaX > 2 && volumeRetretroAtual < 30) volumeRetretroAtual++;
+            if (deltaX < -2 && volumeRetretroAtual > 0) volumeRetretroAtual--;
 
-        document.getElementById('btnAvancarRec1').addEventListener('click', executarEtapa1);
-        document.getElementById('btnAvancarRec2').addEventListener('click', executarEtapa2);
-        document.getElementById('btnAtualizarSenha').addEventListener('click', executarEtapa3);
-        btnLogin.addEventListener('click', realizarLogin);
+            anguloVolume = (volumeRetretroAtual / 30) * 270 - 135;
 
-        document.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                if (!secaoLogin.classList.contains('hidden')) {
-                    realizarLogin();
-                } else if (!recEtapa1.classList.contains('hidden')) {
-                    executarEtapa1();
-                } else if (!recEtapa2.classList.contains('hidden')) {
-                    executarEtapa2();
-                } else if (!recEtapa3.classList.contains('hidden')) {
-                    executarEtapa3();
+            if (volumeRetretroAtual === 0) {
+                audioElement.pause();
+            } else if (audioElement.paused && rádioAtivaNomeGlobal) {
+                audioElement.play().catch(()=>{});
+            }
+
+            atualizarTelaRetrô();
+        });
+
+        window.addEventListener('mouseup', () => {
+            arrastandoVolume = false;
+        });
+
+        // Suporte a toque mobile para o volume
+        knobVolumeContainer.addEventListener('touchstart', (e) => {
+            arrastandoVolume = true;
+            startXVol = e.touches[0].clientX;
+            e.preventDefault();
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (!arrastandoVolume) return;
+            const deltaX = e.touches[0].clientX - startXVol;
+            startXVol = e.touches[0].clientX;
+
+            if (deltaX > 2 && volumeRetretroAtual < 30) volumeRetretroAtual++;
+            if (deltaX < -2 && volumeRetretroAtual > 0) volumeRetretroAtual--;
+
+            anguloVolume = (volumeRetretroAtual / 30) * 270 - 135;
+
+            if (volumeRetretroAtual === 0) {
+                audioElement.pause();
+            } else if (audioElement.paused && rádioAtivaNomeGlobal) {
+                audioElement.play().catch(()=>{});
+            }
+
+            atualizarTelaRetrô();
+        });
+
+        window.addEventListener('touchend', () => {
+            arrastandoVolume = false;
+        });
+
+        // Clique direto no botão de volume para alternar Ligar/Desligar
+        knobVolumeContainer.addEventListener('click', (e) => {
+            if (Math.abs(e.clientX - startXVol) < 5) {
+                if (volumeRetretroAtual === 0) {
+                    volumeRetretroAtual = 15;
+                    if (rádioAtivaNomeGlobal) audioElement.play().catch(()=>{});
+                } else {
+                    volumeRetretroAtual = 0;
+                    audioElement.pause();
                 }
+                anguloVolume = (volumeRetretroAtual / 30) * 270 - 135;
+                atualizarTelaRetrô();
             }
         });
+
+        // Interação por toque/arraste no Botão de Sintonia (Próxima / Anterior)
+        let arrastandoSintonia = false;
+        let startXSintonia = 0;
+
+        knobSintoniaContainer.addEventListener('mousedown', (e) => {
+            arrastandoSintonia = true;
+            startXSintonia = e.clientX;
+            e.preventDefault();
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!arrastandoSintonia) return;
+            const deltaX = e.clientX - startXSintonia;
+            
+            if (Math.abs(deltaX) > 25) {
+                if (deltaX > 0) {
+                    proximaRadio();
+                    anguloSintonia += 45;
+                } else {
+                    radioAnterior();
+                    anguloSintonia -= 45;
+                }
+                startXSintonia = e.clientX;
+                atualizarTelaRetrô();
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            arrastandoSintonia = false;
+        });
+
+        knobSintoniaContainer.addEventListener('touchstart', (e) => {
+            arrastandoSintonia = true;
+            startXSintonia = e.touches[0].clientX;
+            e.preventDefault();
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (!arrastandoSintonia) return;
+            const deltaX = e.touches[0].clientX - startXSintonia;
+
+            if (Math.abs(deltaX) > 25) {
+                if (deltaX > 0) {
+                    proximaRadio();
+                    anguloSintonia += 45;
+                } else {
+                    radioAnterior();
+                    anguloSintonia -= 45;
+                }
+                startXSintonia = e.touches[0].clientX;
+                atualizarTelaRetrô();
+            }
+        });
+
+        window.addEventListener('touchend', () => {
+            arrastandoSintonia = false;
+        });
+
+
+        // ==========================================
+        // SISTEMA DE COMERCIAIS AUTOMÁTICOS
+        // ==========================================
+        let comerciaisAtivos = [];
+        let temporizadorComerciais = null;
+
+        function monitorarComerciaisOuvinte() {
+            const comerciaisRef = ref(db, 'comerciais');
+            
+            onValue(comerciaisRef, (snapshot) => {
+                comerciaisAtivos = [];
+                if (snapshot.exists()) {
+                    const agora = Date.now();
+                    
+                    snapshot.forEach((child) => {
+                        const campanha = child.val();
+                        
+                        const ativa = campanha.ativa !== false;
+                        const dentroDoPrazo = agora >= Number(campanha.inicio) && agora <= Number(campanha.fim);
+                        
+                        let permitidoParaEsteOuvinte = true;
+                        if (campanha.destino === 'clientes') {
+                            const listaClientes = campanha.clientes || [];
+                            permitidoParaEsteOuvinte = listaClientes.includes(nomeUsuarioId);
+                        }
+
+                        if (ativa && dentroDoPrazo && permitidoParaEsteOuvinte) {
+                            comerciaisAtivos.push(campanha);
+                        }
+                    });
+                    
+                    iniciarCicloDeComerciais();
+                }
+            });
+        }
+
+        function iniciarCicloDeComerciais() {
+            if (temporizadorComerciais) clearInterval(temporizadorComerciais);
+            
+            if (comerciaisAtivos.length === 0) return;
+
+            const menorIntervaloMinutos = Math.min(...comerciaisAtivos.map(c => Number(c.frequenciaMinutos) || 10));
+            const intervaloMs = menorIntervaloMinutos * 60 * 1000;
+
+            temporizadorComerciais = setInterval(() => {
+                tocarProximoComercial();
+            }, intervaloMs);
+        }
+
+        function tocarProximoComercial() {
+            if (comerciaisAtivos.length === 0) return;
+
+            const comercialAleatorio = comerciaisAtivos[Math.floor(Math.random() * comerciaisAtivos.length)];
+            const estavaTocando = !audioElement.paused;
+
+            if (estavaTocando) {
+                audioElement.pause();
+            }
+
+            if (comercialAleatorio.tipo === 'video') {
+                exibirModalVideoOuvinte(comercialAleatorio.arquivoUrl, () => {
+                    if (estavaTocando) audioElement.play();
+                });
+            } else {
+                const audioComercial = new Audio(comercialAleatorio.arquivoUrl);
+                audioComercial.play().catch(err => console.log("Erro ao reproduzir comercial:", err));
+
+                audioComercial.onended = () => {
+                    if (estavaTocando) {
+                        audioElement.play();
+                    }
+                };
+            }
+        }
+
+        function exibirModalVideoOuvinte(urlVideo, callbackFim) {
+            let modal = document.getElementById('modalVideoOuvinte');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'modalVideoOuvinte';
+                modal.style = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:9999;";
+                modal.innerHTML = `<video id='videoComercialPlayer' src='${urlVideo}' controls autoplay style='max-width:90%; max-height:90%;'></video>`;
+                document.body.appendChild(modal);
+                
+                const vid = document.getElementById('videoComercialPlayer');
+                vid.onended = () => {
+                    modal.remove();
+                    if (callbackFim) callbackFim();
+                };
+            }
+        }
     </script>
 </body>
 </html>
