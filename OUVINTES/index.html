@@ -1264,7 +1264,7 @@
             <div class="listener-widgets">
                 <button class="btn-retro-mode" id="btnAbrirRetro">📻 Mudar para o Painel Rádio Retrô</button>
                 <span id="relogioDigital">00:00:00</span>
-                <span id="climaInfo">Salvador: 23°C</span>
+                <span id="climaInfo">Curitiba: --°C</span>
                 <button class="btn-sair" id="btnSair">SAIR</button>
             </div>
         </div>
@@ -1410,6 +1410,46 @@
             const agora = new Date();
             document.getElementById('relogioDigital').innerText = agora.toLocaleTimeString();
         }, 1000);
+
+        // =====================================================
+        // CLIMA - 4 CAPITAIS
+        // Alteração isolada: Curitiba, São Paulo, Porto Alegre e Florianópolis.
+        // =====================================================
+        const capitaisClima = [
+            { nome: 'Curitiba', latitude: -25.4284, longitude: -49.2733 },
+            { nome: 'São Paulo', latitude: -23.5505, longitude: -46.6333 },
+            { nome: 'Porto Alegre', latitude: -30.0346, longitude: -51.2177 },
+            { nome: 'Florianópolis', latitude: -27.5954, longitude: -48.5480 }
+        ];
+
+        let indiceCapitalClima = 0;
+
+        async function atualizarClimaCapital() {
+            const climaInfo = document.getElementById('climaInfo');
+            if (!climaInfo) return;
+
+            const cidade = capitaisClima[indiceCapitalClima];
+
+            try {
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${cidade.latitude}&longitude=${cidade.longitude}&current=temperature_2m&timezone=auto`;
+                const resposta = await fetch(url);
+                if (!resposta.ok) throw new Error('Falha ao consultar temperatura');
+
+                const dados = await resposta.json();
+                const temperatura = dados?.current?.temperature_2m;
+                if (temperatura === undefined || temperatura === null) throw new Error('Temperatura indisponível');
+
+                climaInfo.innerText = `${cidade.nome}: ${Math.round(temperatura)}°C`;
+            } catch (erro) {
+                climaInfo.innerText = `${cidade.nome}: --°C`;
+                console.warn('Não foi possível atualizar o clima de ' + cidade.nome, erro);
+            }
+
+            indiceCapitalClima = (indiceCapitalClima + 1) % capitaisClima.length;
+        }
+
+        atualizarClimaCapital();
+        setInterval(atualizarClimaCapital, 6000);
 
     </script>
 
