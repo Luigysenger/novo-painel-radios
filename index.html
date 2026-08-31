@@ -1411,57 +1411,49 @@
             document.getElementById('relogioDigital').innerText = agora.toLocaleTimeString();
         }, 1000);
 
-        // =====================================================
-        // CLIMA — 4 CAPITAIS DO SUL/SUDESTE
-        // Exibe uma capital por vez no mesmo espaço onde aparecia Salvador.
-        // Fonte gratuita: Open-Meteo (não exige chave de API).
-        // =====================================================
+        // CLIMA - 4 CAPITAIS (único ajuste desta versão)
         const capitaisClima = [
             { nome: 'Curitiba', lat: -25.4284, lon: -49.2733 },
             { nome: 'São Paulo', lat: -23.5505, lon: -46.6333 },
             { nome: 'Porto Alegre', lat: -30.0346, lon: -51.2177 },
             { nome: 'Florianópolis', lat: -27.5954, lon: -48.5480 }
         ];
-
         let indiceCapitalClima = 0;
-        const temperaturasCapitais = new Map();
 
-        async function buscarTemperaturaCapital(cidade) {
-            try {
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${cidade.lat}&longitude=${cidade.lon}&current=temperature_2m&timezone=America%2FSao_Paulo`;
-                const resposta = await fetch(url);
-                if (!resposta.ok) throw new Error('Falha ao consultar clima');
-
-                const dados = await resposta.json();
-                const temperatura = dados?.current?.temperature_2m;
-
-                if (typeof temperatura === 'number') {
-                    temperaturasCapitais.set(cidade.nome, Math.round(temperatura));
-                    return Math.round(temperatura);
-                }
-            } catch (erro) {
-                console.warn(`Não foi possível atualizar o clima de ${cidade.nome}:`, erro);
-            }
-
-            return temperaturasCapitais.get(cidade.nome) ?? null;
-        }
-
-        async function atualizarClimaCapital() {
+        function atualizarClimaCapital() {
             const climaInfo = document.getElementById('climaInfo');
             if (!climaInfo) return;
 
             const cidade = capitaisClima[indiceCapitalClima];
-            const temperatura = await buscarTemperaturaCapital(cidade);
+            climaInfo.innerText = cidade.nome + ': carregando...';
 
-            climaInfo.innerText = temperatura !== null
-                ? `${cidade.nome}: ${temperatura}°C`
-                : `${cidade.nome}: --°C`;
+            const url = 'https://api.open-meteo.com/v1/forecast?latitude=' + cidade.lat +
+                        '&longitude=' + cidade.lon +
+                        '&current_weather=true';
+
+            fetch(url)
+                .then(function(resposta) {
+                    if (!resposta.ok) throw new Error('Falha ao consultar clima');
+                    return resposta.json();
+                })
+                .then(function(dados) {
+                    if (dados && dados.current_weather && typeof dados.current_weather.temperature === 'number') {
+                        climaInfo.innerText = cidade.nome + ': ' + Math.round(dados.current_weather.temperature) + '°C';
+                    } else {
+                        climaInfo.innerText = cidade.nome + ': --°C';
+                    }
+                })
+                .catch(function(erro) {
+                    console.warn('Não foi possível atualizar o clima de ' + cidade.nome + ':', erro);
+                    climaInfo.innerText = cidade.nome + ': --°C';
+                });
 
             indiceCapitalClima = (indiceCapitalClima + 1) % capitaisClima.length;
         }
 
         atualizarClimaCapital();
         setInterval(atualizarClimaCapital, 6000);
+
     </script>
 
     <script type="module">
@@ -1473,38 +1465,67 @@
 
 
         // =====================================================
-        // IDENTIDADE + PRESENÇA PARA O CHAT — CHAVE ÚNICA PELO NOME
-        // O chat NÃO depende mais de userId/usuarioKey para localizar a conversa.
-        // Assim LAISA sempre conversa no mesmo canal "chat_laisa" no ADM e no Ouvinte.
+        // IDENTIDADE + PRESENÇA PARA O CHAT
+        // Mantém o ouvinte Online no ADM enquanto este painel estiver aberto.
         // =====================================================
-        let chatOuvinteNome = localStorage.getItem('usuarioLogado') || localStorage.getItem('usuarioNome') || nomeUsuarioId || 'Ouvinte';
-        let chatOuvinteId = null;
+        let chatOuvinteId = localStorage.getItem('usuarioKey') || localStorage.getItem('userId') || null;
+        let chatOuvinteNome = localStorage.getItem('usuarioNome') || localStorage.getItem('usuarioLogado') || nomeUsuarioId;
         let timerPresencaChat = null;
 
-        function criarChaveChatPorNome(nome) {
-            let base = String(nome || 'ouvinte')
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
-                .trim()
-                .toLowerCase()
-                .replace(/[^a-z0-9_-]+/g, '_')
-                .replace(/^_+|_+$/g, '');
-            if (!base) base = 'ouvinte';
-            return 'chat_' + base;
-        }
-
         async function resolverIdentidadeChatOuvinte() {
-            // A fonte de verdade do chat é o nome realmente logado/exibido no painel.
-            // Isso impede que uma chave antiga de outro usuário seja reaproveitada pelo navegador.
-            chatOuvinteNome = String(
+            // IMPORTANTE: não confia cegamente em usuarioKey/userId antigos.
+            // Primeiro confirma qual conta corresponde ao nome/login atualmente exibido no painel.
+            // Isso evita que LAISA ou SUZI acabem usando por engano a chave do ADMINISTRADOR.
+            const alvoAtual = String(
                 localStorage.getItem('usuarioLogado') ||
                 localStorage.getItem('usuarioNome') ||
-                nomeUsuarioId ||
-                'Ouvinte'
-            ).trim() || 'Ouvinte';
+                nomeUsuarioId || ''
+            ).trim().toLowerCase();
 
-            chatOuvinteId = criarChaveChatPorNome(chatOuvinteNome);
-            localStorage.setItem('chatOuvinteId', chatOuvinteId);
+            let idConfirmado = null;
+            let nomeConfirmado = null;
+
+            try {
+                const contasSnap = await get(ref(db, 'contas'));
+                if (contasSnap.exists()) {
+                    contasSnap.forEach(child => {
+                        if (idConfirmado) return;
+                        const conta = child.val() || {};
+                        const candidatos = [conta.nome, conta.email, conta.login]
+                            .filter(Boolean)
+                            .map(v => String(v).trim().toLowerCase());
+
+                        if (alvoAtual && candidatos.includes(alvoAtual)) {
+                            idConfirmado = child.key;
+                            nomeConfirmado = conta.nome || localStorage.getItem('usuarioLogado') || 'Ouvinte';
+                        }
+                    });
+
+                    // Se o nome/login não encontrou, só aceita a chave salva se ela realmente existir
+                    // e não for uma conta administrativa.
+                    if (!idConfirmado && chatOuvinteId) {
+                        const contaPelaChave = contasSnap.child(chatOuvinteId);
+                        if (contaPelaChave.exists()) {
+                            const conta = contaPelaChave.val() || {};
+                            const perfil = String(conta.perfil || '').trim().toLowerCase();
+                            const nomeConta = String(conta.nome || '').trim().toLowerCase();
+                            const ehAdmin = ['adm','admin','administrador'].includes(perfil) || nomeConta === 'administrador';
+                            if (!ehAdmin) {
+                                idConfirmado = chatOuvinteId;
+                                nomeConfirmado = conta.nome || chatOuvinteNome;
+                            }
+                        }
+                    }
+                }
+            } catch (erro) {
+                console.warn('Não foi possível localizar a conta correta do ouvinte para o chat:', erro);
+            }
+
+            chatOuvinteId = idConfirmado || chaveFirebaseUser;
+            chatOuvinteNome = nomeConfirmado || localStorage.getItem('usuarioLogado') || chatOuvinteNome || 'Ouvinte';
+
+            localStorage.setItem('usuarioKey', chatOuvinteId);
+            localStorage.setItem('userId', chatOuvinteId);
             localStorage.setItem('usuarioNome', chatOuvinteNome);
             return chatOuvinteId;
         }
@@ -1515,35 +1536,25 @@
 
             const perfilRef = ref(db, `ouvintes_chat/${id}/perfil`);
             const presencaRef = ref(db, `ouvintes_chat/${id}/presenca`);
+            const contaRef = ref(db, `contas/${id}`);
 
-            // Atualiza o perfil do chat e marca online imediatamente.
-            await update(perfilRef, {
-                nome: chatOuvinteNome || 'Ouvinte',
-                atualizadoEm: Date.now()
-            });
+            await update(perfilRef, { nome: chatOuvinteNome || 'Ouvinte' });
+            await update(presencaRef, { status: 'online', lastSeen: Date.now() });
+            await update(contaRef, { status: 'online', lastSeen: Date.now() });
 
-            await set(presencaRef, {
-                status: 'online',
-                lastSeen: Date.now()
-            });
-
-            // Se a aba/navegador cair ou fechar, o Firebase marca offline.
             try {
-                await onDisconnect(presencaRef).set({
-                    status: 'offline',
-                    lastSeen: Date.now()
-                });
+                await onDisconnect(presencaRef).set({ status: 'offline', lastSeen: Date.now() });
+                await onDisconnect(contaRef).update({ status: 'offline', lastSeen: Date.now() });
             } catch (erro) {
                 console.warn('onDisconnect indisponível para presença:', erro);
             }
 
             if (timerPresencaChat) clearInterval(timerPresencaChat);
             timerPresencaChat = setInterval(() => {
-                set(presencaRef, {
-                    status: 'online',
-                    lastSeen: Date.now()
-                }).catch(() => {});
-            }, 15000);
+                const agoraPresenca = Date.now();
+                update(presencaRef, { status: 'online', lastSeen: agoraPresenca }).catch(() => {});
+                update(contaRef, { status: 'online', lastSeen: agoraPresenca }).catch(() => {});
+            }, 20000);
         }
 
         const balaoAviso = document.getElementById('balaoAviso');
@@ -1629,19 +1640,15 @@
             try {
                 const id = await resolverIdentidadeChatOuvinte();
                 if (id) {
-                    await set(ref(db, `ouvintes_chat/${id}/presenca`), {
-                        status: 'offline',
-                        lastSeen: Date.now()
-                    });
+                    const agoraSaida = Date.now();
+                    await update(ref(db, `ouvintes_chat/${id}/presenca`), { status: 'offline', lastSeen: agoraSaida });
+                    await update(ref(db, `contas/${id}`), { status: 'offline', lastSeen: agoraSaida });
                 }
-            } catch (e) {
-                console.warn('Não foi possível registrar a saída do chat:', e);
-            }
+            } catch (e) {}
             localStorage.removeItem('usuarioLogado');
             localStorage.removeItem('usuarioNome');
             localStorage.removeItem('usuarioKey');
             localStorage.removeItem('userId');
-            localStorage.removeItem('chatOuvinteId');
             window.location.href = "../index.html";
         });
 
