@@ -657,6 +657,8 @@
             font-weight: 800;
             letter-spacing: .7px;
             text-transform: uppercase;
+            cursor: pointer;
+            user-select: none;
         }
 
         .msn-grupo-titulo.online { color: #4ade80; }
@@ -1947,6 +1949,13 @@
     let ouvintesCadastradosChat = {};
     let dadosChatOuvintes = {};
 
+    // Controla se os grupos ONLINE e OFFLINE estão recolhidos.
+    // O estado é mantido mesmo quando a lista é atualizada em tempo real.
+    const gruposChatRecolhidos = {
+        online: false,
+        offline: false
+    };
+
     function escapeChat(valor) {
         return String(valor ?? '')
             .replace(/&/g, '&amp;')
@@ -2016,21 +2025,37 @@
             <span class="ouvinte-nome" style="color:#38bdf8;">💬 Enviar para Todos</span>
         </div>`;
 
-        html += `<div class="msn-grupo-titulo online">▼ Online (${onlineIds.length})</div>`;
-        if (onlineIds.length) {
-            onlineIds.forEach(id => { html += montarItem(id, true); });
-        } else {
-            html += '<div style="font-size:10px;color:#64748b;padding:5px 8px 10px;">Nenhum ouvinte online agora.</div>';
+        const setaOnline = gruposChatRecolhidos.online ? '▶' : '▼';
+        html += `<div class="msn-grupo-titulo online" data-grupo-chat="online">${setaOnline} Online (${onlineIds.length})</div>`;
+        if (!gruposChatRecolhidos.online) {
+            if (onlineIds.length) {
+                onlineIds.forEach(id => { html += montarItem(id, true); });
+            } else {
+                html += '<div style="font-size:10px;color:#64748b;padding:5px 8px 10px;">Nenhum ouvinte online agora.</div>';
+            }
         }
 
-        html += `<div class="msn-grupo-titulo offline">▼ Offline (${offlineIds.length})</div>`;
-        if (offlineIds.length) {
-            offlineIds.forEach(id => { html += montarItem(id, false); });
-        } else {
-            html += '<div style="font-size:10px;color:#64748b;padding:5px 8px 10px;">Nenhum ouvinte offline.</div>';
+        const setaOffline = gruposChatRecolhidos.offline ? '▶' : '▼';
+        html += `<div class="msn-grupo-titulo offline" data-grupo-chat="offline">${setaOffline} Offline (${offlineIds.length})</div>`;
+        if (!gruposChatRecolhidos.offline) {
+            if (offlineIds.length) {
+                offlineIds.forEach(id => { html += montarItem(id, false); });
+            } else {
+                html += '<div style="font-size:10px;color:#64748b;padding:5px 8px 10px;">Nenhum ouvinte offline.</div>';
+            }
         }
 
         listaOuvintesStatus.innerHTML = html;
+
+        // Clicar no título ONLINE/OFFLINE recolhe ou abre somente aquele grupo.
+        listaOuvintesStatus.querySelectorAll('.msn-grupo-titulo[data-grupo-chat]').forEach(titulo => {
+            titulo.addEventListener('click', () => {
+                const grupo = titulo.getAttribute('data-grupo-chat');
+                if (grupo !== 'online' && grupo !== 'offline') return;
+                gruposChatRecolhidos[grupo] = !gruposChatRecolhidos[grupo];
+                renderizarListaOuvintesChat();
+            });
+        });
 
         listaOuvintesStatus.querySelectorAll('.ouvinte-status-item').forEach(el => {
             el.addEventListener('click', () => {
