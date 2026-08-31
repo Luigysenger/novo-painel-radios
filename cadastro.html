@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar Novo Cadastro - Sistema de Rádios</title>
+
     <style>
         * {
             box-sizing: border-box;
@@ -11,6 +12,7 @@
             padding: 0;
             font-family: Arial, sans-serif;
         }
+
         body {
             background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
             display: flex;
@@ -19,6 +21,7 @@
             min-height: 100vh;
             padding: 20px;
         }
+
         .register-card {
             background: rgba(30, 41, 59, 0.85);
             backdrop-filter: blur(10px);
@@ -29,6 +32,7 @@
             max-width: 450px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
+
         .register-card h2 {
             text-align: center;
             color: #f8fafc;
@@ -36,9 +40,11 @@
             font-size: 22px;
             letter-spacing: 0.5px;
         }
+
         .form-group {
             margin-bottom: 15px;
         }
+
         .form-group label {
             display: block;
             font-size: 11px;
@@ -47,6 +53,7 @@
             margin-bottom: 6px;
             letter-spacing: 1px;
         }
+
         .form-group input {
             width: 100%;
             padding: 11px;
@@ -58,9 +65,11 @@
             outline: none;
             transition: border-color 0.2s;
         }
+
         .form-group input:focus {
             border-color: #8b5cf6;
         }
+
         .btn-submit {
             width: 100%;
             background: #7c3aed;
@@ -74,9 +83,11 @@
             margin-top: 10px;
             transition: background 0.2s;
         }
+
         .btn-submit:hover {
             background: #6d28d9;
         }
+
         .btn-back {
             width: 100%;
             background: transparent;
@@ -93,135 +104,372 @@
             text-align: center;
             transition: all 0.2s;
         }
+
         .btn-back:hover {
             background: #334155;
             color: #f8fafc;
         }
     </style>
 </head>
+
 <body>
 
     <div class="register-card">
+
         <h2>Criar Novo Cadastro</h2>
-        
+
         <div class="form-group">
             <label>PRIMEIRO NOME OU APELIDO</label>
-            <input type="text" id="apelido" placeholder="Ex: JOAO" autocomplete="off" oninput="this.value = this.value.toUpperCase()">
+
+            <input
+                type="text"
+                id="apelido"
+                placeholder="Ex: JOAO"
+                autocomplete="off"
+                oninput="this.value = this.value.toUpperCase()"
+            >
         </div>
 
         <div class="form-group">
             <label>NOME COMPLETO</label>
-            <input type="text" id="nomeCompleto" placeholder="Digite seu nome completo" autocomplete="off">
+
+            <input
+                type="text"
+                id="nomeCompleto"
+                placeholder="Digite seu nome completo"
+                autocomplete="off"
+            >
         </div>
 
         <div class="form-group">
             <label>E-MAIL</label>
-            <input type="email" id="email" placeholder="seu@email.com" autocomplete="off">
+
+            <input
+                type="email"
+                id="email"
+                placeholder="seu@email.com"
+                autocomplete="off"
+            >
         </div>
 
         <div class="form-group">
             <label>DATA DE NASCIMENTO</label>
-            <input type="text" id="nascimento" placeholder="DD/MM/AAAA" maxlength="10" autocomplete="off" oninput="mascaraData(this)">
+
+            <input
+                type="text"
+                id="nascimento"
+                placeholder="DD/MM/AAAA"
+                maxlength="10"
+                autocomplete="off"
+                oninput="mascaraData(this)"
+            >
         </div>
 
         <div class="form-group">
             <label>SENHA</label>
-            <input type="password" id="senha" placeholder="Digite sua senha" autocomplete="new-password">
+
+            <input
+                type="password"
+                id="senha"
+                placeholder="Digite sua senha"
+                autocomplete="new-password"
+            >
         </div>
 
         <div class="form-group">
             <label>CONFIRME A SENHA</label>
-            <input type="password" id="confirmaSenha" placeholder="Digite a senha novamente" autocomplete="new-password">
+
+            <input
+                type="password"
+                id="confirmaSenha"
+                placeholder="Digite a senha novamente"
+                autocomplete="new-password"
+            >
         </div>
 
-        <button type="button" id="btnCadastrar" class="btn-submit">FINALIZAR CADASTRO</button>
-        <a href="index.html" class="btn-back">Voltar ao Login</a>
+        <button
+            type="button"
+            id="btnCadastrar"
+            class="btn-submit"
+        >
+            FINALIZAR CADASTRO
+        </button>
+
+        <a
+            href="index.html"
+            class="btn-back"
+        >
+            Voltar ao Login
+        </a>
+
     </div>
 
+
     <script>
+
         window.mascaraData = function(elemento) {
-            let v = elemento.value.replace(/\D/g, '');
-            if (v.length > 8) v = v.slice(0, 8);
-            
-            if (v.length > 4) {
-                elemento.value = v.slice(0, 2) + '/' + v.slice(2, 4) + '/' + v.slice(4, 8);
-            } else if (v.length > 2) {
-                elemento.value = v.slice(0, 2) + '/' + v.slice(2);
-            } else {
-                elemento.value = v;
+
+            let v =
+                elemento.value.replace(/\D/g, '');
+
+            if (v.length > 8) {
+                v = v.slice(0, 8);
             }
+
+            if (v.length > 4) {
+
+                elemento.value =
+                    v.slice(0, 2) +
+                    '/' +
+                    v.slice(2, 4) +
+                    '/' +
+                    v.slice(4, 8);
+
+            }
+            else if (v.length > 2) {
+
+                elemento.value =
+                    v.slice(0, 2) +
+                    '/' +
+                    v.slice(2);
+
+            }
+            else {
+
+                elemento.value = v;
+
+            }
+
         };
+
     </script>
+
 
     <script type="module">
-        import { db } from './firebase-config.js';
-        import { ref, set, serverTimestamp, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        const inputNascimento = document.getElementById('nascimento');
-        const inputApelido = document.getElementById('apelido');
-        const inputNomeCompleto = document.getElementById('nomeCompleto');
-        const inputEmail = document.getElementById('email');
-        const inputSenha = document.getElementById('senha');
-        const inputConfirmaSenha = document.getElementById('confirmaSenha');
-        const btnCadastrar = document.getElementById('btnCadastrar');
+        import { db }
+        from './firebase-config.js';
+
+        import {
+            ref,
+            set,
+            serverTimestamp,
+            get
+        }
+        from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+
+        const inputNascimento =
+            document.getElementById('nascimento');
+
+        const inputApelido =
+            document.getElementById('apelido');
+
+        const inputNomeCompleto =
+            document.getElementById('nomeCompleto');
+
+        const inputEmail =
+            document.getElementById('email');
+
+        const inputSenha =
+            document.getElementById('senha');
+
+        const inputConfirmaSenha =
+            document.getElementById('confirmaSenha');
+
+        const btnCadastrar =
+            document.getElementById('btnCadastrar');
+
 
         async function realizarCadastro(e) {
-            if (e) e.preventDefault();
-            
-            window.mascaraData(inputNascimento);
 
-            const apelido = inputApelido.value.trim();
-            const nomeCompleto = inputNomeCompleto.value.trim();
-            const email = inputEmail.value.trim();
-            const nascimento = inputNascimento.value.trim();
-            const senha = inputSenha.value.trim();
-            const confirmaSenha = inputConfirmaSenha.value.trim();
-
-            if (!apelido || !email || !senha) {
-                alert("Por favor, preencha pelo menos o Apelido, E-mail e Senha.");
-                return;
+            if (e) {
+                e.preventDefault();
             }
 
-            if (senha !== confirmaSenha) {
-                alert("As senhas não coincidem!");
+            window.mascaraData(
+                inputNascimento
+            );
+
+
+            const apelido =
+                inputApelido.value.trim();
+
+            const nomeCompleto =
+                inputNomeCompleto.value.trim();
+
+            const email =
+                inputEmail.value.trim();
+
+            const nascimento =
+                inputNascimento.value.trim();
+
+            const senha =
+                inputSenha.value.trim();
+
+            const confirmaSenha =
+                inputConfirmaSenha.value.trim();
+
+
+            if (
+                !apelido ||
+                !email ||
+                !senha
+            ) {
+
+                alert(
+                    "Por favor, preencha pelo menos o Apelido, E-mail e Senha."
+                );
+
                 return;
+
             }
+
+
+            if (
+                senha !==
+                confirmaSenha
+            ) {
+
+                alert(
+                    "As senhas não coincidem!"
+                );
+
+                return;
+
+            }
+
 
             try {
-                const emailKey = email.toLowerCase().replace(/[.#$\[\]]/g, "_");
-                const usuarioRef = ref(db, 'usuarios_cadastrados/' + emailKey);
 
-                const snapshot = await get(usuarioRef);
-                if (snapshot.exists()) {
-                    alert("Este e-mail já está cadastrado! Tente fazer login ou use outro e-mail.");
+                const emailKey =
+                    email
+                        .toLowerCase()
+                        .replace(
+                            /[.#$\[\]]/g,
+                            "_"
+                        );
+
+
+                const usuarioRef =
+                    ref(
+                        db,
+                        'usuarios_cadastrados/' +
+                        emailKey
+                    );
+
+
+                const snapshot =
+                    await get(
+                        usuarioRef
+                    );
+
+
+                if (
+                    snapshot.exists()
+                ) {
+
+                    alert(
+                        "Este e-mail já está cadastrado! Tente fazer login ou use outro e-mail."
+                    );
+
                     return;
+
                 }
 
-                // Salva os dados no Firebase salvando a senha mascarada com pontos
-                await set(usuarioRef, {
-                    apelido: apelido,
-                    nomeCompleto: nomeCompleto,
-                    email: email,
-                    nascimento: nascimento,
-                    senha: senha.replace(/./g, '•'),
-                    timestamp: serverTimestamp()
-                });
 
-                alert("Cadastro realizado com sucesso! Você já pode fazer login.");
-                window.location.href = "index.html";
-            } catch (erro) {
-                console.error("Erro detalhado ao cadastrar:", erro);
-                alert("Erro ao realizar cadastro.");
+                /*
+                ====================================================
+                CORREÇÃO DO LOGIN
+                ====================================================
+
+                Antes a senha era salva desta forma:
+
+                senha: senha.replace(/./g, '•')
+
+                Isso transformava a senha em bolinhas e fazia
+                o primeiro login sempre dar senha incorreta.
+
+                Agora ela é salva no mesmo formato que o sistema
+                de login e recuperação de senha já utilizam.
+                ====================================================
+                */
+
+                await set(
+                    usuarioRef,
+                    {
+
+                        apelido:
+                            apelido,
+
+                        nomeCompleto:
+                            nomeCompleto,
+
+                        email:
+                            email,
+
+                        nascimento:
+                            nascimento,
+
+                        senha:
+                            senha,
+
+                        timestamp:
+                            serverTimestamp()
+
+                    }
+                );
+
+
+                alert(
+                    "Cadastro realizado com sucesso! Você já pode fazer login."
+                );
+
+
+                window.location.href =
+                    "index.html";
+
             }
+            catch (erro) {
+
+                console.error(
+                    "Erro detalhado ao cadastrar:",
+                    erro
+                );
+
+
+                alert(
+                    "Erro ao realizar cadastro."
+                );
+
+            }
+
         }
 
-        btnCadastrar.addEventListener('click', realizarCadastro);
-        
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                realizarCadastro(e);
+
+        btnCadastrar.addEventListener(
+            'click',
+            realizarCadastro
+        );
+
+
+        document.addEventListener(
+            'keydown',
+            (e) => {
+
+                if (
+                    e.key ===
+                    'Enter'
+                ) {
+
+                    realizarCadastro(e);
+
+                }
+
             }
-        });
+        );
+
     </script>
+
 </body>
 </html>
