@@ -39,7 +39,7 @@
         }
 
         .app {
-            width: min(1180px, 100%);
+            width: min(1500px, 100%);
             margin: 0 auto;
         }
 
@@ -192,8 +192,9 @@
 
         .game {
             display: grid;
-            grid-template-columns: minmax(0, 1fr) 300px;
+            grid-template-columns: minmax(0, 1fr) 320px;
             gap: 14px;
+            align-items: start;
         }
 
         .map-card {
@@ -223,7 +224,8 @@
 
         .mapa {
             position: relative;
-            height: 470px;
+            height: clamp(560px, 72vh, 860px);
+            min-height: 560px;
             border-radius: 18px;
             overflow: hidden;
             border: 1px solid rgba(255,255,255,.1);
@@ -295,14 +297,102 @@
         .ride-person {
             display: grid;
             place-items: center;
-            width: 37px;
-            height: 37px;
+            width: 44px;
+            height: 44px;
             margin: 0 auto 4px;
             border-radius: 50%;
             background: linear-gradient(135deg, #ef4444, #f97316);
             border: 2px solid #fff;
-            font-size: 20px;
+            font-size: 21px;
             animation: pulse 1.15s infinite;
+            position: relative;
+        }
+
+        .ride-luggage {
+            position: absolute;
+            right: -14px;
+            bottom: -3px;
+            font-size: 18px;
+            filter: drop-shadow(0 3px 3px rgba(0,0,0,.4));
+        }
+
+        .destino-pin {
+            position: absolute;
+            z-index: 5;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .destino-bubble {
+            min-width: 112px;
+            padding: 8px 9px;
+            border-radius: 12px;
+            background: rgba(15,23,42,.96);
+            border: 1px solid rgba(56,189,248,.5);
+            box-shadow: 0 10px 24px rgba(0,0,0,.3);
+            font-size: 10px;
+            text-align: center;
+        }
+
+        .destino-icon {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 4px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #0ea5e9, #2563eb);
+            border: 2px solid white;
+            font-size: 20px;
+        }
+
+        .embarque-cena {
+            position: absolute;
+            z-index: 12;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            display: none;
+        }
+
+        .embarque-cena.show {
+            display: block;
+        }
+
+        .embarque-passageiros {
+            position: relative;
+            width: 92px;
+            height: 68px;
+        }
+
+        .embarque-pessoa {
+            position: absolute;
+            bottom: 7px;
+            font-size: 26px;
+            animation: entrarNoCarro 2.2s forwards ease-in-out;
+        }
+
+        .embarque-pessoa.p1 { left: 4px; }
+        .embarque-pessoa.p2 { left: 28px; animation-delay: .28s; }
+
+        .embarque-mala {
+            position: absolute;
+            bottom: 0;
+            left: 58px;
+            font-size: 23px;
+            animation: malaNoPortaMalas 2.2s forwards ease-in-out;
+            animation-delay: .45s;
+        }
+
+        @keyframes entrarNoCarro {
+            0% { transform: translate(0,0) scale(1); opacity: 1; }
+            70% { transform: translate(36px,-8px) scale(.72); opacity: 1; }
+            100% { transform: translate(46px,-9px) scale(.25); opacity: 0; }
+        }
+
+        @keyframes malaNoPortaMalas {
+            0% { transform: translate(0,0) rotate(0deg) scale(1); opacity: 1; }
+            70% { transform: translate(-16px,-18px) rotate(-8deg) scale(.7); opacity: 1; }
+            100% { transform: translate(-20px,-21px) rotate(-8deg) scale(.2); opacity: 0; }
         }
 
         .ride-pin.accepted .ride-person {
@@ -372,40 +462,70 @@
             position: absolute;
             left: 50%;
             top: 20px;
-            width: 44px;
-            height: 25px;
+            width: 50px;
+            height: 28px;
             transform: translateX(-50%);
-            border-radius: 9px 13px 8px 8px;
-            background: var(--car-color);
-            border: 2px solid rgba(255,255,255,.92);
+            border-radius: 7px 14px 7px 7px;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,.30), transparent 35%),
+                var(--car-color);
+            border: 2px solid rgba(255,255,255,.94);
             box-shadow:
-                0 5px 12px rgba(0,0,0,.35),
+                0 7px 14px rgba(0,0,0,.38),
                 0 0 18px color-mix(in srgb, var(--car-color) 48%, transparent);
         }
 
         .carro-visual::before {
             content: "";
             position: absolute;
-            left: 8px;
-            top: -9px;
-            width: 25px;
-            height: 12px;
-            border-radius: 9px 9px 3px 3px;
+            left: 10px;
+            top: -11px;
+            width: 27px;
+            height: 14px;
+            border-radius: 10px 10px 3px 3px;
             background: var(--car-color);
-            border: 2px solid rgba(255,255,255,.9);
+            border: 2px solid rgba(255,255,255,.92);
             border-bottom: 0;
         }
 
         .carro-visual::after {
             content: "";
             position: absolute;
-            left: 13px;
-            top: -5px;
-            width: 15px;
-            height: 7px;
+            left: 15px;
+            top: -7px;
+            width: 16px;
+            height: 8px;
             border-radius: 4px 4px 2px 2px;
-            background: #bae6fd;
+            background: linear-gradient(135deg,#dbeafe,#7dd3fc);
             border: 1px solid rgba(2,6,23,.35);
+        }
+
+        .carro-porta-malas {
+            position: absolute;
+            left: -7px;
+            top: 1px;
+            width: 13px;
+            height: 20px;
+            border-radius: 5px 2px 2px 5px;
+            background: var(--car-color);
+            border: 2px solid rgba(255,255,255,.9);
+            transform-origin: right center;
+            transform: rotateY(0deg);
+            transition: transform .35s ease;
+        }
+
+        .carro-jogador.porta-malas-aberto .carro-porta-malas {
+            transform: translateX(-7px) rotate(-32deg);
+        }
+
+        .carro-parachoque {
+            position: absolute;
+            right: -5px;
+            top: 18px;
+            width: 8px;
+            height: 4px;
+            border-radius: 2px;
+            background: #cbd5e1;
         }
 
         .carro-roda {
@@ -418,8 +538,8 @@
             border: 2px solid #64748b;
         }
 
-        .carro-roda.esq { left: 3px; }
-        .carro-roda.dir { right: 3px; }
+        .carro-roda.esq { left: 5px; }
+        .carro-roda.dir { right: 5px; }
 
         .carro-farol {
             position: absolute;
@@ -571,27 +691,27 @@
 
         .bloqueado {
             position: absolute;
-            inset: 0;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 20;
-            background: rgba(2,6,23,.78);
-            backdrop-filter: blur(2px);
             display: none;
-            align-items: center;
-            justify-content: center;
             text-align: center;
-            padding: 20px;
+            pointer-events: none;
         }
 
         .bloqueado.show {
-            display: flex;
+            display: block;
         }
 
         .bloqueado-box {
-            max-width: 360px;
-            padding: 18px;
-            border-radius: 16px;
-            background: #0f172a;
-            border: 1px solid rgba(255,255,255,.1);
+            max-width: 390px;
+            padding: 10px 14px;
+            border-radius: 14px;
+            background: rgba(15,23,42,.92);
+            border: 1px solid rgba(255,255,255,.14);
+            box-shadow: 0 10px 26px rgba(0,0,0,.32);
+            backdrop-filter: blur(3px);
         }
 
         .bloqueado-box h3 {
@@ -616,7 +736,8 @@
             }
 
             .mapa {
-                height: 430px;
+                height: 68vh;
+                min-height: 520px;
             }
         }
 
@@ -654,7 +775,8 @@
             }
 
             .mapa {
-                height: 390px;
+                height: 66vh;
+                min-height: 500px;
             }
 
             .ride-bubble {
@@ -736,7 +858,7 @@
                 </div>
 
                 <div class="mapa" id="mapa">
-                    <div class="map-legenda">Toque em um passageiro. Seu carrinho irá buscá-lo pelas ruas.</div>
+                    <div class="map-legenda">Toque em um passageiro. Acompanhe o carro buscar, embarcar e levar até o destino.</div>
 
                     <div class="bloqueado" id="bloqueioMapa">
                         <div class="bloqueado-box">
@@ -808,6 +930,9 @@
             LONGE: 10000,
             MUITO_LONGE: 12000
         };
+
+        // Embarque visual rápido; depois começa a ida até o destino.
+        const TEMPO_EMBARQUE_MS = 3000;
 
         // Cores por evolução do ouvinte:
         // começa amarelo, depois verde, roxo, vermelho e azul.
@@ -1141,9 +1266,11 @@
             el.innerHTML = `
                 <div class="carro-nome">${escapar(jogador.nome || 'Ouvinte')}</div>
                 <div class="carro-visual">
+                    <span class="carro-porta-malas"></span>
                     <span class="carro-roda esq"></span>
                     <span class="carro-roda dir"></span>
                     <span class="carro-farol"></span>
+                    <span class="carro-parachoque"></span>
                 </div>
             `;
 
@@ -1254,12 +1381,124 @@
                             y: Number(movimento.paraY)
                         };
 
-                        finalizarMovimentoDoMeuCarrinho(movimento).catch(console.warn);
+                        if (movimento.fase === 'buscar_passageiro') {
+                            processarChegadaAoPassageiro(movimento).catch(console.warn);
+                        } else if (movimento.fase === 'levar_destino') {
+                            processarChegadaAoDestino(movimento).catch(console.warn);
+                        } else {
+                            finalizarMovimentoDoMeuCarrinho(movimento).catch(console.warn);
+                        }
                     }
                 }
             };
 
             executar();
+        }
+
+        async function processarChegadaAoPassageiro(movimento) {
+            if (!corridaAtualCache) return;
+
+            const corridaId = corridaAtualCache.id;
+            mostrarCenaEmbarque(
+                Number(corridaAtualCache.passageiroX),
+                Number(corridaAtualCache.passageiroY)
+            );
+
+            corridaTimer.textContent =
+                '🧳 Embarcando passageiros e colocando as malas no porta-malas...';
+
+            const distanciaEntrega = distanciaEntre(
+                {
+                    x: Number(corridaAtualCache.passageiroX),
+                    y: Number(corridaAtualCache.passageiroY)
+                },
+                {
+                    x: Number(corridaAtualCache.destinoX),
+                    y: Number(corridaAtualCache.destinoY)
+                }
+            );
+
+            const tempoEntregaMs = tempoBuscaPorDistancia(distanciaEntrega);
+            const minutosEntrega = minutosSimuladosPorTempo(tempoEntregaMs);
+
+            await update(
+                ref(db, `ludigins_usuarios/${usuarioId}/corridaAtual`),
+                {
+                    fase: 'embarque',
+                    tempoEntregaMs,
+                    minutosEntrega
+                }
+            );
+
+            setTimeout(async () => {
+                const inicio = {
+                    x: Number(corridaAtualCache?.passageiroX ?? posicaoJogadorAtual.x),
+                    y: Number(corridaAtualCache?.passageiroY ?? posicaoJogadorAtual.y)
+                };
+
+                const movimentoEntrega = {
+                    deX: inicio.x,
+                    deY: inicio.y,
+                    paraX: Number(corridaAtualCache?.destinoX ?? inicio.x),
+                    paraY: Number(corridaAtualCache?.destinoY ?? inicio.y),
+                    inicioEm: Date.now(),
+                    duracaoMs: tempoEntregaMs,
+                    corridaId,
+                    fase: 'levar_destino'
+                };
+
+                await update(
+                    ref(db, `ludigins_usuarios/${usuarioId}/corridaAtual`),
+                    {
+                        fase: 'levando_destino',
+                        movimentoEntregaInicioEm: movimentoEntrega.inicioEm,
+                        tempoEntregaMs,
+                        minutosEntrega
+                    }
+                );
+
+                mostrarDestinoNoMapa({
+                    ...(corridaAtualCache || {}),
+                    minutosEntrega
+                });
+
+                corridaTimer.textContent =
+                    `🏁 Levando passageiros para ${corridaAtualCache?.destino || 'o destino'} • ${minutosEntrega} min simulados`;
+
+                await update(
+                    ref(db, `ludigins_jogo/jogadores/${usuarioId}`),
+                    {
+                        movimento: movimentoEntrega,
+                        status: 'levando_passageiros',
+                        atualizadoEm: Date.now()
+                    }
+                );
+            }, TEMPO_EMBARQUE_MS);
+        }
+
+        async function processarChegadaAoDestino(movimento) {
+            const jogadorRef = ref(db, `ludigins_jogo/jogadores/${usuarioId}`);
+
+            await update(jogadorRef, {
+                x: Number(movimento.paraX),
+                y: Number(movimento.paraY),
+                movimento: null,
+                status: 'aguardando_finalizacao',
+                atualizadoEm: Date.now()
+            });
+
+            await update(
+                ref(db, `ludigins_usuarios/${usuarioId}/corridaAtual`),
+                {
+                    fase: 'chegou_destino',
+                    chegouDestinoEm: Date.now()
+                }
+            );
+
+            corridaTimer.textContent =
+                `✅ Passageiros entregues em ${corridaAtualCache?.destino || 'seu destino'}. Você já pode finalizar!`;
+
+            btnFinalizar.disabled = false;
         }
 
         async function finalizarMovimentoDoMeuCarrinho(movimento) {
@@ -1399,6 +1638,26 @@
             return Math.sqrt(dx * dx + dy * dy);
         }
 
+        function criarPontoDestino(origemX, origemY) {
+            let x = origemX;
+            let y = origemY;
+            let tentativas = 0;
+
+            do {
+                x = aleatorio(10, 90);
+                y = aleatorio(12, 88);
+                tentativas++;
+            } while (
+                distanciaEntre(
+                    { x, y },
+                    { x: origemX, y: origemY }
+                ) < 26 &&
+                tentativas < 40
+            );
+
+            return { x, y };
+        }
+
         function tempoBuscaPorDistancia(distancia) {
             if (distancia <= 22) return TEMPOS_BUSCA.PERTO;
             if (distancia <= 36) return TEMPOS_BUSCA.MEDIO;
@@ -1411,6 +1670,76 @@
             if (tempoMs <= 8000) return 'passageiro um pouco afastado';
             if (tempoMs <= 10000) return 'passageiro afastado';
             return 'passageiro bem afastado';
+        }
+
+        function minutosSimuladosPorTempo(tempoMs) {
+            return Math.max(5, Math.round(tempoMs / 1000));
+        }
+
+        function removerCenaEmbarque() {
+            mapa.querySelectorAll('.embarque-cena').forEach(el => el.remove());
+        }
+
+        function mostrarCenaEmbarque(x, y) {
+            removerCenaEmbarque();
+
+            const cena = document.createElement('div');
+            cena.className = 'embarque-cena show';
+            cena.style.left = `${Number(x)}%`;
+            cena.style.top = `${Number(y)}%`;
+
+            cena.innerHTML = `
+                <div class="embarque-passageiros">
+                    <span class="embarque-pessoa p1">🧍</span>
+                    <span class="embarque-pessoa p2">🧍‍♀️</span>
+                    <span class="embarque-mala">🧳</span>
+                </div>
+            `;
+
+            mapa.appendChild(cena);
+
+            const meuCarro = mapa.querySelector(
+                `.carro-jogador[data-jogador-id="${CSS.escape(usuarioId)}"]`
+            );
+
+            if (meuCarro) {
+                meuCarro.classList.add('porta-malas-aberto');
+            }
+
+            setTimeout(() => {
+                if (meuCarro) {
+                    meuCarro.classList.remove('porta-malas-aberto');
+                }
+                cena.remove();
+            }, TEMPO_EMBARQUE_MS);
+        }
+
+        function removerDestinoPin() {
+            mapa.querySelectorAll('.destino-pin').forEach(el => el.remove());
+        }
+
+        function mostrarDestinoNoMapa(corrida) {
+            removerDestinoPin();
+
+            if (
+                corrida?.destinoX === undefined ||
+                corrida?.destinoY === undefined
+            ) return;
+
+            const el = document.createElement('div');
+            el.className = 'destino-pin';
+            el.style.left = `${Number(corrida.destinoX)}%`;
+            el.style.top = `${Number(corrida.destinoY)}%`;
+
+            el.innerHTML = `
+                <div class="destino-bubble">
+                    <div class="destino-icon">🏁</div>
+                    <strong>${escapar(corrida.destino || 'Destino')}</strong>
+                    <div>${Number(corrida.minutosEntrega || 0)} min simulados</div>
+                </div>
+            `;
+
+            mapa.appendChild(el);
         }
 
         async function iniciarMovimentoAtePassageiro(corridaAceita, tempoBuscaMs) {
@@ -1428,7 +1757,8 @@
                 paraY: Number(corridaAceita.y ?? 50),
                 inicioEm: Date.now(),
                 duracaoMs: tempoBuscaMs,
-                corridaId: corridaAceita.id || null
+                corridaId: corridaAceita.id || null,
+                fase: 'buscar_passageiro'
             };
 
             await runTransaction(jogadorRef, atual => {
@@ -1474,12 +1804,16 @@
                 tentativas < 30
             );
 
+            const destinoPonto = criarPontoDestino(x, y);
+
             return {
                 origem: rota[0],
                 destino: rota[1],
                 valor: aleatorio(MIN_RECOMPENSA, MAX_RECOMPENSA),
                 x,
                 y,
+                destinoX: destinoPonto.x,
+                destinoY: destinoPonto.y,
                 status: 'disponivel',
                 criadoEm: Date.now(),
                 data: dataHoje(),
@@ -1623,13 +1957,24 @@
                     } else {
                         pin.innerHTML = `
                             <div class="ride-bubble">
-                                <div class="ride-person">🧍</div>
+                                <div class="ride-person">
+                                    🧍
+                                    <span class="ride-luggage">🧳</span>
+                                </div>
                                 <span>${escapar(corrida.origem || 'Origem')}</span>
                                 <strong>+${Number(corrida.valor || 0)} 🪙</strong>
                             </div>
                         `;
 
                         pin.addEventListener('click', () => {
+                            if (perfilAtual?.corridaAtual) {
+                                mostrarAviso(
+                                    'Finalize a corrida em andamento antes de aceitar outra.',
+                                    'erro'
+                                );
+                                return;
+                            }
+
                             aceitarCorrida(corrida.id);
                         });
                     }
@@ -1722,6 +2067,9 @@
                             data: dataHoje(),
                             passageiroX: Number(corridaAceita.x ?? 50),
                             passageiroY: Number(corridaAceita.y ?? 50),
+                            destinoX: Number(corridaAceita.destinoX ?? 50),
+                            destinoY: Number(corridaAceita.destinoY ?? 50),
+                            fase: 'indo_buscar',
                             tempoBuscaMs,
                             movimentoInicioEm: Number(movimento.inicioEm),
                             carroDeX: Number(movimento.deX),
@@ -1796,6 +2144,15 @@
             corridaOrigem.textContent = corrida.origem || '-';
             corridaDestino.textContent = corrida.destino || '-';
 
+            if (
+                corrida.fase === 'levando_destino' ||
+                corrida.fase === 'chegou_destino'
+            ) {
+                mostrarDestinoNoMapa(corrida);
+            } else {
+                removerDestinoPin();
+            }
+
             iniciarContagemCorrida(corrida);
         }
 
@@ -1804,6 +2161,50 @@
 
             const atualizar = () => {
                 if (!corridaAtualCache) return;
+
+                const fase = corridaAtualCache.fase || 'indo_buscar';
+
+                if (fase === 'chegou_destino') {
+                    corridaTimer.textContent =
+                        `✅ Passageiros entregues em ${corridaAtualCache.destino || 'seu destino'}. Você já pode finalizar!`;
+                    btnFinalizar.disabled = false;
+
+                    if (timerCorrida) {
+                        clearInterval(timerCorrida);
+                        timerCorrida = null;
+                    }
+                    return;
+                }
+
+                if (fase === 'embarque') {
+                    corridaTimer.textContent =
+                        '🧳 Embarcando passageiros e colocando as malas no porta-malas...';
+                    btnFinalizar.disabled = true;
+                    return;
+                }
+
+                if (fase === 'levando_destino') {
+                    const inicio = Number(
+                        corridaAtualCache.movimentoEntregaInicioEm ||
+                        Date.now()
+                    );
+
+                    const duracao = Number(
+                        corridaAtualCache.tempoEntregaMs ||
+                        TEMPOS_BUSCA.MEDIO
+                    );
+
+                    const restante = Math.max(
+                        0,
+                        duracao - (Date.now() - inicio)
+                    );
+
+                    corridaTimer.textContent =
+                        `🏁 Indo para ${corridaAtualCache.destino || 'o destino'} • ${Number(corridaAtualCache.minutosEntrega || minutosSimuladosPorTempo(duracao))} min simulados • ${Math.ceil(restante / 1000)}s`;
+
+                    btnFinalizar.disabled = true;
+                    return;
+                }
 
                 const inicio = Number(
                     corridaAtualCache.movimentoInicioEm ||
@@ -1821,20 +2222,9 @@
                     duracao - (Date.now() - inicio)
                 );
 
-                if (restante <= 0) {
-                    corridaTimer.textContent =
-                        '🚕 Passageiro alcançado! Você já pode finalizar a corrida.';
-                    btnFinalizar.disabled = false;
-
-                    if (timerCorrida) {
-                        clearInterval(timerCorrida);
-                        timerCorrida = null;
-                    }
-                } else {
-                    corridaTimer.textContent =
-                        `🚕 Indo buscar o passageiro... ${Math.ceil(restante / 1000)}s`;
-                    btnFinalizar.disabled = true;
-                }
+                corridaTimer.textContent =
+                    `🚕 Indo buscar o passageiro... ${Math.ceil(restante / 1000)}s`;
+                btnFinalizar.disabled = true;
             };
 
             atualizar();
@@ -1910,6 +2300,9 @@
                     mostrarAviso('A corrida já foi contabilizada ou não está mais ativa.', 'erro');
                     return;
                 }
+
+                removerDestinoPin();
+                removerCenaEmbarque();
 
                 await update(
                     ref(db, `ludigins_jogo/jogadores/${usuarioId}`),
@@ -2012,7 +2405,7 @@
                 bloqueioMapa.classList.add('show');
                 bloqueioTitulo.textContent = '🚕 Corrida em andamento';
                 bloqueioTexto.textContent =
-                    'Finalize a corrida atual antes de aceitar outra.';
+                    'Acompanhe seu carrinho no mapa. Novas corridas ficam bloqueadas até a entrega.';
                 return;
             }
 
