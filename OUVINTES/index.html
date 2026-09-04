@@ -87,6 +87,24 @@
         }
         .btn-retro-mode:hover { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(245, 158, 11, 0.6); }
 
+        .btn-ludigins {
+            background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 12px;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .btn-ludigins:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(124, 58, 237, 0.6);
+        }
+
         .btn-sair {
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             color: white;
@@ -1265,7 +1283,8 @@
                 flex-wrap: wrap;
                 gap: 8px;
             }
-            .btn-retro-mode {
+            .btn-retro-mode,
+            .btn-ludigins {
                 flex: 1 1 100%;
                 min-height: 40px;
             }
@@ -1584,6 +1603,7 @@
                 <p id="nomeOuvinteDisplay">Olá, Ouvinte</p>
             </div>
             <div class="listener-widgets">
+                <button class="btn-ludigins" id="btnAbrirLudigins">🚕 JOGAR LUDIGINS</button>
                 <button class="btn-retro-mode" id="btnAbrirRetro">📻 Mudar para o Painel Rádio Retrô</button>
                 <span id="relogioDigital">00:00:00</span>
                 <span id="climaInfo">Curitiba: --°C</span>
@@ -3053,6 +3073,13 @@
         // SISTEMA DO MODO RÁDIO RETRÔ INTERATIVO
         // ==========================================
         const retroContainer = document.getElementById('retroRadioContainer');
+        const btnAbrirLudigins = document.getElementById('btnAbrirLudigins');
+        if (btnAbrirLudigins) {
+            btnAbrirLudigins.addEventListener('click', () => {
+                window.location.href = './ouvinte_ludgins.html';
+            });
+        }
+
         const btnAbrirRetro = document.getElementById('btnAbrirRetro');
         const btnSairRetro = document.getElementById('btnSairRetro');
         const retroTitleDisplay = document.getElementById('retroTitleDisplay');
