@@ -1023,6 +1023,43 @@
             background: #6d28d9;
         }
 
+        /* CONTROLE DE VOLUME DO PLAYER ADM — 0 A 80 */
+        .admin-volume-control {
+            min-width: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .admin-volume-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.06);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .admin-volume-range {
+            width: 130px;
+            cursor: pointer;
+            accent-color: #7c3aed;
+        }
+
+        .admin-volume-value {
+            min-width: 28px;
+            text-align: right;
+            font-size: 11px;
+            font-weight: 800;
+            color: #c4b5fd;
+        }
+
         .hidden {
             display: none !important;
         }
@@ -1059,6 +1096,26 @@
 
             header {
                 padding: 15px;
+            }
+
+            .admin-volume-control {
+                min-width: 118px;
+                gap: 5px;
+            }
+
+            .admin-volume-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+
+            .admin-volume-range {
+                width: 62px;
+            }
+
+            .admin-volume-value {
+                min-width: 22px;
+                font-size: 9px;
             }
         }
     </style>
@@ -1813,6 +1870,21 @@
 
     </div>
 
+    <div class="admin-volume-control" title="Volume do player">
+        <div class="admin-volume-icon" id="adminVolumeIcon">🔊</div>
+        <input
+            type="range"
+            id="adminVolumeRange"
+            class="admin-volume-range"
+            min="0"
+            max="80"
+            step="1"
+            value="20"
+            aria-label="Volume de 0 a 80"
+        >
+        <span class="admin-volume-value" id="adminVolumeValue">20</span>
+    </div>
+
 </div>
 
 
@@ -1887,6 +1959,8 @@
             return;
         }
 
+        carregarVolumeAdminDoFirebase();
+
         carregarRadios();
 
         carregarClientes();
@@ -1908,9 +1982,12 @@
 
     document
         .getElementById('btnSair')
-        .addEventListener('click', () => {
+        .addEventListener('click', async () => {
 
             audioElement.pause();
+
+            // Garante o último volume escolhido antes de sair.
+            await salvarVolumeAdminNoFirebase();
 
             localStorage.removeItem('adminLogado');
 
@@ -2324,6 +2401,152 @@
 
     const btnPlayPause =
         document.getElementById('btnPlayPause');
+
+
+    // Volume do player do ADM: 0 a 80.
+    // Primeiro uso = 20. Depois, o valor fica salvo no Firebase.
+    const adminVolumeRange =
+        document.getElementById('adminVolumeRange');
+
+    const adminVolumeValue =
+        document.getElementById('adminVolumeValue');
+
+    const adminVolumeIcon =
+        document.getElementById('adminVolumeIcon');
+
+    let volumeAdminAtual = 20;
+    let timerSalvarVolumeAdmin = null;
+
+    function normalizarVolumeAdmin(valor) {
+        const numero = Number(valor);
+
+        if (!Number.isFinite(numero)) {
+            return 20;
+        }
+
+        return Math.max(
+            0,
+            Math.min(
+                80,
+                Math.round(numero)
+            )
+        );
+    }
+
+    function aplicarVolumeAdmin(valor) {
+        volumeAdminAtual =
+            normalizarVolumeAdmin(valor);
+
+        audioElement.volume =
+            volumeAdminAtual / 100;
+
+        if (adminVolumeRange) {
+            adminVolumeRange.value =
+                String(volumeAdminAtual);
+        }
+
+        if (adminVolumeValue) {
+            adminVolumeValue.textContent =
+                String(volumeAdminAtual);
+        }
+
+        if (adminVolumeIcon) {
+            adminVolumeIcon.textContent =
+                volumeAdminAtual === 0
+                    ? '🔇'
+                    : (
+                        volumeAdminAtual <= 25
+                            ? '🔈'
+                            : '🔊'
+                    );
+        }
+    }
+
+    async function carregarVolumeAdminDoFirebase() {
+        try {
+            const volumeRef =
+                ref(
+                    db,
+                    'admin_preferencias/volumePlayer'
+                );
+
+            const snapshot =
+                await get(volumeRef);
+
+            if (snapshot.exists()) {
+                volumeAdminAtual =
+                    normalizarVolumeAdmin(
+                        snapshot.val()
+                    );
+            } else {
+                volumeAdminAtual = 20;
+            }
+        }
+        catch (erro) {
+            console.error(
+                "Erro ao carregar volume do ADM:",
+                erro
+            );
+
+            volumeAdminAtual = 20;
+        }
+
+        aplicarVolumeAdmin(
+            volumeAdminAtual
+        );
+    }
+
+    async function salvarVolumeAdminNoFirebase() {
+        try {
+            await set(
+                ref(
+                    db,
+                    'admin_preferencias/volumePlayer'
+                ),
+                volumeAdminAtual
+            );
+        }
+        catch (erro) {
+            console.error(
+                "Erro ao salvar volume do ADM:",
+                erro
+            );
+        }
+    }
+
+    if (adminVolumeRange) {
+        adminVolumeRange.addEventListener(
+            'input',
+            () => {
+                aplicarVolumeAdmin(
+                    adminVolumeRange.value
+                );
+
+                clearTimeout(
+                    timerSalvarVolumeAdmin
+                );
+
+                timerSalvarVolumeAdmin =
+                    setTimeout(
+                        salvarVolumeAdminNoFirebase,
+                        350
+                    );
+            }
+        );
+
+        adminVolumeRange.addEventListener(
+            'change',
+            () => {
+                clearTimeout(
+                    timerSalvarVolumeAdmin
+                );
+
+                salvarVolumeAdminNoFirebase();
+            }
+        );
+    }
+
+    aplicarVolumeAdmin(20);
 
 
     let corSelecionada = "#86efac";
@@ -2745,6 +2968,12 @@
 
         btnPlayPause.innerText =
             "⏸️";
+
+        // A rádio inicia no último volume salvo do ADM.
+        // Se nunca houve valor salvo, começa em 20.
+        aplicarVolumeAdmin(
+            volumeAdminAtual
+        );
 
         audioElement.pause();
         audioElement.currentTime = 0;
