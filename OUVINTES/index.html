@@ -682,6 +682,43 @@
             min-width: 280px;
         }
 
+        /* CONTROLE DE VOLUME DO PLAYER PRINCIPAL — 0 A 80 */
+        .player-volume-control {
+            min-width: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .player-volume-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.06);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .player-volume-range {
+            width: 130px;
+            cursor: pointer;
+            accent-color: #8b5cf6;
+        }
+
+        .player-volume-value {
+            min-width: 28px;
+            text-align: right;
+            font-size: 11px;
+            font-weight: 800;
+            color: #c4b5fd;
+        }
+
         /* ==========================================
            MODO RÁDIO RETRÔ — RESPONSIVO / TELA CHEIA
            ========================================== */
@@ -1157,6 +1194,22 @@
             .player-spacer {
                 display: none;
             }
+            .player-volume-control {
+                min-width: 118px;
+                gap: 5px;
+            }
+            .player-volume-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+            .player-volume-range {
+                width: 62px;
+            }
+            .player-volume-value {
+                min-width: 22px;
+                font-size: 9px;
+            }
             .customizer-content, .bible-modal-content {
                 width: calc(100% - 24px);
                 max-height: 88vh;
@@ -1400,7 +1453,20 @@
             <button class="control-btn" id="btnProximo" title="Próxima Rádio">⏭️</button>
         </div>
 
-        <div class="player-spacer"></div>
+        <div class="player-volume-control" title="Volume do player">
+            <div class="player-volume-icon" id="playerVolumeIcon">🔊</div>
+            <input
+                type="range"
+                id="playerVolumeRange"
+                class="player-volume-range"
+                min="0"
+                max="80"
+                step="1"
+                value="5"
+                aria-label="Volume de 0 a 80"
+            >
+            <span class="player-volume-value" id="playerVolumeValue">5</span>
+        </div>
     </div>
 
     <audio id="audioStreaming" preload="none"></audio>
@@ -1634,6 +1700,12 @@
 
         document.getElementById('btnSair').addEventListener('click', async () => {
             audioElement.pause();
+
+            // Garante a persistência do último volume escolhido antes de sair.
+            try {
+                await salvarVolumePlayerNoFirebase();
+            } catch (e) {}
+
             try {
                 const id = await resolverIdentidadeChatOuvinte();
                 if (id) {
@@ -1664,6 +1736,59 @@
         const sidebarRadioList = document.getElementById('sidebarRadioList');
         const centerRadiosGrid = document.getElementById('centerRadiosGrid');
 
+        // Volume do player principal: 0 a 80.
+        // Primeiro uso = 5. Depois disso, o valor é salvo no Firebase por ouvinte.
+        const playerVolumeRange = document.getElementById('playerVolumeRange');
+        const playerVolumeValue = document.getElementById('playerVolumeValue');
+        const playerVolumeIcon = document.getElementById('playerVolumeIcon');
+        let volumePlayerAtual = 5;
+        let timerSalvarVolume = null;
+
+        function normalizarVolumePlayer(valor) {
+            const numero = Number(valor);
+            if (!Number.isFinite(numero)) return 5;
+            return Math.max(0, Math.min(80, Math.round(numero)));
+        }
+
+        function aplicarVolumePlayer(valor) {
+            volumePlayerAtual = normalizarVolumePlayer(valor);
+            audioElement.volume = volumePlayerAtual / 100;
+
+            if (playerVolumeRange) playerVolumeRange.value = String(volumePlayerAtual);
+            if (playerVolumeValue) playerVolumeValue.textContent = String(volumePlayerAtual);
+
+            if (playerVolumeIcon) {
+                playerVolumeIcon.textContent = volumePlayerAtual === 0 ? '🔇' : (volumePlayerAtual <= 25 ? '🔈' : '🔊');
+            }
+        }
+
+        async function salvarVolumePlayerNoFirebase() {
+            try {
+                const prefRef = ref(db, `ouvintes_preferencias/${chaveFirebaseUser}`);
+                await update(prefRef, { volumePlayer: volumePlayerAtual });
+            } catch (err) {
+                console.error("Erro ao salvar volume do ouvinte:", err);
+            }
+        }
+
+        if (playerVolumeRange) {
+            playerVolumeRange.addEventListener('input', () => {
+                aplicarVolumePlayer(playerVolumeRange.value);
+
+                clearTimeout(timerSalvarVolume);
+                timerSalvarVolume = setTimeout(() => {
+                    salvarVolumePlayerNoFirebase();
+                }, 350);
+            });
+
+            playerVolumeRange.addEventListener('change', () => {
+                clearTimeout(timerSalvarVolume);
+                salvarVolumePlayerNoFirebase();
+            });
+        }
+
+        aplicarVolumePlayer(5);
+
         let corSelecionadaOuvinte = "#86efac";
         let iconeSelecionadoOuvinte = "📻";
 
@@ -1691,7 +1816,15 @@
                     const dados = prefSnap.val();
                     radiosFavoritasIds = dados.favoritas || [];
                     customizacoesOuvinte = dados.customizacoes || {};
+
+                    if (dados.volumePlayer !== undefined && dados.volumePlayer !== null) {
+                        volumePlayerAtual = normalizarVolumePlayer(dados.volumePlayer);
+                    }
                 }
+
+                // Se o ouvinte nunca salvou volume, começa em 5.
+                // Se já salvou, recupera o mesmo valor em qualquer computador.
+                aplicarVolumePlayer(volumePlayerAtual);
 
                 const radiosRef = ref(db, 'radios_cadastradas');
                 const snapshot = await get(radiosRef);
@@ -1714,7 +1847,8 @@
                 const prefRef = ref(db, `ouvintes_preferencias/${chaveFirebaseUser}`);
                 await set(prefRef, {
                     favoritas: radiosFavoritasIds,
-                    customizacoes: customizacoesOuvinte
+                    customizacoes: customizacoesOuvinte,
+                    volumePlayer: volumePlayerAtual
                 });
             } catch (err) {
                 console.error("Erro ao salvar preferências:", err);
@@ -2021,6 +2155,9 @@
             playerStatusText.innerText = `Ouvindo Rádio: ${radio.nome}`;
             btnPlayPause.innerText = "⏹️";
 
+            // A rádio sempre inicia no volume salvo do ouvinte.
+            // No primeiro uso, esse valor é 5.
+            aplicarVolumePlayer(volumePlayerAtual);
             audioElement.src = radio.url;
             audioElement.play().catch(err => console.error("Erro no stream:", err));
 
