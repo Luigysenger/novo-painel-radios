@@ -105,6 +105,21 @@
             box-shadow: 0 6px 15px rgba(124, 58, 237, 0.6);
         }
 
+        .ludigins-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: #07111f;
+            display: none;
+        }
+        .ludigins-overlay.show { display: block; }
+        .ludigins-frame {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            background: #07111f;
+        }
+
         .btn-sair {
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             color: white;
@@ -3074,11 +3089,33 @@
         // ==========================================
         const retroContainer = document.getElementById('retroRadioContainer');
         const btnAbrirLudigins = document.getElementById('btnAbrirLudigins');
-        if (btnAbrirLudigins) {
-            btnAbrirLudigins.addEventListener('click', () => {
-                window.location.href = './ouvinte_ludgins.html';
-            });
+        const ludiginsOverlay = document.getElementById('ludiginsOverlay');
+        const ludiginsFrame = document.getElementById('ludiginsFrame');
+
+        function abrirPainelLudigins() {
+            if (!ludiginsOverlay || !ludiginsFrame) return;
+            if (ludiginsFrame.src === 'about:blank' || !ludiginsFrame.src.includes('ouvinte_ludigins.html')) {
+                ludiginsFrame.src = './ouvinte_ludigins.html?embed=1';
+            }
+            ludiginsOverlay.classList.add('show');
+            document.body.style.overflow = 'hidden';
         }
+
+        function fecharPainelLudigins() {
+            if (!ludiginsOverlay) return;
+            ludiginsOverlay.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        if (btnAbrirLudigins) {
+            btnAbrirLudigins.addEventListener('click', abrirPainelLudigins);
+        }
+
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'fecharLudigins') {
+                fecharPainelLudigins();
+            }
+        });
 
         const btnAbrirRetro = document.getElementById('btnAbrirRetro');
         const btnSairRetro = document.getElementById('btnSairRetro');
@@ -3474,5 +3511,9 @@
             }
         }
     </script>
+    <div class="ludigins-overlay" id="ludiginsOverlay">
+        <iframe id="ludiginsFrame" class="ludigins-frame" src="about:blank"
+                title="Painel Ludigins" allow="autoplay"></iframe>
+    </div>
 </body>
 </html>
