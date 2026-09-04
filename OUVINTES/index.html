@@ -1298,7 +1298,7 @@
                 </div>
 
                 <!-- Botão Giratório de Volume / Ligar Desligar (0 a 30) -->
-                <div class="retro-knob-container" id="knobVolume" title="Deslize para ajustar volume (0-30) ou clique para desligar">
+                <div class="retro-knob-container" id="knobVolume" title="Deslize para ajustar volume (0-80) ou clique para desligar">
                     <div class="retro-knob" id="dialVolume">
                         <div class="retro-knob-indicator"></div>
                     </div>
@@ -2135,17 +2135,18 @@
 
         registrarControlesMediaSession();
 
-        // Volume do player principal: 0 a 80.
-        // Primeiro uso = 5. Depois disso, o valor é salvo no Firebase por ouvinte.
+        // Volume único do sistema: 0 a 80.
+        // Primeiro uso = 15. Depois disso, o mesmo valor é salvo no Firebase
+        // e usado tanto no painel normal quanto no modo Rádio Retrô.
         const playerVolumeRange = document.getElementById('playerVolumeRange');
         const playerVolumeValue = document.getElementById('playerVolumeValue');
         const playerVolumeIcon = document.getElementById('playerVolumeIcon');
-        let volumePlayerAtual = 5;
+        let volumePlayerAtual = 15;
         let timerSalvarVolume = null;
 
         function normalizarVolumePlayer(valor) {
             const numero = Number(valor);
-            if (!Number.isFinite(numero)) return 5;
+            if (!Number.isFinite(numero)) return 15;
             return Math.max(0, Math.min(80, Math.round(numero)));
         }
 
@@ -2186,7 +2187,7 @@
             });
         }
 
-        aplicarVolumePlayer(5);
+        aplicarVolumePlayer(15);
 
         let corSelecionadaOuvinte = "#86efac";
         let iconeSelecionadoOuvinte = "📻";
@@ -2221,8 +2222,8 @@
                     }
                 }
 
-                // Se o ouvinte nunca salvou volume, começa em 5.
-                // Se já salvou, recupera o mesmo valor em qualquer computador.
+                // Se o ouvinte nunca salvou volume, começa em 15.
+                // Se já salvou, recupera exatamente o último valor em qualquer computador.
                 aplicarVolumePlayer(volumePlayerAtual);
 
                 const radiosRef = ref(db, 'radios_cadastradas');
@@ -2554,8 +2555,8 @@
             playerStatusText.innerText = `Ouvindo Rádio: ${radio.nome}`;
             btnPlayPause.innerText = "⏹️";
 
-            // A rádio sempre inicia no volume salvo do ouvinte.
-            // No primeiro uso, esse valor é 5.
+            // Toda rádio inicia exatamente no volume único salvo do ouvinte.
+            // No primeiro uso, esse valor é 15.
             aplicarVolumePlayer(volumePlayerAtual);
 
             // Envia nome e, quando existir, imagem da rádio
@@ -2793,16 +2794,22 @@
         const knobVolumeContainer = document.getElementById('knobVolume');
         const knobSintoniaContainer = document.getElementById('knobSintonia');
 
-        let volumeRetretroAtual = 15; // 0 a 30
-        let anguloVolume = (volumeRetretroAtual / 30) * 270 - 135;
+        // O modo Retrô usa exatamente o MESMO volume do painel principal (0 a 80).
+        // Não existe mais um segundo volume separado.
+        let anguloVolume = (volumePlayerAtual / 80) * 270 - 135;
         let anguloSintonia = 0;
 
         btnAbrirRetro.addEventListener('click', () => {
+            // Ao entrar no Retrô, mantém exatamente o volume atual do painel normal.
+            aplicarVolumePlayer(volumePlayerAtual);
+            anguloVolume = (volumePlayerAtual / 80) * 270 - 135;
             retroContainer.classList.remove('hidden');
             atualizarTelaRetrô();
         });
 
         btnSairRetro.addEventListener('click', () => {
+            // Ao voltar ao painel normal, mantém exatamente o volume escolhido no Retrô.
+            aplicarVolumePlayer(volumePlayerAtual);
             retroContainer.classList.add('hidden');
         });
 
@@ -2825,7 +2832,7 @@
                 retroTitleDisplay.innerText = "Selecione uma Rádio";
             }
 
-            if (!audioElement.paused && volumeRetretroAtual > 0) {
+            if (!audioElement.paused && volumePlayerAtual > 0) {
                 retroLed.classList.add('on');
             } else {
                 retroLed.classList.remove('on');
@@ -2837,15 +2844,35 @@
                 : '--';
             document.getElementById('retroFreqDisplay').innerText = `FM ${numeroSintonia}.0`;
 
-            audioElement.volume = volumeRetretroAtual / 30;
-            labelVolumeText.innerText = `VOL: ${volumeRetretroAtual}`;
+            // Retrô e painel normal usam o mesmo volume real: valor / 100.
+            aplicarVolumePlayer(volumePlayerAtual);
+            anguloVolume = (volumePlayerAtual / 80) * 270 - 135;
+            labelVolumeText.innerText = `VOL: ${volumePlayerAtual}`;
             dialVolume.style.transform = `rotate(${anguloVolume}deg)`;
             dialSintonia.style.transform = `rotate(${anguloSintonia}deg)`;
         }
 
-        // Interação por toque/arraste no Botão de Volume (0 a 30)
+        // Interação por toque/arraste no Botão de Volume (0 a 80)
         let arrastandoVolume = false;
         let startXVol = 0;
+
+        function aplicarVolumePeloRetro(novoValor) {
+            aplicarVolumePlayer(novoValor);
+            anguloVolume = (volumePlayerAtual / 80) * 270 - 135;
+
+            clearTimeout(timerSalvarVolume);
+            timerSalvarVolume = setTimeout(() => {
+                salvarVolumePlayerNoFirebase();
+            }, 350);
+
+            if (volumePlayerAtual === 0) {
+                audioElement.pause();
+            } else if (audioElement.paused && rádioAtivaNomeGlobal) {
+                audioElement.play().catch(()=>{});
+            }
+
+            atualizarTelaRetrô();
+        }
 
         knobVolumeContainer.addEventListener('mousedown', (e) => {
             arrastandoVolume = true;
@@ -2855,25 +2882,25 @@
 
         window.addEventListener('mousemove', (e) => {
             if (!arrastandoVolume) return;
+
             const deltaX = e.clientX - startXVol;
             startXVol = e.clientX;
 
-            if (deltaX > 2 && volumeRetretroAtual < 30) volumeRetretroAtual++;
-            if (deltaX < -2 && volumeRetretroAtual > 0) volumeRetretroAtual--;
-
-            anguloVolume = (volumeRetretroAtual / 30) * 270 - 135;
-
-            if (volumeRetretroAtual === 0) {
-                audioElement.pause();
-            } else if (audioElement.paused && rádioAtivaNomeGlobal) {
-                audioElement.play().catch(()=>{});
+            if (deltaX > 2 && volumePlayerAtual < 80) {
+                aplicarVolumePeloRetro(volumePlayerAtual + 1);
             }
 
-            atualizarTelaRetrô();
+            if (deltaX < -2 && volumePlayerAtual > 0) {
+                aplicarVolumePeloRetro(volumePlayerAtual - 1);
+            }
         });
 
         window.addEventListener('mouseup', () => {
-            arrastandoVolume = false;
+            if (arrastandoVolume) {
+                arrastandoVolume = false;
+                clearTimeout(timerSalvarVolume);
+                salvarVolumePlayerNoFirebase();
+            }
         });
 
         // Suporte a toque mobile para o volume
@@ -2885,38 +2912,43 @@
 
         window.addEventListener('touchmove', (e) => {
             if (!arrastandoVolume) return;
+
             const deltaX = e.touches[0].clientX - startXVol;
             startXVol = e.touches[0].clientX;
 
-            if (deltaX > 2 && volumeRetretroAtual < 30) volumeRetretroAtual++;
-            if (deltaX < -2 && volumeRetretroAtual > 0) volumeRetretroAtual--;
-
-            anguloVolume = (volumeRetretroAtual / 30) * 270 - 135;
-
-            if (volumeRetretroAtual === 0) {
-                audioElement.pause();
-            } else if (audioElement.paused && rádioAtivaNomeGlobal) {
-                audioElement.play().catch(()=>{});
+            if (deltaX > 2 && volumePlayerAtual < 80) {
+                aplicarVolumePeloRetro(volumePlayerAtual + 1);
             }
 
-            atualizarTelaRetrô();
-        });
+            if (deltaX < -2 && volumePlayerAtual > 0) {
+                aplicarVolumePeloRetro(volumePlayerAtual - 1);
+            }
+        }, { passive: false });
 
         window.addEventListener('touchend', () => {
-            arrastandoVolume = false;
+            if (arrastandoVolume) {
+                arrastandoVolume = false;
+                clearTimeout(timerSalvarVolume);
+                salvarVolumePlayerNoFirebase();
+            }
         });
 
-        // Clique direto no botão de volume para alternar Ligar/Desligar
+        // Clique direto no botão de volume para alternar Ligar/Desligar.
+        // Ao religar, volta em 15 somente quando estava realmente em zero.
         knobVolumeContainer.addEventListener('click', (e) => {
             if (Math.abs(e.clientX - startXVol) < 5) {
-                if (volumeRetretroAtual === 0) {
-                    volumeRetretroAtual = 15;
-                    if (rádioAtivaNomeGlobal) audioElement.play().catch(()=>{});
+                if (volumePlayerAtual === 0) {
+                    aplicarVolumePlayer(15);
+                    if (rádioAtivaNomeGlobal) {
+                        audioElement.play().catch(()=>{});
+                    }
                 } else {
-                    volumeRetretroAtual = 0;
+                    aplicarVolumePlayer(0);
                     audioElement.pause();
                 }
-                anguloVolume = (volumeRetretroAtual / 30) * 270 - 135;
+
+                anguloVolume = (volumePlayerAtual / 80) * 270 - 135;
+                salvarVolumePlayerNoFirebase();
                 atualizarTelaRetrô();
             }
         });
