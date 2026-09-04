@@ -693,6 +693,33 @@
             font-size: 14px;
         }
 
+        /* INDICADOR DE MENSAGEM NÃO LIDA */
+        .msg-nao-lida-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 17px;
+            min-width: 17px;
+            height: 17px;
+            font-size: 11px;
+            line-height: 1;
+            filter: drop-shadow(0 0 4px rgba(56,189,248,.9));
+            animation: piscarMensagemNaoLida .85s ease-in-out infinite;
+        }
+
+        .msg-nao-lida-grupo {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 5px;
+            font-size: 11px;
+            animation: piscarMensagemNaoLida .85s ease-in-out infinite;
+        }
+
+        @keyframes piscarMensagemNaoLida {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .22; transform: scale(.88); }
+        }
+
         .ouvinte-nome {
             font-weight: bold;
             overflow: hidden;
@@ -1971,6 +1998,29 @@
         return conta.nome || perfilChat.nome || conta.email || perfilChat.email || id;
     }
 
+    // Mensagem fica marcada até o ADM responder.
+    // Apenas abrir a conversa NÃO remove o aviso.
+    function temMensagemNaoLidaChat(id) {
+        const chat = dadosChatOuvintes[id] || {};
+        const mensagensObj = chat.mensagens || {};
+
+        let ultimaMensagemOuvinte = 0;
+        let ultimaMensagemAdm = 0;
+
+        Object.values(mensagensObj).forEach(msg => {
+            const mensagem = msg || {};
+            const timestamp = Number(mensagem.timestamp || 0);
+
+            if (mensagem.remetente === 'adm') {
+                if (timestamp > ultimaMensagemAdm) ultimaMensagemAdm = timestamp;
+            } else {
+                if (timestamp > ultimaMensagemOuvinte) ultimaMensagemOuvinte = timestamp;
+            }
+        });
+
+        return ultimaMensagemOuvinte > ultimaMensagemAdm;
+    }
+
     function renderizarListaOuvintesChat() {
         if (!listaOuvintesStatus) return;
 
@@ -2012,8 +2062,10 @@
         const montarItem = (id, online) => {
             const nome = nomeDoOuvinteChat(id);
             const selecionado = ouvinteSelecionadoChat === id;
+            const mensagemNaoLida = temMensagemNaoLidaChat(id);
             return `
                 <div class="ouvinte-status-item" data-ouvinte="${escapeChat(id)}" style="${selecionado ? 'background:rgba(56,189,248,.25);' : ''}">
+                    ${mensagemNaoLida ? '<span class="msg-nao-lida-icon" title="Mensagem aguardando resposta">💬</span>' : ''}
                     <span class="msn-icon">${online ? '🟢' : '🔴'}</span>
                     <span class="ouvinte-nome ${online ? 'status-online' : 'status-offline'}">${escapeChat(nome)}</span>
                     <span style="font-size:9px;color:${online ? '#4ade80' : '#f87171'};font-weight:bold;">${online ? 'Online' : 'Offline'}</span>
@@ -2025,8 +2077,11 @@
             <span class="ouvinte-nome" style="color:#38bdf8;">💬 Enviar para Todos</span>
         </div>`;
 
+        const naoLidasOnline = onlineIds.filter(id => temMensagemNaoLidaChat(id)).length;
+        const naoLidasOffline = offlineIds.filter(id => temMensagemNaoLidaChat(id)).length;
+
         const setaOnline = gruposChatRecolhidos.online ? '▶' : '▼';
-        html += `<div class="msn-grupo-titulo online" data-grupo-chat="online">${setaOnline} Online (${onlineIds.length})</div>`;
+        html += `<div class="msn-grupo-titulo online" data-grupo-chat="online">${setaOnline} Online (${onlineIds.length})${naoLidasOnline ? `<span class="msg-nao-lida-grupo" title="${naoLidasOnline} conversa(s) aguardando resposta">💬 ${naoLidasOnline}</span>` : ''}</div>`;
         if (!gruposChatRecolhidos.online) {
             if (onlineIds.length) {
                 onlineIds.forEach(id => { html += montarItem(id, true); });
@@ -2036,7 +2091,7 @@
         }
 
         const setaOffline = gruposChatRecolhidos.offline ? '▶' : '▼';
-        html += `<div class="msn-grupo-titulo offline" data-grupo-chat="offline">${setaOffline} Offline (${offlineIds.length})</div>`;
+        html += `<div class="msn-grupo-titulo offline" data-grupo-chat="offline">${setaOffline} Offline (${offlineIds.length})${naoLidasOffline ? `<span class="msg-nao-lida-grupo" title="${naoLidasOffline} conversa(s) aguardando resposta">💬 ${naoLidasOffline}</span>` : ''}</div>`;
         if (!gruposChatRecolhidos.offline) {
             if (offlineIds.length) {
                 offlineIds.forEach(id => { html += montarItem(id, false); });
