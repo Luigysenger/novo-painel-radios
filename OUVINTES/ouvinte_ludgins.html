@@ -2,94 +2,1570 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel do Ouvinte - Conteúdo Exclusivo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Ludigins - Painel do Ouvinte</title>
+
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
         }
+
+        :root {
+            --bg: #07111f;
+            --card: rgba(15, 23, 42, 0.94);
+            --card2: rgba(30, 41, 59, 0.92);
+            --line: rgba(148, 163, 184, 0.18);
+            --txt: #f8fafc;
+            --muted: #94a3b8;
+            --purple: #8b5cf6;
+            --purple2: #a855f7;
+            --green: #22c55e;
+            --yellow: #f59e0b;
+            --red: #ef4444;
+            --cyan: #38bdf8;
+        }
+
         body {
-            background-color: #0b0713;
-            color: #ffffff;
-            padding: 20px;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 10% 0%, rgba(124, 58, 237, .20), transparent 28%),
+                radial-gradient(circle at 90% 10%, rgba(14, 165, 233, .13), transparent 28%),
+                linear-gradient(135deg, #050b14 0%, #07111f 50%, #0f172a 100%);
+            color: var(--txt);
+            padding: 16px;
         }
-        header {
+
+        .app {
+            width: min(1180px, 100%);
+            margin: 0 auto;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .brand h1 {
+            font-size: clamp(20px, 3vw, 30px);
+            letter-spacing: .4px;
+        }
+
+        .brand p {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        .btn-voltar {
+            border: 1px solid rgba(255,255,255,.13);
+            background: rgba(255,255,255,.07);
+            color: white;
+            padding: 10px 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 800;
+        }
+
+        .grid-topo {
+            display: grid;
+            grid-template-columns: 1.15fr .85fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            box-shadow: 0 18px 50px rgba(0,0,0,.22);
+        }
+
+        .perfil {
+            padding: 18px;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .patente-badge {
+            width: 84px;
+            height: 84px;
+            border-radius: 22px;
+            display: grid;
+            place-items: center;
+            font-size: 42px;
+            background: linear-gradient(135deg, #334155, #0f172a);
+            border: 1px solid rgba(255,255,255,.12);
+            box-shadow: inset 0 0 28px rgba(255,255,255,.04);
+        }
+
+        .perfil-nome {
+            font-size: 13px;
+            color: #cbd5e1;
+            margin-bottom: 4px;
+        }
+
+        .perfil-patente {
+            font-size: clamp(20px, 3vw, 28px);
+            font-weight: 900;
+            color: #fbbf24;
+            margin-bottom: 5px;
+        }
+
+        .saldo {
+            font-size: clamp(22px, 4vw, 34px);
+            font-weight: 900;
+        }
+
+        .saldo small {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 700;
+        }
+
+        .progress-wrap {
+            grid-column: 1 / -1;
+            margin-top: 2px;
+        }
+
+        .progress-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 7px;
+        }
+
+        .progress-track {
+            height: 12px;
+            border-radius: 999px;
+            overflow: hidden;
+            background: #020617;
+            border: 1px solid rgba(255,255,255,.08);
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, var(--purple), #c084fc);
+            transition: width .35s ease;
+        }
+
+        .resumo {
+            padding: 18px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .mini-card {
+            padding: 13px;
+            border-radius: 14px;
+            background: rgba(255,255,255,.045);
+            border: 1px solid rgba(255,255,255,.07);
+        }
+
+        .mini-card span {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: .7px;
+        }
+
+        .mini-card strong {
+            display: block;
+            margin-top: 5px;
+            font-size: 20px;
+        }
+
+        .game {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 300px;
+            gap: 14px;
+        }
+
+        .map-card {
+            padding: 14px;
+        }
+
+        .section-title {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 15px;
-            margin-bottom: 25px;
+            gap: 10px;
+            margin-bottom: 10px;
         }
-        .logo-area h1 {
-            color: #ff2a85;
-            font-size: 22px;
-        }
-        .logo-area p {
-            color: #a0a0a0;
-            font-size: 13px;
-        }
-        .btn-voltar {
-            background-color: #7c3aed;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            text-decoration: none;
-        }
-        .content-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: #140d24;
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .info-card {
-            background: #1f1235;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border: 1px solid #7c3aed;
-            font-size: 14px;
-        }
-        .info-card h4 {
-            color: #ff2a85;
-            margin-bottom: 8px;
+
+        .section-title h2 {
             font-size: 16px;
+        }
+
+        .status-online {
+            font-size: 10px;
+            color: #86efac;
+            border: 1px solid rgba(34,197,94,.35);
+            background: rgba(34,197,94,.08);
+            padding: 5px 8px;
+            border-radius: 999px;
+        }
+
+        .mapa {
+            position: relative;
+            height: 470px;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,.1);
+            background:
+                linear-gradient(90deg, transparent 47%, rgba(148,163,184,.14) 47%, rgba(148,163,184,.14) 53%, transparent 53%),
+                linear-gradient(0deg, transparent 47%, rgba(148,163,184,.14) 47%, rgba(148,163,184,.14) 53%, transparent 53%),
+                repeating-linear-gradient(90deg, rgba(255,255,255,.025) 0 1px, transparent 1px 58px),
+                repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 58px),
+                radial-gradient(circle at 20% 20%, rgba(34,197,94,.12), transparent 17%),
+                radial-gradient(circle at 80% 75%, rgba(59,130,246,.12), transparent 18%),
+                #0a1628;
+        }
+
+        .mapa::before,
+        .mapa::after {
+            content: "";
+            position: absolute;
+            background: rgba(148,163,184,.12);
+            border-radius: 20px;
+            pointer-events: none;
+        }
+
+        .mapa::before {
+            width: 120%;
+            height: 24px;
+            left: -10%;
+            top: 30%;
+            transform: rotate(-11deg);
+        }
+
+        .mapa::after {
+            width: 24px;
+            height: 125%;
+            top: -10%;
+            left: 25%;
+            transform: rotate(13deg);
+        }
+
+        .ride-pin {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            z-index: 5;
+            color: white;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .ride-bubble {
+            min-width: 96px;
+            padding: 7px 9px;
+            border-radius: 12px;
+            background: rgba(15,23,42,.96);
+            border: 1px solid rgba(255,255,255,.12);
+            box-shadow: 0 10px 24px rgba(0,0,0,.3);
+            font-size: 10px;
+            line-height: 1.25;
+            text-align: center;
+        }
+
+        .ride-bubble strong {
+            display: block;
+            color: #fde68a;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .ride-person {
+            display: grid;
+            place-items: center;
+            width: 37px;
+            height: 37px;
+            margin: 0 auto 4px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ef4444, #f97316);
+            border: 2px solid #fff;
+            font-size: 20px;
+            animation: pulse 1.15s infinite;
+        }
+
+        .ride-pin.accepted .ride-person {
+            background: linear-gradient(135deg, #64748b, #334155);
+            animation: none;
+            opacity: .85;
+        }
+
+        .ride-pin.accepted .ride-bubble {
+            opacity: .82;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239,68,68,.35); }
+            50% { transform: scale(1.08); box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+        }
+
+        .carro-jogador {
+            position: absolute;
+            left: 49%;
+            top: 52%;
+            transform: translate(-50%, -50%);
+            z-index: 4;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            font-size: 28px;
+            background: rgba(124,58,237,.22);
+            border: 1px solid rgba(167,139,250,.5);
+            box-shadow: 0 0 22px rgba(124,58,237,.25);
+        }
+
+        .map-legenda {
+            position: absolute;
+            left: 10px;
+            bottom: 10px;
+            z-index: 8;
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: rgba(2,6,23,.78);
+            color: #cbd5e1;
+            font-size: 10px;
+            border: 1px solid rgba(255,255,255,.08);
+        }
+
+        .side {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .side-card {
+            padding: 15px;
+        }
+
+        .corrida-atual {
+            min-height: 168px;
+        }
+
+        .corrida-vazia {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.45;
+            padding-top: 5px;
+        }
+
+        .corrida-box {
+            display: none;
+        }
+
+        .corrida-box.show {
+            display: block;
+        }
+
+        .corrida-rota {
+            font-size: 12px;
+            line-height: 1.5;
+            color: #e2e8f0;
+            margin: 9px 0;
+        }
+
+        .corrida-valor {
+            font-size: 23px;
+            color: #fde68a;
+            font-weight: 900;
+        }
+
+        .timer {
+            font-size: 11px;
+            color: #c4b5fd;
+            margin: 8px 0 10px;
+        }
+
+        .btn-finalizar {
+            width: 100%;
+            border: 0;
+            border-radius: 12px;
+            padding: 11px;
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: white;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .btn-finalizar:disabled {
+            opacity: .42;
+            cursor: not-allowed;
+        }
+
+        .feed {
+            max-height: 250px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .feed-item {
+            padding: 9px 10px;
+            border-radius: 10px;
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.06);
+            font-size: 11px;
+            line-height: 1.35;
+            color: #cbd5e1;
+        }
+
+        .feed-item strong {
+            color: white;
+        }
+
+        .aviso {
+            position: fixed;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-18px);
+            z-index: 9999;
+            width: min(92vw, 520px);
+            padding: 12px 14px;
+            border-radius: 13px;
+            background: #111827;
+            color: white;
+            border: 1px solid rgba(255,255,255,.13);
+            box-shadow: 0 18px 50px rgba(0,0,0,.35);
+            opacity: 0;
+            pointer-events: none;
+            transition: .25s ease;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .aviso.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .aviso.ok { border-color: rgba(34,197,94,.5); }
+        .aviso.erro { border-color: rgba(239,68,68,.55); }
+
+        .bloqueado {
+            position: absolute;
+            inset: 0;
+            z-index: 20;
+            background: rgba(2,6,23,.78);
+            backdrop-filter: blur(2px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .bloqueado.show {
+            display: flex;
+        }
+
+        .bloqueado-box {
+            max-width: 360px;
+            padding: 18px;
+            border-radius: 16px;
+            background: #0f172a;
+            border: 1px solid rgba(255,255,255,.1);
+        }
+
+        .bloqueado-box h3 {
+            margin-bottom: 7px;
+        }
+
+        .bloqueado-box p {
+            color: #cbd5e1;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 900px) {
+            .grid-topo,
+            .game {
+                grid-template-columns: 1fr;
+            }
+
+            .side {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0,1fr));
+            }
+
+            .mapa {
+                height: 430px;
+            }
+        }
+
+        @media (max-width: 620px) {
+            body {
+                padding: 10px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+            }
+
+            .brand p {
+                max-width: 230px;
+            }
+
+            .perfil {
+                grid-template-columns: 68px 1fr;
+                padding: 14px;
+            }
+
+            .patente-badge {
+                width: 68px;
+                height: 68px;
+                font-size: 34px;
+                border-radius: 18px;
+            }
+
+            .resumo {
+                padding: 12px;
+            }
+
+            .side {
+                grid-template-columns: 1fr;
+            }
+
+            .mapa {
+                height: 390px;
+            }
+
+            .ride-bubble {
+                min-width: 82px;
+                padding: 6px;
+                font-size: 9px;
+            }
+
+            .ride-person {
+                width: 32px;
+                height: 32px;
+                font-size: 17px;
+            }
         }
     </style>
 </head>
+
 <body>
+    <div class="aviso" id="aviso"></div>
 
-    <header>
-        <div class="logo-area">
-            <h1>Conteúdo Especial</h1>
-            <p>Seção personalizada de rádios e mídias</p>
-        </div>
-        <div>
-            <a href="ouvinte_cards_radio.html" class="btn-voltar">Voltar ao Painel</a>
-        </div>
-    </header>
+    <main class="app">
+        <header class="topbar">
+            <div class="brand">
+                <h1>🚕 Ludigins</h1>
+                <p>Complete corridas, ganhe Ludigins e suba de patente.</p>
+            </div>
+            <button class="btn-voltar" id="btnVoltar">← Voltar</button>
+        </header>
 
-    <div class="content-container">
-        <h3 style="margin-bottom: 20px; font-size: 16px; color: #e0e0e0;">🎵 Seus Módulos e Programação</h3>
-        
-        <div class="info-card">
-            <h4>Destaques da Programação</h4>
-            <p>Aqui você encontra conteúdos exclusivos e listas especiais selecionadas para a sua audiência.</p>
-        </div>
+        <section class="grid-topo">
+            <div class="card perfil">
+                <div class="patente-badge" id="patenteIcone">🎧</div>
 
-        <div class="info-card">
-            <h4>Preferências Salvas</h4>
-            <p>Suas seleções de rádios e configurações ficam armazenadas e sincronizadas para acesso rápido.</p>
-        </div>
-    </div>
+                <div>
+                    <div class="perfil-nome" id="nomeOuvinte">OUVINTE</div>
+                    <div class="perfil-patente" id="patenteNome">SEM PATENTE</div>
+                    <div class="saldo">
+                        <span id="saldoLudigins">0</span>
+                        <small>LUDIGINS</small>
+                    </div>
+                </div>
 
+                <div class="progress-wrap">
+                    <div class="progress-info">
+                        <span id="textoProgresso">Comece a jogar</span>
+                        <span id="percentualProgresso">0%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-bar" id="barraProgresso"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card resumo">
+                <div class="mini-card">
+                    <span>Corridas hoje</span>
+                    <strong><span id="corridasHoje">0</span>/5</strong>
+                </div>
+                <div class="mini-card">
+                    <span>Ganhos hoje</span>
+                    <strong><span id="ganhosHoje">0</span> 🪙</strong>
+                </div>
+                <div class="mini-card">
+                    <span>Valor simbólico</span>
+                    <strong>R$ 22</strong>
+                </div>
+                <div class="mini-card">
+                    <span>Próxima patente</span>
+                    <strong id="proximaPatenteMini">CHUMBO</strong>
+                </div>
+            </div>
+        </section>
+
+        <section class="game">
+            <div class="card map-card">
+                <div class="section-title">
+                    <h2>🗺️ Mapa das Corridas</h2>
+                    <span class="status-online">● AO VIVO</span>
+                </div>
+
+                <div class="mapa" id="mapa">
+                    <div class="carro-jogador">🚕</div>
+                    <div class="map-legenda">Toque em um passageiro para tentar aceitar a corrida.</div>
+
+                    <div class="bloqueado" id="bloqueioMapa">
+                        <div class="bloqueado-box">
+                            <h3 id="bloqueioTitulo">Corrida em andamento</h3>
+                            <p id="bloqueioTexto">Finalize sua corrida atual antes de aceitar outra.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="side">
+                <div class="card side-card corrida-atual">
+                    <div class="section-title">
+                        <h2>🚖 Sua corrida</h2>
+                    </div>
+
+                    <div class="corrida-vazia" id="corridaVazia">
+                        Você ainda não aceitou uma corrida. Escolha um passageiro no mapa.
+                    </div>
+
+                    <div class="corrida-box" id="corridaBox">
+                        <div class="corrida-valor">+<span id="corridaValor">0</span> Ludigins</div>
+                        <div class="corrida-rota">
+                            📍 <span id="corridaOrigem">-</span><br>
+                            🏁 <span id="corridaDestino">-</span>
+                        </div>
+                        <div class="timer" id="corridaTimer">Preparando corrida...</div>
+                        <button class="btn-finalizar" id="btnFinalizar" disabled>
+                            Finalizar corrida
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card side-card">
+                    <div class="section-title">
+                        <h2>📢 Acontecendo agora</h2>
+                    </div>
+                    <div class="feed" id="feed">
+                        <div class="feed-item">Aguardando movimentação dos ouvintes...</div>
+                    </div>
+                </div>
+            </aside>
+        </section>
+    </main>
+
+    <script type="module">
+        import { db } from '../firebase-config.js';
+        import {
+            ref,
+            get,
+            set,
+            update,
+            push,
+            onValue,
+            runTransaction
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // =========================================================
+        // CONFIGURAÇÕES DO JOGO
+        // =========================================================
+        const MAX_CORRIDAS_DIA = 5;
+        const MIN_RECOMPENSA = 1;
+        const MAX_RECOMPENSA = 7;
+        const TEMPO_MINIMO_CORRIDA_MS = 7000;
+
+        const PATENTES = [
+            { nome: 'SEM PATENTE', minimo: 0, icone: '🎧' },
+            { nome: 'CHUMBO', minimo: 2000, icone: '🛡️' },
+            { nome: 'BRONZE', minimo: 3000, icone: '🥉' },
+            { nome: 'PRATA', minimo: 5000, icone: '🥈' },
+            { nome: 'OURO', minimo: 7000, icone: '🥇' },
+            { nome: 'DIAMANTE', minimo: 10000, icone: '💎' }
+        ];
+
+        const ROTAS = [
+            ['Centro', 'Parque Municipal'],
+            ['Terminal', 'Shopping'],
+            ['Praça Central', 'Hospital'],
+            ['Universidade', 'Centro'],
+            ['Mercado', 'Rodoviária'],
+            ['Bairro Norte', 'Centro'],
+            ['Bairro Sul', 'Shopping'],
+            ['Parque', 'Universidade'],
+            ['Hospital', 'Praça Central'],
+            ['Rodoviária', 'Mercado']
+        ];
+
+        // =========================================================
+        // ELEMENTOS
+        // =========================================================
+        const aviso = document.getElementById('aviso');
+        const mapa = document.getElementById('mapa');
+        const bloqueioMapa = document.getElementById('bloqueioMapa');
+        const bloqueioTitulo = document.getElementById('bloqueioTitulo');
+        const bloqueioTexto = document.getElementById('bloqueioTexto');
+
+        const nomeOuvinteEl = document.getElementById('nomeOuvinte');
+        const patenteNomeEl = document.getElementById('patenteNome');
+        const patenteIconeEl = document.getElementById('patenteIcone');
+        const saldoLudiginsEl = document.getElementById('saldoLudigins');
+        const corridasHojeEl = document.getElementById('corridasHoje');
+        const ganhosHojeEl = document.getElementById('ganhosHoje');
+        const proximaPatenteMiniEl = document.getElementById('proximaPatenteMini');
+        const textoProgressoEl = document.getElementById('textoProgresso');
+        const percentualProgressoEl = document.getElementById('percentualProgresso');
+        const barraProgressoEl = document.getElementById('barraProgresso');
+
+        const corridaVazia = document.getElementById('corridaVazia');
+        const corridaBox = document.getElementById('corridaBox');
+        const corridaValor = document.getElementById('corridaValor');
+        const corridaOrigem = document.getElementById('corridaOrigem');
+        const corridaDestino = document.getElementById('corridaDestino');
+        const corridaTimer = document.getElementById('corridaTimer');
+        const btnFinalizar = document.getElementById('btnFinalizar');
+        const feed = document.getElementById('feed');
+
+        // =========================================================
+        // IDENTIDADE DO OUVINTE
+        // Usa a mesma lógica do painel principal.
+        // =========================================================
+        let usuarioId = localStorage.getItem('usuarioKey') ||
+                        localStorage.getItem('userId') ||
+                        null;
+
+        let usuarioNome = localStorage.getItem('usuarioNome') ||
+                          localStorage.getItem('usuarioLogado') ||
+                          'Ouvinte';
+
+        let perfilAtual = null;
+        let corridaAtualCache = null;
+        let timerCorrida = null;
+        let aceitandoCorrida = false;
+
+        function chaveFallback() {
+            return String(
+                localStorage.getItem('usuarioLogado') ||
+                usuarioNome ||
+                'ouvinte'
+            ).replace(/[^a-zA-Z0-9]/g, '_');
+        }
+
+        async function resolverUsuario() {
+            const alvo = String(
+                localStorage.getItem('usuarioLogado') ||
+                localStorage.getItem('usuarioNome') ||
+                usuarioNome ||
+                ''
+            ).trim().toLowerCase();
+
+            try {
+                const snap = await get(ref(db, 'contas'));
+
+                if (snap.exists()) {
+                    let encontrado = null;
+                    let nomeEncontrado = null;
+
+                    snap.forEach(child => {
+                        if (encontrado) return;
+
+                        const conta = child.val() || {};
+                        const perfil = String(conta.perfil || '').trim().toLowerCase();
+                        const ehAdmin =
+                            ['adm','admin','administrador'].includes(perfil) ||
+                            String(conta.nome || '').trim().toLowerCase() === 'administrador';
+
+                        if (ehAdmin) return;
+
+                        const candidatos = [
+                            conta.nome,
+                            conta.email,
+                            conta.login
+                        ]
+                        .filter(Boolean)
+                        .map(v => String(v).trim().toLowerCase());
+
+                        if (alvo && candidatos.includes(alvo)) {
+                            encontrado = child.key;
+                            nomeEncontrado = conta.nome || usuarioNome;
+                        }
+                    });
+
+                    if (!encontrado && usuarioId) {
+                        const contaSalva = snap.child(usuarioId);
+                        if (contaSalva.exists()) {
+                            const conta = contaSalva.val() || {};
+                            const perfil = String(conta.perfil || '').trim().toLowerCase();
+                            const ehAdmin =
+                                ['adm','admin','administrador'].includes(perfil) ||
+                                String(conta.nome || '').trim().toLowerCase() === 'administrador';
+
+                            if (!ehAdmin) {
+                                encontrado = usuarioId;
+                                nomeEncontrado = conta.nome || usuarioNome;
+                            }
+                        }
+                    }
+
+                    if (encontrado) {
+                        usuarioId = encontrado;
+                        usuarioNome = nomeEncontrado || usuarioNome;
+                    }
+                }
+            } catch (erro) {
+                console.warn('Não foi possível confirmar a conta do ouvinte:', erro);
+            }
+
+            usuarioId = usuarioId || chaveFallback();
+
+            localStorage.setItem('usuarioKey', usuarioId);
+            localStorage.setItem('userId', usuarioId);
+            localStorage.setItem('usuarioNome', usuarioNome);
+
+            return usuarioId;
+        }
+
+        // =========================================================
+        // DATA LOCAL DO JOGO
+        // =========================================================
+        function dataHoje() {
+            const agora = new Date();
+            const ano = agora.getFullYear();
+            const mes = String(agora.getMonth() + 1).padStart(2, '0');
+            const dia = String(agora.getDate()).padStart(2, '0');
+            return `${ano}-${mes}-${dia}`;
+        }
+
+        // =========================================================
+        // PATENTES
+        // =========================================================
+        function calcularPatente(saldo) {
+            const valor = Math.max(0, Number(saldo || 0));
+            let atual = PATENTES[0];
+
+            for (const patente of PATENTES) {
+                if (valor >= patente.minimo) atual = patente;
+            }
+
+            const indice = PATENTES.findIndex(p => p.nome === atual.nome);
+            const proxima = PATENTES[indice + 1] || null;
+
+            return { atual, proxima, indice };
+        }
+
+        function calcularProgresso(saldo) {
+            const valor = Math.max(0, Number(saldo || 0));
+            const { atual, proxima } = calcularPatente(valor);
+
+            if (!proxima) {
+                return {
+                    percentual: 100,
+                    texto: 'Patente máxima alcançada',
+                    proximaNome: 'MÁXIMA'
+                };
+            }
+
+            const inicio = atual.minimo;
+            const fim = proxima.minimo;
+            const dentro = Math.max(0, valor - inicio);
+            const faixa = Math.max(1, fim - inicio);
+            const percentual = Math.min(100, Math.round((dentro / faixa) * 100));
+            const faltam = Math.max(0, fim - valor);
+
+            return {
+                percentual,
+                texto: `Faltam ${faltam.toLocaleString('pt-BR')} para ${proxima.nome}`,
+                proximaNome: proxima.nome
+            };
+        }
+
+        // =========================================================
+        // PERFIL / SALDO
+        // =========================================================
+        async function garantirPerfil() {
+            const perfilRef = ref(db, `ludigins_usuarios/${usuarioId}`);
+
+            await runTransaction(perfilRef, atual => {
+                const hoje = dataHoje();
+
+                if (!atual) {
+                    return {
+                        nome: usuarioNome,
+                        saldo: 0,
+                        patente: 'SEM PATENTE',
+                        nivel: 0,
+                        corridasHoje: 0,
+                        ganhosHoje: 0,
+                        dataCorridas: hoje,
+                        corridaAtual: null,
+                        criadoEm: Date.now(),
+                        atualizadoEm: Date.now()
+                    };
+                }
+
+                const perfil = { ...atual };
+
+                if (perfil.dataCorridas !== hoje) {
+                    perfil.dataCorridas = hoje;
+                    perfil.corridasHoje = 0;
+                    perfil.ganhosHoje = 0;
+
+                    // Se ficou uma corrida antiga presa de outro dia, libera o ouvinte.
+                    if (perfil.corridaAtual && perfil.corridaAtual.data !== hoje) {
+                        perfil.corridaAtual = null;
+                    }
+                }
+
+                perfil.nome = usuarioNome || perfil.nome || 'Ouvinte';
+                perfil.saldo = Number(perfil.saldo || 0);
+                perfil.corridasHoje = Number(perfil.corridasHoje || 0);
+                perfil.ganhosHoje = Number(perfil.ganhosHoje || 0);
+
+                const { atual: patente } = calcularPatente(perfil.saldo);
+                perfil.patente = patente.nome;
+                perfil.nivel = PATENTES.findIndex(p => p.nome === patente.nome);
+
+                return perfil;
+            });
+        }
+
+        function desenharPerfil(perfil) {
+            if (!perfil) return;
+
+            perfilAtual = perfil;
+
+            const saldo = Number(perfil.saldo || 0);
+            const corridas = Number(perfil.corridasHoje || 0);
+            const ganhos = Number(perfil.ganhosHoje || 0);
+            const { atual } = calcularPatente(saldo);
+            const progresso = calcularProgresso(saldo);
+
+            nomeOuvinteEl.textContent = String(perfil.nome || usuarioNome).toUpperCase();
+            patenteNomeEl.textContent = atual.nome;
+            patenteIconeEl.textContent = atual.icone;
+            saldoLudiginsEl.textContent = saldo.toLocaleString('pt-BR');
+            corridasHojeEl.textContent = corridas;
+            ganhosHojeEl.textContent = ganhos;
+            proximaPatenteMiniEl.textContent = progresso.proximaNome;
+            textoProgressoEl.textContent = progresso.texto;
+            percentualProgressoEl.textContent = `${progresso.percentual}%`;
+            barraProgressoEl.style.width = `${progresso.percentual}%`;
+
+            atualizarBloqueioMapa();
+            atualizarCorridaAtual(perfil.corridaAtual || null);
+        }
+
+        // =========================================================
+        // MAPA COMPARTILHADO
+        // =========================================================
+        function aleatorio(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function criarDadosCorrida() {
+            const rota = ROTAS[aleatorio(0, ROTAS.length - 1)];
+
+            return {
+                origem: rota[0],
+                destino: rota[1],
+                valor: aleatorio(MIN_RECOMPENSA, MAX_RECOMPENSA),
+                x: aleatorio(12, 88),
+                y: aleatorio(15, 83),
+                status: 'disponivel',
+                criadoEm: Date.now(),
+                data: dataHoje(),
+                aceitoPor: null,
+                aceitoNome: null,
+                aceitoEm: null,
+                finalizadoEm: null
+            };
+        }
+
+        async function garantirCorridasDisponiveis(snapshotAtual = null) {
+            let existentes = [];
+
+            if (snapshotAtual && snapshotAtual.exists()) {
+                snapshotAtual.forEach(child => {
+                    const c = child.val() || {};
+                    if (
+                        c.data === dataHoje() &&
+                        c.status === 'disponivel'
+                    ) {
+                        existentes.push(child.key);
+                    }
+                });
+            } else {
+                const snap = await get(ref(db, 'ludigins_corridas/ativas'));
+                if (snap.exists()) {
+                    snap.forEach(child => {
+                        const c = child.val() || {};
+                        if (
+                            c.data === dataHoje() &&
+                            c.status === 'disponivel'
+                        ) {
+                            existentes.push(child.key);
+                        }
+                    });
+                }
+            }
+
+            const faltam = Math.max(0, 4 - existentes.length);
+
+            if (faltam === 0) return;
+
+            // Pequena trava compartilhada para evitar que todos os celulares
+            // criem várias corridas ao mesmo tempo.
+            const lockRef = ref(db, 'ludigins_jogo/geradorCorridas');
+            const token = `${usuarioId}_${Date.now()}_${Math.random()}`;
+
+            const lock = await runTransaction(lockRef, atual => {
+                const agora = Date.now();
+
+                if (!atual || !atual.expiraEm || atual.expiraEm < agora) {
+                    return {
+                        token,
+                        expiraEm: agora + 5000
+                    };
+                }
+
+                return;
+            });
+
+            if (!lock.committed || lock.snapshot.val()?.token !== token) return;
+
+            try {
+                const snapNovo = await get(ref(db, 'ludigins_corridas/ativas'));
+                let disponiveis = 0;
+
+                if (snapNovo.exists()) {
+                    snapNovo.forEach(child => {
+                        const c = child.val() || {};
+                        if (
+                            c.data === dataHoje() &&
+                            c.status === 'disponivel'
+                        ) {
+                            disponiveis++;
+                        }
+                    });
+                }
+
+                const criar = Math.max(0, 4 - disponiveis);
+
+                for (let i = 0; i < criar; i++) {
+                    const novaRef = push(ref(db, 'ludigins_corridas/ativas'));
+                    await set(novaRef, criarDadosCorrida());
+                }
+            } finally {
+                try {
+                    const atualLock = await get(lockRef);
+                    if (atualLock.exists() && atualLock.val()?.token === token) {
+                        await set(lockRef, null);
+                    }
+                } catch (e) {}
+            }
+        }
+
+        function limparPins() {
+            mapa.querySelectorAll('.ride-pin').forEach(el => el.remove());
+        }
+
+        function desenharCorridas(snapshot) {
+            limparPins();
+
+            const corridas = [];
+
+            if (snapshot.exists()) {
+                snapshot.forEach(child => {
+                    const corrida = child.val() || {};
+
+                    if (corrida.data !== dataHoje()) return;
+
+                    if (
+                        corrida.status === 'disponivel' ||
+                        corrida.status === 'aceita'
+                    ) {
+                        corridas.push({
+                            id: child.key,
+                            ...corrida
+                        });
+                    }
+                });
+            }
+
+            corridas
+                .sort((a, b) => Number(a.criadoEm || 0) - Number(b.criadoEm || 0))
+                .slice(-8)
+                .forEach(corrida => {
+                    const pin = document.createElement('button');
+                    pin.className = `ride-pin ${corrida.status === 'aceita' ? 'accepted' : ''}`;
+                    pin.style.left = `${Number(corrida.x || 50)}%`;
+                    pin.style.top = `${Number(corrida.y || 50)}%`;
+                    pin.setAttribute('aria-label', `Corrida de ${corrida.valor} Ludigins`);
+
+                    if (corrida.status === 'aceita') {
+                        pin.innerHTML = `
+                            <div class="ride-bubble">
+                                <div class="ride-person">🚕</div>
+                                <span>${escapar(corrida.aceitoNome || 'Ouvinte')} aceitou</span>
+                                <strong>+${Number(corrida.valor || 0)} 🪙</strong>
+                            </div>
+                        `;
+                        pin.disabled = true;
+                    } else {
+                        pin.innerHTML = `
+                            <div class="ride-bubble">
+                                <div class="ride-person">🧍</div>
+                                <span>${escapar(corrida.origem || 'Origem')}</span>
+                                <strong>+${Number(corrida.valor || 0)} 🪙</strong>
+                            </div>
+                        `;
+
+                        pin.addEventListener('click', () => {
+                            aceitarCorrida(corrida.id);
+                        });
+                    }
+
+                    mapa.appendChild(pin);
+                });
+
+            garantirCorridasDisponiveis(snapshot).catch(console.warn);
+        }
+
+        // =========================================================
+        // ACEITAR CORRIDA
+        // Regra: não pode aceitar outra enquanto há uma em andamento.
+        // Também respeita o limite de 5 no dia.
+        // =========================================================
+        async function aceitarCorrida(corridaId) {
+            if (aceitandoCorrida) return;
+            aceitandoCorrida = true;
+
+            try {
+                const perfilSnap = await get(ref(db, `ludigins_usuarios/${usuarioId}`));
+                const perfil = perfilSnap.val() || {};
+
+                if (perfil.corridaAtual) {
+                    mostrarAviso('Finalize sua corrida atual antes de aceitar outra.', 'erro');
+                    return;
+                }
+
+                if (Number(perfil.corridasHoje || 0) >= MAX_CORRIDAS_DIA) {
+                    mostrarAviso('Você já completou as 5 corridas de hoje. Volte amanhã!', 'erro');
+                    return;
+                }
+
+                const corridaRef = ref(db, `ludigins_corridas/ativas/${corridaId}`);
+
+                const resultado = await runTransaction(corridaRef, atual => {
+                    if (!atual) return;
+                    if (atual.data !== dataHoje()) return;
+                    if (atual.status !== 'disponivel') return;
+
+                    return {
+                        ...atual,
+                        status: 'aceita',
+                        aceitoPor: usuarioId,
+                        aceitoNome: usuarioNome,
+                        aceitoEm: Date.now()
+                    };
+                });
+
+                if (!resultado.committed) {
+                    mostrarAviso('Outro ouvinte pegou essa corrida primeiro.', 'erro');
+                    return;
+                }
+
+                const corridaAceita = resultado.snapshot.val();
+
+                // Agora reserva a corrida no perfil do ouvinte.
+                const perfilRef = ref(db, `ludigins_usuarios/${usuarioId}`);
+                const reserva = await runTransaction(perfilRef, atual => {
+                    if (!atual) return;
+
+                    if (atual.corridaAtual) return;
+                    if (Number(atual.corridasHoje || 0) >= MAX_CORRIDAS_DIA) return;
+
+                    return {
+                        ...atual,
+                        corridaAtual: {
+                            id: corridaId,
+                            origem: corridaAceita.origem,
+                            destino: corridaAceita.destino,
+                            valor: Number(corridaAceita.valor || 0),
+                            aceitoEm: Number(corridaAceita.aceitoEm || Date.now()),
+                            data: dataHoje()
+                        },
+                        atualizadoEm: Date.now()
+                    };
+                });
+
+                if (!reserva.committed) {
+                    // Se por alguma razão a conta já estava ocupada, devolve a corrida.
+                    await runTransaction(corridaRef, atual => {
+                        if (
+                            atual &&
+                            atual.status === 'aceita' &&
+                            atual.aceitoPor === usuarioId
+                        ) {
+                            return {
+                                ...atual,
+                                status: 'disponivel',
+                                aceitoPor: null,
+                                aceitoNome: null,
+                                aceitoEm: null
+                            };
+                        }
+                        return atual;
+                    });
+
+                    mostrarAviso('Você já possui uma corrida em andamento.', 'erro');
+                    return;
+                }
+
+                await registrarEvento(
+                    `${usuarioNome} aceitou uma corrida de ${corridaAceita.valor} Ludigins.`
+                );
+
+                mostrarAviso(
+                    `Corrida aceita! Vale ${corridaAceita.valor} Ludigins.`,
+                    'ok'
+                );
+            } catch (erro) {
+                console.error(erro);
+                mostrarAviso('Não foi possível aceitar a corrida agora.', 'erro');
+            } finally {
+                aceitandoCorrida = false;
+            }
+        }
+
+        // =========================================================
+        // CORRIDA ATUAL / FINALIZAÇÃO
+        // =========================================================
+        function atualizarCorridaAtual(corrida) {
+            corridaAtualCache = corrida || null;
+
+            if (!corrida) {
+                corridaVazia.style.display = 'block';
+                corridaBox.classList.remove('show');
+                btnFinalizar.disabled = true;
+
+                if (timerCorrida) {
+                    clearInterval(timerCorrida);
+                    timerCorrida = null;
+                }
+
+                return;
+            }
+
+            corridaVazia.style.display = 'none';
+            corridaBox.classList.add('show');
+
+            corridaValor.textContent = Number(corrida.valor || 0);
+            corridaOrigem.textContent = corrida.origem || '-';
+            corridaDestino.textContent = corrida.destino || '-';
+
+            iniciarContagemCorrida(corrida);
+        }
+
+        function iniciarContagemCorrida(corrida) {
+            if (timerCorrida) clearInterval(timerCorrida);
+
+            const atualizar = () => {
+                if (!corridaAtualCache) return;
+
+                const aceitoEm = Number(corridaAtualCache.aceitoEm || Date.now());
+                const restante = Math.max(
+                    0,
+                    TEMPO_MINIMO_CORRIDA_MS - (Date.now() - aceitoEm)
+                );
+
+                if (restante <= 0) {
+                    corridaTimer.textContent = 'Destino alcançado. Você já pode finalizar!';
+                    btnFinalizar.disabled = false;
+
+                    if (timerCorrida) {
+                        clearInterval(timerCorrida);
+                        timerCorrida = null;
+                    }
+                } else {
+                    corridaTimer.textContent =
+                        `Em viagem... ${Math.ceil(restante / 1000)}s`;
+                    btnFinalizar.disabled = true;
+                }
+            };
+
+            atualizar();
+            timerCorrida = setInterval(atualizar, 500);
+        }
+
+        btnFinalizar.addEventListener('click', async () => {
+            if (!corridaAtualCache || btnFinalizar.disabled) return;
+
+            btnFinalizar.disabled = true;
+
+            const corrida = { ...corridaAtualCache };
+            const corridaId = corrida.id;
+            const valor = Number(corrida.valor || 0);
+
+            try {
+                // Primeiro confirma no banco que esta corrida ainda pertence a este ouvinte.
+                const corridaRef = ref(db, `ludigins_corridas/ativas/${corridaId}`);
+                const conf = await runTransaction(corridaRef, atual => {
+                    if (!atual) return;
+                    if (atual.status !== 'aceita') return;
+                    if (atual.aceitoPor !== usuarioId) return;
+
+                    return {
+                        ...atual,
+                        status: 'finalizada',
+                        finalizadoEm: Date.now()
+                    };
+                });
+
+                if (!conf.committed) {
+                    mostrarAviso('Não foi possível confirmar essa corrida.', 'erro');
+                    return;
+                }
+
+                const perfilRef = ref(db, `ludigins_usuarios/${usuarioId}`);
+
+                const ganho = await runTransaction(perfilRef, atual => {
+                    if (!atual) return;
+
+                    const atualCorrida = atual.corridaAtual;
+
+                    if (!atualCorrida || atualCorrida.id !== corridaId) return;
+
+                    const novoSaldo =
+                        Number(atual.saldo || 0) + valor;
+
+                    const novasCorridas =
+                        Number(atual.corridasHoje || 0) + 1;
+
+                    const novosGanhos =
+                        Number(atual.ganhosHoje || 0) + valor;
+
+                    const { atual: novaPatente } =
+                        calcularPatente(novoSaldo);
+
+                    return {
+                        ...atual,
+                        saldo: novoSaldo,
+                        patente: novaPatente.nome,
+                        nivel: PATENTES.findIndex(
+                            p => p.nome === novaPatente.nome
+                        ),
+                        corridasHoje: novasCorridas,
+                        ganhosHoje: novosGanhos,
+                        corridaAtual: null,
+                        dataCorridas: dataHoje(),
+                        atualizadoEm: Date.now()
+                    };
+                });
+
+                if (!ganho.committed) {
+                    mostrarAviso('A corrida já foi contabilizada ou não está mais ativa.', 'erro');
+                    return;
+                }
+
+                await registrarEvento(
+                    `${usuarioNome} finalizou a corrida e ganhou ${valor} Ludigins.`
+                );
+
+                const perfilNovo = ganho.snapshot.val() || {};
+                const feitas = Number(perfilNovo.corridasHoje || 0);
+
+                if (feitas >= MAX_CORRIDAS_DIA) {
+                    mostrarAviso(
+                        `Missão do dia concluída! Você ganhou ${Number(perfilNovo.ganhosHoje || 0)} Ludigins hoje.`,
+                        'ok'
+                    );
+                } else {
+                    mostrarAviso(
+                        `Corrida finalizada! +${valor} Ludigins. Restam ${MAX_CORRIDAS_DIA - feitas} corridas hoje.`,
+                        'ok'
+                    );
+                }
+
+                // Corridas finalizadas ficam registradas no histórico,
+                // mas saem do mapa ativo.
+                setTimeout(() => {
+                    set(ref(db, `ludigins_corridas/ativas/${corridaId}`), null)
+                        .catch(() => {});
+                }, 1500);
+
+            } catch (erro) {
+                console.error(erro);
+                mostrarAviso('Erro ao finalizar a corrida.', 'erro');
+            }
+        });
+
+        // =========================================================
+        // FEED GLOBAL
+        // =========================================================
+        async function registrarEvento(texto) {
+            const evt = push(ref(db, 'ludigins_eventos'));
+            await set(evt, {
+                texto,
+                usuarioId,
+                usuarioNome,
+                timestamp: Date.now()
+            });
+        }
+
+        function desenharFeed(snapshot) {
+            const itens = [];
+
+            if (snapshot.exists()) {
+                snapshot.forEach(child => {
+                    itens.push(child.val() || {});
+                });
+            }
+
+            itens.sort((a,b) => Number(b.timestamp || 0) - Number(a.timestamp || 0));
+
+            const ultimos = itens.slice(0, 12);
+
+            if (!ultimos.length) {
+                feed.innerHTML =
+                    '<div class="feed-item">Aguardando movimentação dos ouvintes...</div>';
+                return;
+            }
+
+            feed.innerHTML = ultimos.map(item => `
+                <div class="feed-item">
+                    <strong>${escapar(item.usuarioNome || 'Ouvinte')}</strong><br>
+                    ${escapar(item.texto || '')}
+                </div>
+            `).join('');
+        }
+
+        // =========================================================
+        // BLOQUEIOS
+        // =========================================================
+        function atualizarBloqueioMapa() {
+            if (!perfilAtual) return;
+
+            const temCorrida = !!perfilAtual.corridaAtual;
+            const feitas = Number(perfilAtual.corridasHoje || 0);
+            const limite = feitas >= MAX_CORRIDAS_DIA;
+
+            if (temCorrida) {
+                bloqueioMapa.classList.add('show');
+                bloqueioTitulo.textContent = '🚕 Corrida em andamento';
+                bloqueioTexto.textContent =
+                    'Finalize a corrida atual antes de aceitar outra.';
+                return;
+            }
+
+            if (limite) {
+                bloqueioMapa.classList.add('show');
+                bloqueioTitulo.textContent = '✅ Missão diária concluída';
+                bloqueioTexto.textContent =
+                    `Você completou suas ${MAX_CORRIDAS_DIA} corridas de hoje. Volte amanhã para jogar novamente.`;
+                return;
+            }
+
+            bloqueioMapa.classList.remove('show');
+        }
+
+        // =========================================================
+        // UTILIDADES
+        // =========================================================
+        function escapar(valor) {
+            return String(valor ?? '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
+
+        let timerAviso = null;
+
+        function mostrarAviso(texto, tipo = 'ok') {
+            clearTimeout(timerAviso);
+
+            aviso.textContent = texto;
+            aviso.className = `aviso show ${tipo}`;
+
+            timerAviso = setTimeout(() => {
+                aviso.className = 'aviso';
+            }, 3600);
+        }
+
+        document.getElementById('btnVoltar').addEventListener('click', () => {
+            window.location.href = './index.html';
+        });
+
+        // =========================================================
+        // INICIALIZAÇÃO
+        // =========================================================
+        async function iniciar() {
+            await resolverUsuario();
+            await garantirPerfil();
+
+            nomeOuvinteEl.textContent = String(usuarioNome || 'OUVINTE').toUpperCase();
+
+            onValue(
+                ref(db, `ludigins_usuarios/${usuarioId}`),
+                snapshot => {
+                    if (snapshot.exists()) {
+                        desenharPerfil(snapshot.val());
+                    }
+                }
+            );
+
+            onValue(
+                ref(db, 'ludigins_corridas/ativas'),
+                snapshot => {
+                    desenharCorridas(snapshot);
+                }
+            );
+
+            onValue(
+                ref(db, 'ludigins_eventos'),
+                snapshot => {
+                    desenharFeed(snapshot);
+                }
+            );
+
+            // Primeira criação do mapa compartilhado.
+            const corridasSnap = await get(ref(db, 'ludigins_corridas/ativas'));
+            await garantirCorridasDisponiveis(corridasSnap);
+        }
+
+        iniciar().catch(erro => {
+            console.error(erro);
+            mostrarAviso(
+                'Não foi possível iniciar o jogo. Verifique a conexão com o Firebase.',
+                'erro'
+            );
+        });
+    </script>
 </body>
 </html>
