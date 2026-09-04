@@ -1749,22 +1749,237 @@
         // CONTROLES DE MÍDIA DO CELULAR / BLUETOOTH / CARRO
         // Integração isolada via Media Session API.
         // =====================================================
-        function atualizarMediaSessionRadio(radio) {
+        let capaMediaSessionAtualUrl = null;
+        let sequenciaCapaMediaSession = 0;
+
+        function quebrarTextoCapa(ctx, texto, larguraMaxima) {
+            const palavras = String(texto || '').trim().split(/\s+/);
+            const linhas = [];
+            let linha = '';
+
+            palavras.forEach(palavra => {
+                const teste = linha ? `${linha} ${palavra}` : palavra;
+
+                if (
+                    ctx.measureText(teste).width <= larguraMaxima ||
+                    !linha
+                ) {
+                    linha = teste;
+                } else {
+                    linhas.push(linha);
+                    linha = palavra;
+                }
+            });
+
+            if (linha) linhas.push(linha);
+
+            return linhas.slice(0, 3);
+        }
+
+        function criarCapaCardRadio(radio) {
+            return new Promise((resolve) => {
+                try {
+                    const custom =
+                        customizacoesOuvinte[radio.id] || {};
+
+                    const corCard =
+                        custom.cor ||
+                        radio.cor ||
+                        "#86efac";
+
+                    const iconeCard =
+                        custom.icone ||
+                        radio.icone ||
+                        "📻";
+
+                    const nomeRadio =
+                        radio.nome ||
+                        "RÁDIO ONLINE";
+
+                    const canvas =
+                        document.createElement('canvas');
+
+                    canvas.width = 512;
+                    canvas.height = 512;
+
+                    const ctx =
+                        canvas.getContext('2d');
+
+                    if (!ctx) {
+                        resolve(null);
+                        return;
+                    }
+
+                    // Fundo escuro externo, semelhante ao painel.
+                    ctx.fillStyle = '#111827';
+                    ctx.fillRect(0, 0, 512, 512);
+
+                    // Card com a mesma cor escolhida pelo ouvinte.
+                    const x = 28;
+                    const y = 28;
+                    const w = 456;
+                    const h = 456;
+                    const raio = 36;
+
+                    ctx.beginPath();
+                    ctx.moveTo(x + raio, y);
+                    ctx.lineTo(x + w - raio, y);
+                    ctx.quadraticCurveTo(
+                        x + w,
+                        y,
+                        x + w,
+                        y + raio
+                    );
+                    ctx.lineTo(
+                        x + w,
+                        y + h - raio
+                    );
+                    ctx.quadraticCurveTo(
+                        x + w,
+                        y + h,
+                        x + w - raio,
+                        y + h
+                    );
+                    ctx.lineTo(x + raio, y + h);
+                    ctx.quadraticCurveTo(
+                        x,
+                        y + h,
+                        x,
+                        y + h - raio
+                    );
+                    ctx.lineTo(x, y + raio);
+                    ctx.quadraticCurveTo(
+                        x,
+                        y,
+                        x + raio,
+                        y
+                    );
+                    ctx.closePath();
+
+                    ctx.fillStyle = corCard;
+                    ctx.fill();
+
+                    // Ícone escolhido pelo ouvinte.
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.font =
+                        '118px "Apple Color Emoji", "Segoe UI Emoji", sans-serif';
+
+                    ctx.fillText(
+                        String(iconeCard),
+                        256,
+                        178
+                    );
+
+                    // Linha divisória, como no card do painel.
+                    ctx.globalAlpha = 0.18;
+                    ctx.fillStyle = '#0f172a';
+                    ctx.fillRect(
+                        78,
+                        290,
+                        356,
+                        2
+                    );
+                    ctx.globalAlpha = 1;
+
+                    // Nome da rádio.
+                    ctx.fillStyle = '#0f172a';
+                    ctx.font =
+                        'bold 34px Arial, sans-serif';
+
+                    const linhas =
+                        quebrarTextoCapa(
+                            ctx,
+                            String(nomeRadio).toUpperCase(),
+                            390
+                        );
+
+                    const inicioY =
+                        linhas.length === 1
+                            ? 356
+                            : (
+                                linhas.length === 2
+                                    ? 338
+                                    : 320
+                            );
+
+                    linhas.forEach(
+                        (linha, indice) => {
+                            ctx.fillText(
+                                linha,
+                                256,
+                                inicioY + indice * 42
+                            );
+                        }
+                    );
+
+                    // Pequeno texto AO VIVO na parte inferior.
+                    ctx.font =
+                        'bold 22px Arial, sans-serif';
+                    ctx.globalAlpha = 0.72;
+                    ctx.fillText(
+                        'AO VIVO',
+                        256,
+                        446
+                    );
+                    ctx.globalAlpha = 1;
+
+                    canvas.toBlob(
+                        blob => {
+                            if (!blob) {
+                                resolve(null);
+                                return;
+                            }
+
+                            resolve(
+                                URL.createObjectURL(blob)
+                            );
+                        },
+                        'image/png',
+                        1
+                    );
+                }
+                catch (erro) {
+                    console.warn(
+                        'Não foi possível criar a capa do card:',
+                        erro
+                    );
+
+                    resolve(null);
+                }
+            });
+        }
+
+        async function atualizarMediaSessionRadio(radio) {
             if (!('mediaSession' in navigator) || !radio) return;
 
-            try {
-                const nomeRadio = radio.nome || 'Rádio Online';
+            const minhaSequencia =
+                ++sequenciaCapaMediaSession;
 
-                // Se no futuro a rádio tiver uma URL de logo/imagem,
-                // ela será enviada automaticamente para os controles de mídia.
-                const imagemRadio =
-                    radio.logoUrl ||
-                    radio.logo ||
-                    radio.imagemUrl ||
-                    radio.imagem ||
-                    radio.capaUrl ||
-                    radio.capa ||
-                    '';
+            try {
+                const nomeRadio =
+                    radio.nome ||
+                    'Rádio Online';
+
+                // Cria uma imagem quadrada baseada exatamente
+                // na cor e no ícone escolhidos pelo ouvinte.
+                const capaGerada =
+                    await criarCapaCardRadio(radio);
+
+                // Evita que uma capa antiga apareça se o ouvinte
+                // trocar de rádio muito rapidamente.
+                if (
+                    minhaSequencia !==
+                    sequenciaCapaMediaSession
+                ) {
+                    if (capaGerada) {
+                        URL.revokeObjectURL(
+                            capaGerada
+                        );
+                    }
+
+                    return;
+                }
 
                 const metadata = {
                     title: nomeRadio,
@@ -1772,19 +1987,31 @@
                     album: 'Painel do Ouvinte'
                 };
 
-                if (imagemRadio && /^https?:\/\//i.test(String(imagemRadio))) {
+                if (capaGerada) {
                     metadata.artwork = [
-                        { src: imagemRadio, sizes: '96x96' },
-                        { src: imagemRadio, sizes: '128x128' },
-                        { src: imagemRadio, sizes: '192x192' },
-                        { src: imagemRadio, sizes: '256x256' },
-                        { src: imagemRadio, sizes: '384x384' },
-                        { src: imagemRadio, sizes: '512x512' }
+                        {
+                            src: capaGerada,
+                            sizes: '512x512',
+                            type: 'image/png'
+                        }
                     ];
                 }
 
                 navigator.mediaSession.metadata =
                     new MediaMetadata(metadata);
+
+                if (
+                    capaMediaSessionAtualUrl &&
+                    capaMediaSessionAtualUrl !==
+                        capaGerada
+                ) {
+                    URL.revokeObjectURL(
+                        capaMediaSessionAtualUrl
+                    );
+                }
+
+                capaMediaSessionAtualUrl =
+                    capaGerada;
             }
             catch (erro) {
                 console.warn(
