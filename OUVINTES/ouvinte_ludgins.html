@@ -325,16 +325,120 @@
             left: 49%;
             top: 52%;
             transform: translate(-50%, -50%);
-            z-index: 4;
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
-            display: grid;
-            place-items: center;
-            font-size: 28px;
-            background: rgba(124,58,237,.22);
-            border: 1px solid rgba(167,139,250,.5);
-            box-shadow: 0 0 22px rgba(124,58,237,.25);
+            z-index: 7;
+            width: 54px;
+            height: 58px;
+            pointer-events: none;
+            transition: left .08s linear, top .08s linear;
+            will-change: left, top;
+        }
+
+        .carro-jogador.outro {
+            z-index: 6;
+            opacity: .94;
+        }
+
+        .carro-nome {
+            position: absolute;
+            left: 50%;
+            bottom: calc(100% + 4px);
+            transform: translateX(-50%);
+            max-width: 105px;
+            padding: 4px 7px;
+            border-radius: 9px;
+            background: rgba(2, 6, 23, .92);
+            border: 1px solid rgba(255,255,255,.18);
+            color: #fff;
+            font-size: 9px;
+            font-weight: 900;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            box-shadow: 0 5px 16px rgba(0,0,0,.28);
+        }
+
+        .carro-nome::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 100%;
+            transform: translateX(-50%);
+            border: 4px solid transparent;
+            border-top-color: rgba(2, 6, 23, .92);
+        }
+
+        .carro-visual {
+            --car-color: #facc15;
+            position: absolute;
+            left: 50%;
+            top: 20px;
+            width: 44px;
+            height: 25px;
+            transform: translateX(-50%);
+            border-radius: 9px 13px 8px 8px;
+            background: var(--car-color);
+            border: 2px solid rgba(255,255,255,.92);
+            box-shadow:
+                0 5px 12px rgba(0,0,0,.35),
+                0 0 18px color-mix(in srgb, var(--car-color) 48%, transparent);
+        }
+
+        .carro-visual::before {
+            content: "";
+            position: absolute;
+            left: 8px;
+            top: -9px;
+            width: 25px;
+            height: 12px;
+            border-radius: 9px 9px 3px 3px;
+            background: var(--car-color);
+            border: 2px solid rgba(255,255,255,.9);
+            border-bottom: 0;
+        }
+
+        .carro-visual::after {
+            content: "";
+            position: absolute;
+            left: 13px;
+            top: -5px;
+            width: 15px;
+            height: 7px;
+            border-radius: 4px 4px 2px 2px;
+            background: #bae6fd;
+            border: 1px solid rgba(2,6,23,.35);
+        }
+
+        .carro-roda {
+            position: absolute;
+            top: 17px;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #020617;
+            border: 2px solid #64748b;
+        }
+
+        .carro-roda.esq { left: 3px; }
+        .carro-roda.dir { right: 3px; }
+
+        .carro-farol {
+            position: absolute;
+            right: -3px;
+            top: 7px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #fef08a;
+            box-shadow: 0 0 8px rgba(254,240,138,.9);
+        }
+
+        .carro-jogador.andando .carro-visual {
+            animation: carroVibrando .28s infinite alternate ease-in-out;
+        }
+
+        @keyframes carroVibrando {
+            from { transform: translateX(-50%) translateY(0); }
+            to { transform: translateX(-50%) translateY(-1.5px); }
         }
 
         .map-legenda {
@@ -632,8 +736,7 @@
                 </div>
 
                 <div class="mapa" id="mapa">
-                    <div class="carro-jogador">🚕</div>
-                    <div class="map-legenda">Toque em um passageiro para tentar aceitar a corrida.</div>
+                    <div class="map-legenda">Toque em um passageiro. Seu carrinho irá buscá-lo pelas ruas.</div>
 
                     <div class="bloqueado" id="bloqueioMapa">
                         <div class="bloqueado-box">
@@ -697,7 +800,24 @@
         const MAX_CORRIDAS_DIA = 5;
         const MIN_RECOMPENSA = 1;
         const MAX_RECOMPENSA = 7;
-        const TEMPO_MINIMO_CORRIDA_MS = 7000;
+
+        // Tempo para o carrinho chegar até o passageiro, conforme a distância.
+        const TEMPOS_BUSCA = {
+            PERTO: 5000,
+            MEDIO: 8000,
+            LONGE: 10000,
+            MUITO_LONGE: 12000
+        };
+
+        // Cores por evolução do ouvinte:
+        // começa amarelo, depois verde, roxo, vermelho e azul.
+        const CORES_CARRINHO = [
+            '#facc15',
+            '#22c55e',
+            '#a855f7',
+            '#ef4444',
+            '#3b82f6'
+        ];
 
         const PATENTES = [
             { nome: 'SEM PATENTE', minimo: 0, icone: '🎧' },
@@ -766,6 +886,12 @@
         let corridaAtualCache = null;
         let timerCorrida = null;
         let aceitandoCorrida = false;
+
+        // Jogadores online no mapa.
+        let jogadoresOnlineCache = {};
+        let animacoesCarrinhos = new Map();
+        let heartbeatJogador = null;
+        let posicaoJogadorAtual = { x: 49, y: 52 };
 
         function chaveFallback() {
             return String(
@@ -977,6 +1103,351 @@
 
             atualizarBloqueioMapa();
             atualizarCorridaAtual(perfil.corridaAtual || null);
+
+            if (usuarioId) {
+                update(
+                    ref(db, `ludigins_jogo/jogadores/${usuarioId}`),
+                    {
+                        nome: perfil.nome || usuarioNome,
+                        saldo,
+                        cor: corCarrinhoPorSaldo(saldo),
+                        atualizadoEm: Date.now()
+                    }
+                ).catch(() => {});
+            }
+        }
+
+        // =========================================================
+        // CARRINHOS ONLINE / MOVIMENTO EM TEMPO REAL
+        // =========================================================
+        function indiceCorCarrinho(saldo) {
+            const { indice } = calcularPatente(Number(saldo || 0));
+
+            // Mantém exatamente a sequência pedida:
+            // amarelo -> verde -> roxo -> vermelho -> azul.
+            // Na patente máxima, permanece azul.
+            return Math.max(0, Math.min(CORES_CARRINHO.length - 1, indice));
+        }
+
+        function corCarrinhoPorSaldo(saldo) {
+            return CORES_CARRINHO[indiceCorCarrinho(saldo)];
+        }
+
+        function criarElementoCarrinho(id, jogador) {
+            const el = document.createElement('div');
+            el.className = `carro-jogador ${id === usuarioId ? 'meu' : 'outro'}`;
+            el.dataset.jogadorId = id;
+
+            el.innerHTML = `
+                <div class="carro-nome">${escapar(jogador.nome || 'Ouvinte')}</div>
+                <div class="carro-visual">
+                    <span class="carro-roda esq"></span>
+                    <span class="carro-roda dir"></span>
+                    <span class="carro-farol"></span>
+                </div>
+            `;
+
+            mapa.appendChild(el);
+            return el;
+        }
+
+        function atualizarVisualCarrinho(el, jogador) {
+            const visual = el.querySelector('.carro-visual');
+            const nome = el.querySelector('.carro-nome');
+
+            if (visual) {
+                visual.style.setProperty(
+                    '--car-color',
+                    jogador.cor || corCarrinhoPorSaldo(jogador.saldo || 0)
+                );
+            }
+
+            if (nome) {
+                nome.textContent = jogador.nome || 'Ouvinte';
+            }
+        }
+
+        function posicaoNoMovimento(movimento, agora = Date.now()) {
+            if (!movimento || !movimento.inicioEm || !movimento.duracaoMs) {
+                return null;
+            }
+
+            const inicio = Number(movimento.inicioEm);
+            const duracao = Math.max(1, Number(movimento.duracaoMs));
+            const progresso = Math.max(0, Math.min(1, (agora - inicio) / duracao));
+
+            const x0 = Number(movimento.deX ?? 49);
+            const y0 = Number(movimento.deY ?? 52);
+            const x1 = Number(movimento.paraX ?? x0);
+            const y1 = Number(movimento.paraY ?? y0);
+
+            // Caminho em "L": primeiro pela rua horizontal,
+            // depois entra na rua vertical até o passageiro.
+            const distX = Math.abs(x1 - x0);
+            const distY = Math.abs(y1 - y0);
+            const total = Math.max(.001, distX + distY);
+            const corte = distX / total;
+
+            let x;
+            let y;
+
+            if (progresso <= corte && corte > 0) {
+                const p = progresso / corte;
+                x = x0 + (x1 - x0) * p;
+                y = y0;
+            } else {
+                const p = corte >= 1
+                    ? 1
+                    : Math.max(0, Math.min(1, (progresso - corte) / Math.max(.001, 1 - corte)));
+
+                x = x1;
+                y = y0 + (y1 - y0) * p;
+            }
+
+            return {
+                x,
+                y,
+                progresso,
+                terminou: progresso >= 1
+            };
+        }
+
+        function pararAnimacaoCarrinho(id) {
+            const raf = animacoesCarrinhos.get(id);
+            if (raf) cancelAnimationFrame(raf);
+            animacoesCarrinhos.delete(id);
+        }
+
+        function animarCarrinho(id, jogador, el) {
+            pararAnimacaoCarrinho(id);
+
+            const executar = () => {
+                const movimento = jogador.movimento;
+                const pos = posicaoNoMovimento(movimento);
+
+                if (!pos) {
+                    el.style.left = `${Number(jogador.x ?? 49)}%`;
+                    el.style.top = `${Number(jogador.y ?? 52)}%`;
+                    el.classList.remove('andando');
+                    return;
+                }
+
+                el.style.left = `${pos.x}%`;
+                el.style.top = `${pos.y}%`;
+
+                if (!pos.terminou) {
+                    el.classList.add('andando');
+
+                    if (id === usuarioId) {
+                        posicaoJogadorAtual = { x: pos.x, y: pos.y };
+                    }
+
+                    const raf = requestAnimationFrame(executar);
+                    animacoesCarrinhos.set(id, raf);
+                } else {
+                    el.classList.remove('andando');
+                    animacoesCarrinhos.delete(id);
+
+                    if (id === usuarioId) {
+                        posicaoJogadorAtual = {
+                            x: Number(movimento.paraX),
+                            y: Number(movimento.paraY)
+                        };
+
+                        finalizarMovimentoDoMeuCarrinho(movimento).catch(console.warn);
+                    }
+                }
+            };
+
+            executar();
+        }
+
+        async function finalizarMovimentoDoMeuCarrinho(movimento) {
+            const jogadorRef = ref(db, `ludigins_jogo/jogadores/${usuarioId}`);
+
+            await runTransaction(jogadorRef, atual => {
+                if (!atual) return;
+                if (!atual.movimento) return atual;
+
+                if (
+                    Number(atual.movimento.inicioEm || 0) !==
+                    Number(movimento.inicioEm || 0)
+                ) {
+                    return atual;
+                }
+
+                return {
+                    ...atual,
+                    x: Number(movimento.paraX),
+                    y: Number(movimento.paraY),
+                    movimento: null,
+                    status: 'aguardando_finalizacao',
+                    atualizadoEm: Date.now()
+                };
+            });
+        }
+
+        function desenharJogadoresOnline(snapshot) {
+            const agora = Date.now();
+            const vistos = new Set();
+            jogadoresOnlineCache = {};
+
+            if (snapshot.exists()) {
+                snapshot.forEach(child => {
+                    const jogador = child.val() || {};
+                    const id = child.key;
+
+                    // Considera online se atualizou nos últimos 20 segundos.
+                    if (agora - Number(jogador.atualizadoEm || 0) > 20000) {
+                        return;
+                    }
+
+                    vistos.add(id);
+                    jogadoresOnlineCache[id] = jogador;
+
+                    let el = mapa.querySelector(
+                        `.carro-jogador[data-jogador-id="${CSS.escape(id)}"]`
+                    );
+
+                    if (!el) {
+                        el = criarElementoCarrinho(id, jogador);
+                    }
+
+                    atualizarVisualCarrinho(el, jogador);
+
+                    if (jogador.movimento) {
+                        animarCarrinho(id, jogador, el);
+                    } else {
+                        pararAnimacaoCarrinho(id);
+                        el.classList.remove('andando');
+                        el.style.left = `${Number(jogador.x ?? 49)}%`;
+                        el.style.top = `${Number(jogador.y ?? 52)}%`;
+
+                        if (id === usuarioId) {
+                            posicaoJogadorAtual = {
+                                x: Number(jogador.x ?? 49),
+                                y: Number(jogador.y ?? 52)
+                            };
+                        }
+                    }
+                });
+            }
+
+            mapa.querySelectorAll('.carro-jogador').forEach(el => {
+                const id = el.dataset.jogadorId;
+
+                if (!vistos.has(id)) {
+                    pararAnimacaoCarrinho(id);
+                    el.remove();
+                }
+            });
+        }
+
+        async function marcarJogadorOnline() {
+            const jogadorRef = ref(db, `ludigins_jogo/jogadores/${usuarioId}`);
+            const snap = await get(jogadorRef);
+            const anterior = snap.exists() ? (snap.val() || {}) : {};
+
+            const saldo = Number(perfilAtual?.saldo || anterior.saldo || 0);
+
+            const dados = {
+                nome: usuarioNome,
+                saldo,
+                cor: corCarrinhoPorSaldo(saldo),
+                x: Number(anterior.x ?? posicaoJogadorAtual.x ?? 49),
+                y: Number(anterior.y ?? posicaoJogadorAtual.y ?? 52),
+                movimento: anterior.movimento || null,
+                status: anterior.status || 'online',
+                atualizadoEm: Date.now()
+            };
+
+            await set(jogadorRef, dados);
+        }
+
+        async function atualizarHeartbeatJogador() {
+            const jogadorRef = ref(db, `ludigins_jogo/jogadores/${usuarioId}`);
+            const saldo = Number(perfilAtual?.saldo || 0);
+
+            try {
+                await update(jogadorRef, {
+                    nome: usuarioNome,
+                    saldo,
+                    cor: corCarrinhoPorSaldo(saldo),
+                    atualizadoEm: Date.now()
+                });
+            } catch (e) {}
+        }
+
+        function iniciarPresencaNoMapa() {
+            if (heartbeatJogador) clearInterval(heartbeatJogador);
+
+            marcarJogadorOnline().catch(console.warn);
+
+            heartbeatJogador = setInterval(() => {
+                atualizarHeartbeatJogador();
+            }, 5000);
+
+            window.addEventListener('beforeunload', () => {
+                // O timeout de 20s remove visualmente o carrinho mesmo
+                // se o navegador não conseguir gravar o offline ao fechar.
+            });
+        }
+
+        function distanciaEntre(a, b) {
+            const dx = Number(a.x) - Number(b.x);
+            const dy = Number(a.y) - Number(b.y);
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        function tempoBuscaPorDistancia(distancia) {
+            if (distancia <= 22) return TEMPOS_BUSCA.PERTO;
+            if (distancia <= 36) return TEMPOS_BUSCA.MEDIO;
+            if (distancia <= 52) return TEMPOS_BUSCA.LONGE;
+            return TEMPOS_BUSCA.MUITO_LONGE;
+        }
+
+        function textoDistanciaPorTempo(tempoMs) {
+            if (tempoMs <= 5000) return 'passageiro próximo';
+            if (tempoMs <= 8000) return 'passageiro um pouco afastado';
+            if (tempoMs <= 10000) return 'passageiro afastado';
+            return 'passageiro bem afastado';
+        }
+
+        async function iniciarMovimentoAtePassageiro(corridaAceita, tempoBuscaMs) {
+            const jogadorRef = ref(db, `ludigins_jogo/jogadores/${usuarioId}`);
+
+            const inicio = {
+                x: Number(posicaoJogadorAtual.x ?? 49),
+                y: Number(posicaoJogadorAtual.y ?? 52)
+            };
+
+            const movimento = {
+                deX: inicio.x,
+                deY: inicio.y,
+                paraX: Number(corridaAceita.x ?? 50),
+                paraY: Number(corridaAceita.y ?? 50),
+                inicioEm: Date.now(),
+                duracaoMs: tempoBuscaMs,
+                corridaId: corridaAceita.id || null
+            };
+
+            await runTransaction(jogadorRef, atual => {
+                const saldo = Number(perfilAtual?.saldo || atual?.saldo || 0);
+
+                return {
+                    ...(atual || {}),
+                    nome: usuarioNome,
+                    saldo,
+                    cor: corCarrinhoPorSaldo(saldo),
+                    x: inicio.x,
+                    y: inicio.y,
+                    movimento,
+                    status: 'indo_buscar_passageiro',
+                    atualizadoEm: Date.now()
+                };
+            });
+
+            return movimento;
         }
 
         // =========================================================
@@ -989,12 +1460,26 @@
         function criarDadosCorrida() {
             const rota = ROTAS[aleatorio(0, ROTAS.length - 1)];
 
+            let x;
+            let y;
+            let tentativas = 0;
+
+            // Evita passageiros grudados no centro do mapa.
+            do {
+                x = aleatorio(10, 90);
+                y = aleatorio(12, 88);
+                tentativas++;
+            } while (
+                distanciaEntre({ x, y }, { x: 49, y: 52 }) < 24 &&
+                tentativas < 30
+            );
+
             return {
                 origem: rota[0],
                 destino: rota[1],
                 valor: aleatorio(MIN_RECOMPENSA, MAX_RECOMPENSA),
-                x: aleatorio(12, 88),
-                y: aleatorio(15, 83),
+                x,
+                y,
                 status: 'disponivel',
                 criadoEm: Date.now(),
                 data: dataHoje(),
@@ -1199,7 +1684,24 @@
                     return;
                 }
 
-                const corridaAceita = resultado.snapshot.val();
+                const corridaAceita = {
+                    id: corridaId,
+                    ...(resultado.snapshot.val() || {})
+                };
+
+                const distancia = distanciaEntre(
+                    posicaoJogadorAtual,
+                    {
+                        x: Number(corridaAceita.x ?? 50),
+                        y: Number(corridaAceita.y ?? 50)
+                    }
+                );
+
+                const tempoBuscaMs = tempoBuscaPorDistancia(distancia);
+                const movimento = await iniciarMovimentoAtePassageiro(
+                    corridaAceita,
+                    tempoBuscaMs
+                );
 
                 // Agora reserva a corrida no perfil do ouvinte.
                 const perfilRef = ref(db, `ludigins_usuarios/${usuarioId}`);
@@ -1217,7 +1719,13 @@
                             destino: corridaAceita.destino,
                             valor: Number(corridaAceita.valor || 0),
                             aceitoEm: Number(corridaAceita.aceitoEm || Date.now()),
-                            data: dataHoje()
+                            data: dataHoje(),
+                            passageiroX: Number(corridaAceita.x ?? 50),
+                            passageiroY: Number(corridaAceita.y ?? 50),
+                            tempoBuscaMs,
+                            movimentoInicioEm: Number(movimento.inicioEm),
+                            carroDeX: Number(movimento.deX),
+                            carroDeY: Number(movimento.deY)
                         },
                         atualizadoEm: Date.now()
                     };
@@ -1251,7 +1759,7 @@
                 );
 
                 mostrarAviso(
-                    `Corrida aceita! Vale ${corridaAceita.valor} Ludigins.`,
+                    `Corrida aceita! Seu carrinho está indo buscar o ${textoDistanciaPorTempo(tempoBuscaMs)}. Chegada em ${Math.round(tempoBuscaMs / 1000)} segundos.`,
                     'ok'
                 );
             } catch (erro) {
@@ -1297,14 +1805,25 @@
             const atualizar = () => {
                 if (!corridaAtualCache) return;
 
-                const aceitoEm = Number(corridaAtualCache.aceitoEm || Date.now());
+                const inicio = Number(
+                    corridaAtualCache.movimentoInicioEm ||
+                    corridaAtualCache.aceitoEm ||
+                    Date.now()
+                );
+
+                const duracao = Number(
+                    corridaAtualCache.tempoBuscaMs ||
+                    TEMPOS_BUSCA.MEDIO
+                );
+
                 const restante = Math.max(
                     0,
-                    TEMPO_MINIMO_CORRIDA_MS - (Date.now() - aceitoEm)
+                    duracao - (Date.now() - inicio)
                 );
 
                 if (restante <= 0) {
-                    corridaTimer.textContent = 'Destino alcançado. Você já pode finalizar!';
+                    corridaTimer.textContent =
+                        '🚕 Passageiro alcançado! Você já pode finalizar a corrida.';
                     btnFinalizar.disabled = false;
 
                     if (timerCorrida) {
@@ -1313,13 +1832,13 @@
                     }
                 } else {
                     corridaTimer.textContent =
-                        `Em viagem... ${Math.ceil(restante / 1000)}s`;
+                        `🚕 Indo buscar o passageiro... ${Math.ceil(restante / 1000)}s`;
                     btnFinalizar.disabled = true;
                 }
             };
 
             atualizar();
-            timerCorrida = setInterval(atualizar, 500);
+            timerCorrida = setInterval(atualizar, 250);
         }
 
         btnFinalizar.addEventListener('click', async () => {
@@ -1391,6 +1910,21 @@
                     mostrarAviso('A corrida já foi contabilizada ou não está mais ativa.', 'erro');
                     return;
                 }
+
+                await update(
+                    ref(db, `ludigins_jogo/jogadores/${usuarioId}`),
+                    {
+                        x: Number(corrida.passageiroX ?? posicaoJogadorAtual.x),
+                        y: Number(corrida.passageiroY ?? posicaoJogadorAtual.y),
+                        movimento: null,
+                        status: 'online',
+                        saldo: Number(ganho.snapshot.val()?.saldo || 0),
+                        cor: corCarrinhoPorSaldo(
+                            Number(ganho.snapshot.val()?.saldo || 0)
+                        ),
+                        atualizadoEm: Date.now()
+                    }
+                );
 
                 await registrarEvento(
                     `${usuarioNome} finalizou a corrida e ganhou ${valor} Ludigins.`
@@ -1553,6 +2087,15 @@
                     desenharFeed(snapshot);
                 }
             );
+
+            onValue(
+                ref(db, 'ludigins_jogo/jogadores'),
+                snapshot => {
+                    desenharJogadoresOnline(snapshot);
+                }
+            );
+
+            iniciarPresencaNoMapa();
 
             // Primeira criação do mapa compartilhado.
             const corridasSnap = await get(ref(db, 'ludigins_corridas/ativas'));
