@@ -966,28 +966,156 @@
             letter-spacing: .5px;
         }
 
-        /* Celulares: o aparelho usa praticamente toda a tela */
+        /* Celulares: Rádio Retrô compacto, com controles sempre visíveis */
         @media (max-width: 700px) {
             #retroRadioContainer {
-                padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+                padding:
+                    max(4px, env(safe-area-inset-top))
+                    max(4px, env(safe-area-inset-right))
+                    max(4px, env(safe-area-inset-bottom))
+                    max(4px, env(safe-area-inset-left));
+                align-items: stretch;
+                overflow: hidden;
             }
+
             .retro-cabinet {
                 width: 100%;
                 height: 100%;
+                max-height: 100dvh;
                 border-width: 4px;
                 border-radius: 12px;
-                padding: clamp(9px, 2.8vw, 14px);
+                padding: 8px 10px 10px;
+                justify-content: flex-start;
+                gap: 5px;
+                overflow: hidden;
             }
+
+            .retro-top-panel {
+                margin-bottom: 1px;
+                min-height: 34px;
+            }
+
+            .btn-exit-retro {
+                min-height: 34px;
+                padding: 6px 12px;
+                font-size: 10px;
+            }
+
+            .retro-dial-glass {
+                margin: 2px 0;
+                padding: 6px 8px;
+                flex: 0 0 auto;
+            }
+
+            .retro-station-title {
+                font-size: clamp(13px, 4vw, 18px);
+                margin-bottom: 3px;
+            }
+
+            .retro-digital-tuner {
+                margin-top: 2px;
+                gap: 5px;
+            }
+
+            .retro-digital-display {
+                min-height: 42px;
+                font-size: clamp(18px, 6vw, 25px);
+            }
+
+            .retro-level-meter {
+                height: 30px;
+                padding: 2px 4px;
+            }
+
+            /* A caixa de som continua bonita, mas não empurra os botões para fora da tela */
             .retro-speaker-grille {
-                min-height: 0;
+                flex: 1 1 auto;
+                min-height: 90px;
+                max-height: 38dvh;
+                margin: 3px 0;
+                border-width: 3px;
+            }
+
+            .retro-brand-badge {
+                padding: 5px 12px;
+                font-size: 10px;
+            }
+
+            /* Controles ficam presos na parte inferior visível do rádio */
+            .retro-controls-row {
+                flex: 0 0 auto;
+                width: 100%;
+                min-height: 112px;
+                margin-top: 2px;
+                padding: 5px 4px max(4px, env(safe-area-inset-bottom));
+                justify-content: space-evenly;
+                gap: 18px;
+                background: rgba(18, 9, 3, 0.20);
+                border-radius: 10px;
+            }
+
+            .retro-knob-container {
+                min-width: 112px;
+                min-height: 104px;
+                justify-content: center;
+                touch-action: none;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .retro-knob {
+                width: 72px;
+                height: 72px;
+                border-width: 4px;
+            }
+
+            .retro-knob-label {
+                margin-top: 6px;
+                font-size: 10px;
             }
         }
 
-        /* Tablets */
+        /* Tablets: controles do Retrô sempre visíveis e fáceis de tocar */
         @media (min-width: 701px) and (max-width: 1100px) {
+            #retroRadioContainer {
+                overflow: hidden;
+            }
+
             .retro-cabinet {
                 width: min(94vw, 760px);
                 height: min(94dvh, 900px);
+                justify-content: flex-start;
+                gap: 7px;
+            }
+
+            .retro-dial-glass {
+                flex: 0 0 auto;
+            }
+
+            .retro-speaker-grille {
+                flex: 1 1 auto;
+                min-height: 120px;
+                max-height: 48dvh;
+            }
+
+            .retro-controls-row {
+                flex: 0 0 auto;
+                min-height: 128px;
+                padding: 8px 10px 6px;
+                justify-content: space-evenly;
+                gap: 36px;
+            }
+
+            .retro-knob-container {
+                min-width: 135px;
+                min-height: 116px;
+                justify-content: center;
+                touch-action: none;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .retro-knob {
+                width: 82px;
+                height: 82px;
             }
         }
 
@@ -2996,6 +3124,8 @@
         // Interação por toque/arraste no Botão de Volume (0 a 80)
         let arrastandoVolume = false;
         let startXVol = 0;
+        let startYVol = 0;
+        let moveuVolumeNoToque = false;
 
         function aplicarVolumePeloRetro(novoValor) {
             aplicarVolumePlayer(novoValor);
@@ -3048,14 +3178,25 @@
         knobVolumeContainer.addEventListener('touchstart', (e) => {
             arrastandoVolume = true;
             startXVol = e.touches[0].clientX;
+            startYVol = e.touches[0].clientY;
+            moveuVolumeNoToque = false;
             e.preventDefault();
-        });
+        }, { passive: false });
 
         window.addEventListener('touchmove', (e) => {
             if (!arrastandoVolume) return;
 
-            const deltaX = e.touches[0].clientX - startXVol;
-            startXVol = e.touches[0].clientX;
+            const toque = e.touches[0];
+            const deltaX = toque.clientX - startXVol;
+
+            if (
+                Math.abs(deltaX) > 3 ||
+                Math.abs(toque.clientY - startYVol) > 6
+            ) {
+                moveuVolumeNoToque = true;
+            }
+
+            startXVol = toque.clientX;
 
             if (deltaX > 2 && volumePlayerAtual < 80) {
                 aplicarVolumePeloRetro(volumePlayerAtual + 1);
@@ -3064,15 +3205,38 @@
             if (deltaX < -2 && volumePlayerAtual > 0) {
                 aplicarVolumePeloRetro(volumePlayerAtual - 1);
             }
+
+            e.preventDefault();
         }, { passive: false });
 
-        window.addEventListener('touchend', () => {
-            if (arrastandoVolume) {
-                arrastandoVolume = false;
-                clearTimeout(timerSalvarVolume);
-                salvarVolumePlayerNoFirebase();
+        knobVolumeContainer.addEventListener('touchend', (e) => {
+            if (!arrastandoVolume) return;
+
+            arrastandoVolume = false;
+
+            /* Em celular/tablet:
+               toque à esquerda diminui 5;
+               toque à direita aumenta 5.
+               Se houve arraste, mantém apenas o ajuste pelo arraste. */
+            if (!moveuVolumeNoToque && e.changedTouches && e.changedTouches[0]) {
+                const rect = knobVolumeContainer.getBoundingClientRect();
+                const x = e.changedTouches[0].clientX - rect.left;
+
+                if (x < rect.width / 2) {
+                    aplicarVolumePeloRetro(
+                        Math.max(0, volumePlayerAtual - 5)
+                    );
+                } else {
+                    aplicarVolumePeloRetro(
+                        Math.min(80, volumePlayerAtual + 5)
+                    );
+                }
             }
-        });
+
+            clearTimeout(timerSalvarVolume);
+            salvarVolumePlayerNoFirebase();
+            e.preventDefault();
+        }, { passive: false });
 
         // Clique direto no botão de volume para alternar Ligar/Desligar.
         // Ao religar, volta em 15 somente quando estava realmente em zero.
@@ -3097,6 +3261,8 @@
         // Interação por toque/arraste no Botão de Sintonia (Próxima / Anterior)
         let arrastandoSintonia = false;
         let startXSintonia = 0;
+        let startYSintonia = 0;
+        let moveuSintoniaNoToque = false;
 
         knobSintoniaContainer.addEventListener('mousedown', (e) => {
             arrastandoSintonia = true;
@@ -3128,12 +3294,23 @@
         knobSintoniaContainer.addEventListener('touchstart', (e) => {
             arrastandoSintonia = true;
             startXSintonia = e.touches[0].clientX;
+            startYSintonia = e.touches[0].clientY;
+            moveuSintoniaNoToque = false;
             e.preventDefault();
-        });
+        }, { passive: false });
 
         window.addEventListener('touchmove', (e) => {
             if (!arrastandoSintonia) return;
-            const deltaX = e.touches[0].clientX - startXSintonia;
+
+            const toque = e.touches[0];
+            const deltaX = toque.clientX - startXSintonia;
+
+            if (
+                Math.abs(deltaX) > 6 ||
+                Math.abs(toque.clientY - startYSintonia) > 8
+            ) {
+                moveuSintoniaNoToque = true;
+            }
 
             if (Math.abs(deltaX) > 25) {
                 if (deltaX > 0) {
@@ -3143,14 +3320,39 @@
                     radioAnterior();
                     anguloSintonia -= 45;
                 }
-                startXSintonia = e.touches[0].clientX;
+
+                startXSintonia = toque.clientX;
                 atualizarTelaRetrô();
             }
-        });
 
-        window.addEventListener('touchend', () => {
+            e.preventDefault();
+        }, { passive: false });
+
+        knobSintoniaContainer.addEventListener('touchend', (e) => {
+            if (!arrastandoSintonia) return;
+
             arrastandoSintonia = false;
-        });
+
+            /* Em celular/tablet, um toque simples também funciona:
+               lado esquerdo = rádio anterior;
+               lado direito = próxima rádio. */
+            if (!moveuSintoniaNoToque && e.changedTouches && e.changedTouches[0]) {
+                const rect = knobSintoniaContainer.getBoundingClientRect();
+                const x = e.changedTouches[0].clientX - rect.left;
+
+                if (x < rect.width / 2) {
+                    radioAnterior();
+                    anguloSintonia -= 45;
+                } else {
+                    proximaRadio();
+                    anguloSintonia += 45;
+                }
+
+                atualizarTelaRetrô();
+            }
+
+            e.preventDefault();
+        }, { passive: false });
 
 
         // ==========================================
