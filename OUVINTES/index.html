@@ -1698,8 +1698,17 @@
             ativarPresencaChatOuvinte();
         });
 
+        document.addEventListener(
+            'click',
+            () => {
+                registrarControlesMediaSession();
+            },
+            { once: true }
+        );
+
         document.getElementById('btnSair').addEventListener('click', async () => {
             audioElement.pause();
+            atualizarEstadoMediaSession('none');
 
             // Garante a persistência do último volume escolhido antes de sair.
             try {
@@ -1735,6 +1744,169 @@
         const btnPlayPause = document.getElementById('btnPlayPause');
         const sidebarRadioList = document.getElementById('sidebarRadioList');
         const centerRadiosGrid = document.getElementById('centerRadiosGrid');
+
+        // =====================================================
+        // CONTROLES DE MÍDIA DO CELULAR / BLUETOOTH / CARRO
+        // Integração isolada via Media Session API.
+        // =====================================================
+        function atualizarMediaSessionRadio(radio) {
+            if (!('mediaSession' in navigator) || !radio) return;
+
+            try {
+                const nomeRadio = radio.nome || 'Rádio Online';
+
+                // Se no futuro a rádio tiver uma URL de logo/imagem,
+                // ela será enviada automaticamente para os controles de mídia.
+                const imagemRadio =
+                    radio.logoUrl ||
+                    radio.logo ||
+                    radio.imagemUrl ||
+                    radio.imagem ||
+                    radio.capaUrl ||
+                    radio.capa ||
+                    '';
+
+                const metadata = {
+                    title: nomeRadio,
+                    artist: 'AO VIVO',
+                    album: 'Painel do Ouvinte'
+                };
+
+                if (imagemRadio && /^https?:\/\//i.test(String(imagemRadio))) {
+                    metadata.artwork = [
+                        { src: imagemRadio, sizes: '96x96' },
+                        { src: imagemRadio, sizes: '128x128' },
+                        { src: imagemRadio, sizes: '192x192' },
+                        { src: imagemRadio, sizes: '256x256' },
+                        { src: imagemRadio, sizes: '384x384' },
+                        { src: imagemRadio, sizes: '512x512' }
+                    ];
+                }
+
+                navigator.mediaSession.metadata =
+                    new MediaMetadata(metadata);
+            }
+            catch (erro) {
+                console.warn(
+                    'Não foi possível atualizar os dados de mídia:',
+                    erro
+                );
+            }
+        }
+
+        function atualizarEstadoMediaSession(estado) {
+            if (!('mediaSession' in navigator)) return;
+
+            try {
+                navigator.mediaSession.playbackState = estado;
+            }
+            catch (erro) {
+                // Alguns navegadores não expõem playbackState.
+            }
+        }
+
+        function registrarControlesMediaSession() {
+            if (!('mediaSession' in navigator)) return;
+
+            const registrar = (acao, funcao) => {
+                try {
+                    navigator.mediaSession.setActionHandler(
+                        acao,
+                        funcao
+                    );
+                }
+                catch (erro) {
+                    console.warn(
+                        'Comando de mídia não suportado:',
+                        acao
+                    );
+                }
+            };
+
+            registrar('play', async () => {
+                const radiosAtivasNoCentro =
+                    radiosFavoritasIds
+                        .map(id =>
+                            todasRadiosGlobal.find(
+                                r => r.id === id
+                            )
+                        )
+                        .filter(Boolean);
+
+                try {
+                    if (
+                        indiceRadioAtual === -1 &&
+                        radiosAtivasNoCentro.length > 0
+                    ) {
+                        tocarRadioPorObjeto(
+                            radiosAtivasNoCentro[0]
+                        );
+                        return;
+                    }
+
+                    await audioElement.play();
+                    btnPlayPause.innerText = "⏹️";
+                    playerStatusText.innerText =
+                        `Ouvindo Rádio: ${rádioAtivaNomeGlobal}`;
+
+                    atualizarEstadoMediaSession(
+                        'playing'
+                    );
+
+                    atualizarTelaRetrô();
+                }
+                catch (erro) {
+                    console.error(
+                        'Erro ao reproduzir pelo controle de mídia:',
+                        erro
+                    );
+                }
+            });
+
+            registrar('pause', () => {
+                audioElement.pause();
+                btnPlayPause.innerText = "▶️";
+                playerStatusText.innerText =
+                    "Rádio pausada";
+
+                document
+                    .querySelectorAll('.radio-card-user')
+                    .forEach(c =>
+                        c.classList.remove(
+                            'active-neon'
+                        )
+                    );
+
+                atualizarEstadoMediaSession(
+                    'paused'
+                );
+
+                atualizarTelaRetrô();
+            });
+
+            registrar('nexttrack', () => {
+                proximaRadio();
+            });
+
+            registrar('previoustrack', () => {
+                radioAnterior();
+            });
+
+            registrar('stop', () => {
+                audioElement.pause();
+                btnPlayPause.innerText = "▶️";
+                playerStatusText.innerText =
+                    "Rádio pausada";
+
+                atualizarEstadoMediaSession(
+                    'none'
+                );
+
+                atualizarTelaRetrô();
+            });
+        }
+
+        registrarControlesMediaSession();
 
         // Volume do player principal: 0 a 80.
         // Primeiro uso = 5. Depois disso, o valor é salvo no Firebase por ouvinte.
@@ -2158,8 +2330,24 @@
             // A rádio sempre inicia no volume salvo do ouvinte.
             // No primeiro uso, esse valor é 5.
             aplicarVolumePlayer(volumePlayerAtual);
+
+            // Envia nome e, quando existir, imagem da rádio
+            // para os controles de mídia do celular/BT/carro.
+            atualizarMediaSessionRadio(radio);
+
             audioElement.src = radio.url;
-            audioElement.play().catch(err => console.error("Erro no stream:", err));
+            audioElement.play()
+                .then(() => {
+                    atualizarEstadoMediaSession(
+                        'playing'
+                    );
+                })
+                .catch(err =>
+                    console.error(
+                        "Erro no stream:",
+                        err
+                    )
+                );
 
             atualizarTelaRetrô();
         }
@@ -2197,12 +2385,14 @@
                     audioElement.play();
                     btnPlayPause.innerText = "⏹️";
                     playerStatusText.innerText = `Ouvindo Rádio: ${rádioAtivaNomeGlobal}`;
+                    atualizarEstadoMediaSession('playing');
                 }
             } else {
                 audioElement.pause();
                 btnPlayPause.innerText = "▶️";
                 playerStatusText.innerText = "Rádio pausada";
                 document.querySelectorAll('.radio-card-user').forEach(c => c.classList.remove('active-neon'));
+                atualizarEstadoMediaSession('paused');
             }
             atualizarTelaRetrô();
         });
