@@ -661,17 +661,23 @@
         }
 
         .feed-item {
-            padding: 9px 10px;
+            --ouvinte-cor: #64748b;
+            padding: 9px 10px 9px 13px;
             border-radius: 10px;
-            background: rgba(255,255,255,.04);
-            border: 1px solid rgba(255,255,255,.06);
+            background: linear-gradient(
+                90deg,
+                color-mix(in srgb, var(--ouvinte-cor) 16%, transparent),
+                rgba(255,255,255,.035) 42%
+            );
+            border: 1px solid color-mix(in srgb, var(--ouvinte-cor) 38%, rgba(255,255,255,.06));
+            border-left: 5px solid var(--ouvinte-cor);
             font-size: 11px;
             line-height: 1.35;
             color: #cbd5e1;
         }
 
         .feed-item strong {
-            color: white;
+            color: var(--ouvinte-cor);
         }
 
         .aviso {
@@ -981,6 +987,12 @@
             '#3b82f6'
         ];
 
+        const CORES_OUVINTES = [
+            '#38bdf8', '#f472b6', '#22c55e', '#f59e0b',
+            '#a78bfa', '#fb7185', '#2dd4bf', '#facc15',
+            '#60a5fa', '#c084fc', '#34d399', '#fb923c'
+        ];
+
         const PATENTES = [
             { nome: 'SEM PATENTE', minimo: 0, icone: '🎧' },
             { nome: 'CHUMBO', minimo: 2000, icone: '🛡️' },
@@ -1194,6 +1206,16 @@
         // =========================================================
         // PERFIL / SALDO
         // =========================================================
+        function escolherCorOuvintePeloId(id) {
+            const texto = String(id || usuarioNome || 'ouvinte');
+            let hash = 0;
+            for (let i = 0; i < texto.length; i++) {
+                hash = ((hash << 5) - hash) + texto.charCodeAt(i);
+                hash |= 0;
+            }
+            return CORES_OUVINTES[Math.abs(hash) % CORES_OUVINTES.length];
+        }
+
         async function garantirPerfil() {
             const perfilRef = ref(db, `ludigins_usuarios/${usuarioId}`);
 
@@ -1203,6 +1225,7 @@
                 if (!atual) {
                     return {
                         nome: usuarioNome,
+                        corOuvinte: escolherCorOuvintePeloId(usuarioId),
                         saldo: 0,
                         patente: 'SEM PATENTE',
                         nivel: 0,
@@ -1229,6 +1252,7 @@
                 }
 
                 perfil.nome = usuarioNome || perfil.nome || 'Ouvinte';
+                perfil.corOuvinte = perfil.corOuvinte || escolherCorOuvintePeloId(usuarioId);
                 perfil.saldo = Number(perfil.saldo || 0);
                 perfil.corridasHoje = Number(perfil.corridasHoje || 0);
                 perfil.ganhosHoje = Number(perfil.ganhosHoje || 0);
@@ -2497,6 +2521,7 @@
                 texto,
                 usuarioId,
                 usuarioNome,
+                corOuvinte: perfilAtual?.corOuvinte || escolherCorOuvintePeloId(usuarioId),
                 timestamp: Date.now()
             });
         }
@@ -2520,12 +2545,15 @@
                 return;
             }
 
-            feed.innerHTML = ultimos.map(item => `
-                <div class="feed-item">
-                    <strong>${escapar(item.usuarioNome || 'Ouvinte')}</strong><br>
-                    ${escapar(item.texto || '')}
-                </div>
-            `).join('');
+            feed.innerHTML = ultimos.map(item => {
+                const cor = item.corOuvinte || escolherCorOuvintePeloId(item.usuarioId || item.usuarioNome || 'ouvinte');
+                return `
+                    <div class="feed-item" style="--ouvinte-cor:${escapar(cor)}">
+                        <strong>${escapar(item.usuarioNome || 'Ouvinte')}</strong><br>
+                        ${escapar(item.texto || '')}
+                    </div>
+                `;
+            }).join('');
         }
 
         // =========================================================
@@ -2583,6 +2611,14 @@
         }
 
         document.getElementById('btnVoltar').addEventListener('click', () => {
+            const params = new URLSearchParams(window.location.search);
+            const embed = params.get('embed') === '1';
+
+            if (embed && window.parent !== window) {
+                window.parent.postMessage({ type: 'fecharLudigins' }, '*');
+                return;
+            }
+
             window.location.href = './index.html';
         });
 
