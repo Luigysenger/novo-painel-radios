@@ -224,44 +224,114 @@
 
         .mapa {
             position: relative;
-            height: clamp(560px, 72vh, 860px);
-            min-height: 560px;
+            height: clamp(620px, 76vh, 900px);
+            min-height: 620px;
             border-radius: 18px;
             overflow: hidden;
             border: 1px solid rgba(255,255,255,.1);
             background:
-                linear-gradient(90deg, transparent 47%, rgba(148,163,184,.14) 47%, rgba(148,163,184,.14) 53%, transparent 53%),
-                linear-gradient(0deg, transparent 47%, rgba(148,163,184,.14) 47%, rgba(148,163,184,.14) 53%, transparent 53%),
-                repeating-linear-gradient(90deg, rgba(255,255,255,.025) 0 1px, transparent 1px 58px),
-                repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 58px),
-                radial-gradient(circle at 20% 20%, rgba(34,197,94,.12), transparent 17%),
-                radial-gradient(circle at 80% 75%, rgba(59,130,246,.12), transparent 18%),
-                #0a1628;
+                radial-gradient(circle at 13% 17%, rgba(34,197,94,.13), transparent 16%),
+                radial-gradient(circle at 83% 80%, rgba(59,130,246,.11), transparent 18%),
+                linear-gradient(135deg, #071525 0%, #0a1728 45%, #081423 100%);
         }
 
-        .mapa::before,
-        .mapa::after {
-            content: "";
+        .cidade-grid {
             position: absolute;
-            background: rgba(148,163,184,.12);
-            border-radius: 20px;
+            inset: 0;
+            z-index: 0;
+            opacity: .9;
+            background:
+                repeating-linear-gradient(90deg, transparent 0 90px, rgba(255,255,255,.025) 90px 91px),
+                repeating-linear-gradient(0deg, transparent 0 78px, rgba(255,255,255,.025) 78px 79px);
             pointer-events: none;
         }
 
-        .mapa::before {
-            width: 120%;
-            height: 24px;
-            left: -10%;
-            top: 30%;
-            transform: rotate(-11deg);
+        .rua {
+            position: absolute;
+            z-index: 1;
+            border-radius: 22px;
+            background:
+                repeating-linear-gradient(
+                    90deg,
+                    rgba(255,255,255,.34) 0 18px,
+                    transparent 18px 34px
+                ),
+                linear-gradient(#334155, #263548);
+            background-size: auto 2px, auto;
+            background-position: center center;
+            background-repeat: repeat-x, no-repeat;
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,.08),
+                inset 0 -1px 0 rgba(0,0,0,.35);
+            pointer-events: none;
         }
 
-        .mapa::after {
-            width: 24px;
-            height: 125%;
-            top: -10%;
-            left: 25%;
-            transform: rotate(13deg);
+        .rua.horizontal {
+            height: 34px;
+        }
+
+        .rua.vertical {
+            width: 34px;
+            transform-origin: center;
+        }
+
+        .rua.vertical::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            transform: translateX(-50%);
+            background:
+                repeating-linear-gradient(
+                    180deg,
+                    rgba(255,255,255,.34) 0 18px,
+                    transparent 18px 34px
+                );
+        }
+
+        .rua.diagonal {
+            height: 32px;
+            transform-origin: left center;
+        }
+
+        .poi {
+            position: absolute;
+            z-index: 3;
+            transform: translate(-50%, -50%);
+            min-width: 78px;
+            padding: 7px 8px;
+            border-radius: 11px;
+            background: rgba(15,23,42,.88);
+            border: 1px solid rgba(255,255,255,.10);
+            box-shadow: 0 7px 20px rgba(0,0,0,.22);
+            text-align: center;
+            color: #e2e8f0;
+            font-size: 9px;
+            font-weight: 800;
+            pointer-events: none;
+        }
+
+        .poi span {
+            display: block;
+            font-size: 21px;
+            margin-bottom: 2px;
+        }
+
+        .praca {
+            position: absolute;
+            z-index: 2;
+            width: 110px;
+            height: 78px;
+            border-radius: 22px;
+            transform: translate(-50%, -50%);
+            background:
+                radial-gradient(circle at 30% 40%, #22c55e 0 4px, transparent 5px),
+                radial-gradient(circle at 70% 60%, #16a34a 0 5px, transparent 6px),
+                linear-gradient(135deg, rgba(22,163,74,.32), rgba(21,128,61,.16));
+            border: 1px solid rgba(74,222,128,.20);
+            pointer-events: none;
         }
 
         .ride-pin {
@@ -461,95 +531,39 @@
             --car-color: #facc15;
             position: absolute;
             left: 50%;
-            top: 20px;
-            width: 50px;
-            height: 28px;
+            top: 14px;
+            width: 52px;
+            height: 52px;
             transform: translateX(-50%);
-            border-radius: 7px 14px 7px 7px;
-            background:
-                linear-gradient(180deg, rgba(255,255,255,.30), transparent 35%),
-                var(--car-color);
-            border: 2px solid rgba(255,255,255,.94);
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: color-mix(in srgb, var(--car-color) 23%, rgba(15,23,42,.92));
+            border: 3px solid var(--car-color);
             box-shadow:
-                0 7px 14px rgba(0,0,0,.38),
-                0 0 18px color-mix(in srgb, var(--car-color) 48%, transparent);
+                0 8px 16px rgba(0,0,0,.36),
+                0 0 19px color-mix(in srgb, var(--car-color) 50%, transparent);
         }
 
-        .carro-visual::before {
-            content: "";
-            position: absolute;
-            left: 10px;
-            top: -11px;
-            width: 27px;
-            height: 14px;
-            border-radius: 10px 10px 3px 3px;
-            background: var(--car-color);
-            border: 2px solid rgba(255,255,255,.92);
-            border-bottom: 0;
+        .carro-emoji {
+            font-size: 39px;
+            line-height: 1;
+            filter: drop-shadow(0 3px 3px rgba(0,0,0,.45));
+            transform: translateY(-1px);
         }
 
-        .carro-visual::after {
-            content: "";
-            position: absolute;
-            left: 15px;
-            top: -7px;
-            width: 16px;
-            height: 8px;
-            border-radius: 4px 4px 2px 2px;
-            background: linear-gradient(135deg,#dbeafe,#7dd3fc);
-            border: 1px solid rgba(2,6,23,.35);
-        }
-
-        .carro-porta-malas {
-            position: absolute;
-            left: -7px;
-            top: 1px;
-            width: 13px;
-            height: 20px;
-            border-radius: 5px 2px 2px 5px;
-            background: var(--car-color);
-            border: 2px solid rgba(255,255,255,.9);
-            transform-origin: right center;
-            transform: rotateY(0deg);
-            transition: transform .35s ease;
-        }
-
-        .carro-jogador.porta-malas-aberto .carro-porta-malas {
-            transform: translateX(-7px) rotate(-32deg);
-        }
-
+        .carro-porta-malas,
+        .carro-roda,
+        .carro-farol,
         .carro-parachoque {
-            position: absolute;
-            right: -5px;
-            top: 18px;
-            width: 8px;
-            height: 4px;
-            border-radius: 2px;
-            background: #cbd5e1;
+            display: none;
         }
 
-        .carro-roda {
-            position: absolute;
-            top: 17px;
-            width: 9px;
-            height: 9px;
-            border-radius: 50%;
-            background: #020617;
-            border: 2px solid #64748b;
-        }
-
-        .carro-roda.esq { left: 5px; }
-        .carro-roda.dir { right: 5px; }
-
-        .carro-farol {
-            position: absolute;
-            right: -3px;
-            top: 7px;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: #fef08a;
-            box-shadow: 0 0 8px rgba(254,240,138,.9);
+        .carro-jogador.porta-malas-aberto .carro-visual {
+            transform: translateX(-50%) scale(1.08);
+            box-shadow:
+                0 8px 18px rgba(0,0,0,.40),
+                0 0 28px color-mix(in srgb, var(--car-color) 70%, transparent);
         }
 
         .carro-jogador.andando .carro-visual {
@@ -736,8 +750,8 @@
             }
 
             .mapa {
-                height: 68vh;
-                min-height: 520px;
+                height: 72vh;
+                min-height: 560px;
             }
         }
 
@@ -775,8 +789,8 @@
             }
 
             .mapa {
-                height: 66vh;
-                min-height: 500px;
+                height: 70vh;
+                min-height: 540px;
             }
 
             .ride-bubble {
@@ -858,7 +872,30 @@
                 </div>
 
                 <div class="mapa" id="mapa">
-                    <div class="map-legenda">Toque em um passageiro. Acompanhe o carro buscar, embarcar e levar até o destino.</div>
+                    <div class="cidade-grid"></div>
+
+                    <div class="rua horizontal" style="left:0; top:18%; width:100%;"></div>
+                    <div class="rua horizontal" style="left:0; top:43%; width:100%;"></div>
+                    <div class="rua horizontal" style="left:0; top:70%; width:100%;"></div>
+                    <div class="rua vertical" style="left:18%; top:0; height:100%;"></div>
+                    <div class="rua vertical" style="left:48%; top:0; height:100%;"></div>
+                    <div class="rua vertical" style="left:76%; top:0; height:100%;"></div>
+                    <div class="rua diagonal" style="left:-8%; top:83%; width:120%; transform:rotate(-12deg);"></div>
+                    <div class="rua diagonal" style="left:8%; top:6%; width:108%; transform:rotate(10deg);"></div>
+
+                    <div class="praca" style="left:34%; top:31%;"></div>
+                    <div class="praca" style="left:67%; top:58%; width:96px; height:66px;"></div>
+
+                    <div class="poi" style="left:11%; top:10%;"><span>⛪</span>Igreja</div>
+                    <div class="poi" style="left:35%; top:28%;"><span>🌳</span>Praça Central</div>
+                    <div class="poi" style="left:61%; top:12%;"><span>🛒</span>Mercado</div>
+                    <div class="poi" style="left:87%; top:28%;"><span>🏥</span>Hospital</div>
+                    <div class="poi" style="left:12%; top:57%;"><span>🏫</span>Escola</div>
+                    <div class="poi" style="left:38%; top:82%;"><span>⛽</span>Posto</div>
+                    <div class="poi" style="left:69%; top:61%;"><span>🌲</span>Parque</div>
+                    <div class="poi" style="left:88%; top:84%;"><span>🏬</span>Shopping</div>
+
+                    <div class="map-legenda">Toque em um passageiro. Acompanhe o táxi buscar, embarcar e levar até o destino.</div>
 
                     <div class="bloqueado" id="bloqueioMapa">
                         <div class="bloqueado-box">
@@ -1204,6 +1241,62 @@
             });
         }
 
+        async function corrigirCorridaFantasma() {
+            const perfilRef = ref(db, `ludigins_usuarios/${usuarioId}`);
+            const perfilSnap = await get(perfilRef);
+
+            if (!perfilSnap.exists()) return;
+
+            const perfil = perfilSnap.val() || {};
+            const corridaAtual = perfil.corridaAtual;
+
+            if (!corridaAtual || !corridaAtual.id) return;
+
+            const corridaSnap = await get(
+                ref(db, `ludigins_corridas/ativas/${corridaAtual.id}`)
+            );
+
+            const corridaBanco = corridaSnap.exists()
+                ? (corridaSnap.val() || {})
+                : null;
+
+            const corridaValida =
+                corridaBanco &&
+                corridaBanco.status === 'aceita' &&
+                corridaBanco.aceitoPor === usuarioId &&
+                corridaBanco.data === dataHoje();
+
+            if (!corridaValida) {
+                await runTransaction(perfilRef, atual => {
+                    if (!atual) return atual;
+
+                    return {
+                        ...atual,
+                        corridaAtual: null,
+                        atualizadoEm: Date.now()
+                    };
+                });
+
+                await update(
+                    ref(db, `ludigins_jogo/jogadores/${usuarioId}`),
+                    {
+                        movimento: null,
+                        status: 'online',
+                        atualizadoEm: Date.now()
+                    }
+                ).catch(() => {});
+
+                corridaAtualCache = null;
+                removerDestinoPin();
+                removerCenaEmbarque();
+
+                mostrarAviso(
+                    'Uma corrida antiga ficou presa e foi liberada automaticamente.',
+                    'ok'
+                );
+            }
+        }
+
         function desenharPerfil(perfil) {
             if (!perfil) return;
 
@@ -1266,11 +1359,7 @@
             el.innerHTML = `
                 <div class="carro-nome">${escapar(jogador.nome || 'Ouvinte')}</div>
                 <div class="carro-visual">
-                    <span class="carro-porta-malas"></span>
-                    <span class="carro-roda esq"></span>
-                    <span class="carro-roda dir"></span>
-                    <span class="carro-farol"></span>
-                    <span class="carro-parachoque"></span>
+                    <span class="carro-emoji">🚕</span>
                 </div>
             `;
 
@@ -1395,8 +1484,18 @@
             executar();
         }
 
+        let processandoChegadaPassageiro = false;
+
         async function processarChegadaAoPassageiro(movimento) {
-            if (!corridaAtualCache) return;
+            if (!corridaAtualCache || processandoChegadaPassageiro) return;
+
+            if (
+                corridaAtualCache.fase === 'embarque' ||
+                corridaAtualCache.fase === 'levando_destino' ||
+                corridaAtualCache.fase === 'chegou_destino'
+            ) return;
+
+            processandoChegadaPassageiro = true;
 
             const corridaId = corridaAtualCache.id;
             mostrarCenaEmbarque(
@@ -1473,6 +1572,8 @@
                         atualizadoEm: Date.now()
                     }
                 );
+
+                processandoChegadaPassageiro = false;
             }, TEMPO_EMBARQUE_MS);
         }
 
@@ -1787,21 +1888,27 @@
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        function criarDadosCorrida() {
+        function criarDadosCorrida(posicoesOcupadas = []) {
             const rota = ROTAS[aleatorio(0, ROTAS.length - 1)];
 
             let x;
             let y;
             let tentativas = 0;
 
-            // Evita passageiros grudados no centro do mapa.
+            // Mantém os passageiros bem separados entre si e longe
+            // da região central onde o jogador normalmente começa.
             do {
-                x = aleatorio(10, 90);
-                y = aleatorio(12, 88);
+                x = aleatorio(8, 92);
+                y = aleatorio(10, 90);
                 tentativas++;
             } while (
-                distanciaEntre({ x, y }, { x: 49, y: 52 }) < 24 &&
-                tentativas < 30
+                (
+                    distanciaEntre({ x, y }, { x: 49, y: 52 }) < 28 ||
+                    posicoesOcupadas.some(p =>
+                        distanciaEntre({ x, y }, p) < 25
+                    )
+                ) &&
+                tentativas < 80
             );
 
             const destinoPonto = criarPontoDestino(x, y);
@@ -1879,6 +1986,7 @@
             try {
                 const snapNovo = await get(ref(db, 'ludigins_corridas/ativas'));
                 let disponiveis = 0;
+                const posicoesOcupadas = [];
 
                 if (snapNovo.exists()) {
                     snapNovo.forEach(child => {
@@ -1888,6 +1996,10 @@
                             c.status === 'disponivel'
                         ) {
                             disponiveis++;
+                            posicoesOcupadas.push({
+                                x: Number(c.x || 50),
+                                y: Number(c.y || 50)
+                            });
                         }
                     });
                 }
@@ -1895,8 +2007,11 @@
                 const criar = Math.max(0, 4 - disponiveis);
 
                 for (let i = 0; i < criar; i++) {
+                    const nova = criarDadosCorrida(posicoesOcupadas);
+                    posicoesOcupadas.push({ x: nova.x, y: nova.y });
+
                     const novaRef = push(ref(db, 'ludigins_corridas/ativas'));
-                    await set(novaRef, criarDadosCorrida());
+                    await set(novaRef, nova);
                 }
             } finally {
                 try {
@@ -2222,6 +2337,28 @@
                     duracao - (Date.now() - inicio)
                 );
 
+                if (restante <= 0) {
+                    corridaTimer.textContent =
+                        '🚕 Chegando ao passageiro...';
+
+                    btnFinalizar.disabled = true;
+
+                    if (
+                        corridaAtualCache &&
+                        corridaAtualCache.fase !== 'embarque' &&
+                        corridaAtualCache.fase !== 'levando_destino' &&
+                        corridaAtualCache.fase !== 'chegou_destino'
+                    ) {
+                        processarChegadaAoPassageiro({
+                            paraX: Number(corridaAtualCache.passageiroX || 50),
+                            paraY: Number(corridaAtualCache.passageiroY || 50),
+                            fase: 'buscar_passageiro'
+                        }).catch(console.warn);
+                    }
+
+                    return;
+                }
+
                 corridaTimer.textContent =
                     `🚕 Indo buscar o passageiro... ${Math.ceil(restante / 1000)}s`;
                 btnFinalizar.disabled = true;
@@ -2455,6 +2592,7 @@
         async function iniciar() {
             await resolverUsuario();
             await garantirPerfil();
+            await corrigirCorridaFantasma();
 
             nomeOuvinteEl.textContent = String(usuarioNome || 'OUVINTE').toUpperCase();
 
