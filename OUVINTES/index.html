@@ -3094,9 +3094,11 @@
 
         function abrirPainelLudigins() {
             if (!ludiginsOverlay || !ludiginsFrame) return;
-            if (ludiginsFrame.src === 'about:blank' || !ludiginsFrame.src.includes('ouvinte_ludgins.html')) {
-                ludiginsFrame.src = './ouvinte_ludgins.html?embed=1&v=mapa2d-20260905';
-            }
+
+            // Sempre carrega a versão mais recente do Ludigins,
+            // evitando que o navegador reaproveite uma versão antiga em cache.
+            ludiginsFrame.src = './ouvinte_ludgins.html?embed=1&v=' + Date.now();
+
             ludiginsOverlay.classList.add('show');
             document.body.style.overflow = 'hidden';
         }
