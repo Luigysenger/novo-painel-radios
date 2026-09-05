@@ -196,6 +196,159 @@
             font-size: 20px;
         }
 
+        /* Cores claras diferentes em cada espaço, preservando o tema escuro */
+        .perfil {
+            background: linear-gradient(135deg, rgba(186,230,253,.12), rgba(255,255,255,.035));
+        }
+
+        .resumo {
+            background: linear-gradient(135deg, rgba(224,231,255,.10), rgba(255,255,255,.03));
+        }
+
+        .mini-card:nth-child(1) {
+            background: linear-gradient(135deg, rgba(219,234,254,.16), rgba(255,255,255,.04));
+            border-color: rgba(147,197,253,.28);
+        }
+
+        .mini-card:nth-child(2) {
+            background: linear-gradient(135deg, rgba(220,252,231,.16), rgba(255,255,255,.04));
+            border-color: rgba(134,239,172,.28);
+        }
+
+        .mini-card:nth-child(3) {
+            background: linear-gradient(135deg, rgba(254,249,195,.16), rgba(255,255,255,.04));
+            border-color: rgba(253,224,71,.26);
+        }
+
+        .mini-card:nth-child(4) {
+            background: linear-gradient(135deg, rgba(243,232,255,.16), rgba(255,255,255,.04));
+            border-color: rgba(216,180,254,.28);
+        }
+
+        .mini-card.combustivel-card {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(207,250,254,.18), rgba(219,234,254,.10));
+            border-color: rgba(103,232,249,.34);
+        }
+
+        .map-card {
+            background: linear-gradient(135deg, rgba(224,242,254,.055), rgba(255,255,255,.02));
+        }
+
+        .side .side-card:nth-child(1) {
+            background: linear-gradient(135deg, rgba(254,243,199,.10), rgba(255,255,255,.025));
+            border-color: rgba(253,230,138,.20);
+        }
+
+        .side .side-card:nth-child(2) {
+            background: linear-gradient(135deg, rgba(233,213,255,.10), rgba(255,255,255,.025));
+            border-color: rgba(216,180,254,.20);
+        }
+
+        .combustivel-wrap {
+            margin-top: 8px;
+        }
+
+        .combustivel-linha {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .combustivel-linha strong {
+            margin: 0;
+            font-size: 19px;
+        }
+
+        .combustivel-track {
+            height: 10px;
+            margin-top: 8px;
+            border-radius: 999px;
+            background: rgba(15,23,42,.55);
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,.08);
+        }
+
+        .combustivel-bar {
+            width: 100%;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #86efac, #67e8f9);
+            transition: width .3s ease, background .3s ease;
+        }
+
+        .combustivel-aviso {
+            display: none;
+            margin-top: 7px;
+            padding: 7px 9px;
+            border-radius: 9px;
+            font-size: 10px;
+            font-weight: 900;
+            color: #fecaca;
+            background: rgba(127,29,29,.32);
+            border: 1px solid rgba(248,113,113,.45);
+        }
+
+        .combustivel-card.baixo .combustivel-aviso {
+            display: block;
+            animation: piscaCombustivel .8s infinite;
+        }
+
+        .combustivel-card.baixo .combustivel-bar {
+            background: linear-gradient(90deg, #ef4444, #fb7185);
+        }
+
+        @keyframes piscaCombustivel {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 rgba(239,68,68,0); }
+            50% { opacity: .42; box-shadow: 0 0 18px rgba(239,68,68,.35); }
+        }
+
+        .btn-abastecer {
+            margin-top: 9px;
+            width: 100%;
+            border: 1px solid #67e8f9;
+            border-radius: 10px;
+            padding: 9px 10px;
+            background: linear-gradient(135deg, #cffafe, #bae6fd);
+            color: #083344;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .btn-abastecer:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+        .passageiros-grupo {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 1px;
+            min-height: 28px;
+            font-size: 22px;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .ride-rota {
+            display: block;
+            margin-top: 3px;
+            font-size: 9px;
+            line-height: 1.25;
+            color: #78350f;
+            font-weight: 900;
+        }
+
+        .ride-destino {
+            display: block;
+            margin-top: 2px;
+            font-size: 9px;
+            color: #0c4a6e;
+            font-weight: 900;
+        }
+
         .game {
             display: grid;
             grid-template-columns: minmax(0, 1fr) 320px;
@@ -461,8 +614,9 @@
             animation: entrarNoCarro 2.2s forwards ease-in-out;
         }
 
-        .embarque-pessoa.p1 { left: 4px; }
-        .embarque-pessoa.p2 { left: 28px; animation-delay: .28s; }
+        .embarque-pessoa.p1 { left: 2px; }
+        .embarque-pessoa.p2 { left: 25px; animation-delay: .20s; }
+        .embarque-pessoa.p3 { left: 48px; animation-delay: .38s; }
 
         .embarque-mala {
             position: absolute;
@@ -936,6 +1090,25 @@
                     <span>Próxima patente</span>
                     <strong id="proximaPatenteMini">CHUMBO</strong>
                 </div>
+
+                <div class="mini-card combustivel-card" id="combustivelCard">
+                    <span>⛽ Combustível</span>
+                    <div class="combustivel-wrap">
+                        <div class="combustivel-linha">
+                            <strong><span id="combustivelValor">100</span>%</strong>
+                            <small>Cada corrida consome 15%</small>
+                        </div>
+                        <div class="combustivel-track">
+                            <div class="combustivel-bar" id="combustivelBar"></div>
+                        </div>
+                        <div class="combustivel-aviso" id="combustivelAviso">
+                            ⚠ COMBUSTÍVEL BAIXO — ABASTEÇA PARA CONTINUAR AS CORRIDAS
+                        </div>
+                        <button class="btn-abastecer" id="btnAbastecer">
+                            ⛽ Encher tanque — 5 Ludigins
+                        </button>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -1035,6 +1208,12 @@
         const MIN_RECOMPENSA = 1;
         const MAX_RECOMPENSA = 7;
 
+        // Combustível do táxi
+        const COMBUSTIVEL_MAX = 100;
+        const CONSUMO_POR_CORRIDA = 15;
+        const LIMITE_COMBUSTIVEL_BAIXO = 20;
+        const CUSTO_ABASTECIMENTO = 5;
+
         // Tempo para o carrinho chegar até o passageiro, conforme a distância.
         const TEMPOS_BUSCA = {
             PERTO: 5000,
@@ -1071,17 +1250,34 @@
             { nome: 'DIAMANTE', minimo: 10000, icone: '💎' }
         ];
 
-        const ROTAS = [
-            ['Centro', 'Parque Municipal'],
-            ['Terminal', 'Shopping'],
-            ['Praça Central', 'Hospital'],
-            ['Universidade', 'Centro'],
-            ['Mercado', 'Rodoviária'],
-            ['Bairro Norte', 'Centro'],
-            ['Bairro Sul', 'Shopping'],
-            ['Parque', 'Universidade'],
-            ['Hospital', 'Praça Central'],
-            ['Rodoviária', 'Mercado']
+        const PONTOS_CIDADE = [
+            { nome: 'Escola Municipal', x: 18, y: 19 },
+            { nome: 'UBS', x: 40, y: 19 },
+            { nome: 'Delegacia', x: 59, y: 19 },
+            { nome: 'Indústria', x: 77, y: 19 },
+            { nome: 'Parque', x: 92, y: 20 },
+            { nome: 'Residências', x: 18, y: 38 },
+            { nome: 'Supermercado', x: 40, y: 39 },
+            { nome: 'Açougue', x: 53, y: 39 },
+            { nome: 'Padaria', x: 62, y: 39 },
+            { nome: 'Posto de Combustível', x: 76, y: 39 },
+            { nome: 'Borracharia', x: 93, y: 39 },
+            { nome: 'Farmácia', x: 7, y: 61 },
+            { nome: 'Banco', x: 36, y: 61 },
+            { nome: 'Praça Central', x: 48, y: 62 },
+            { nome: 'Igreja', x: 66, y: 62 },
+            { nome: 'Escola Estadual', x: 93, y: 62 },
+            { nome: 'Condomínio', x: 7, y: 80 },
+            { nome: 'Pet Shop', x: 23, y: 80 },
+            { nome: 'Prefeitura', x: 37, y: 80 },
+            { nome: 'Correios', x: 51, y: 80 },
+            { nome: 'Loja de Roupas', x: 66, y: 80 },
+            { nome: 'Creche', x: 92, y: 80 },
+            { nome: 'Academia', x: 7, y: 94 },
+            { nome: 'Restaurante', x: 23, y: 94 },
+            { nome: 'Hotel', x: 43, y: 94 },
+            { nome: 'Lan House', x: 62, y: 94 },
+            { nome: 'Comércio', x: 83, y: 94 }
         ];
 
         // =========================================================
@@ -1112,6 +1308,10 @@
         const corridaTimer = document.getElementById('corridaTimer');
         const btnFinalizar = document.getElementById('btnFinalizar');
         const feed = document.getElementById('feed');
+        const combustivelCard = document.getElementById('combustivelCard');
+        const combustivelValor = document.getElementById('combustivelValor');
+        const combustivelBar = document.getElementById('combustivelBar');
+        const btnAbastecer = document.getElementById('btnAbastecer');
 
         // =========================================================
         // IDENTIDADE DO OUVINTE
@@ -1300,6 +1500,7 @@
                         nivel: 0,
                         corridasHoje: 0,
                         ganhosHoje: 0,
+                        combustivel: COMBUSTIVEL_MAX,
                         dataCorridas: hoje,
                         corridaAtual: null,
                         criadoEm: Date.now(),
@@ -1325,6 +1526,9 @@
                 perfil.saldo = Number(perfil.saldo || 0);
                 perfil.corridasHoje = Number(perfil.corridasHoje || 0);
                 perfil.ganhosHoje = Number(perfil.ganhosHoje || 0);
+                perfil.combustivel = perfil.combustivel === undefined
+                    ? COMBUSTIVEL_MAX
+                    : Math.max(0, Math.min(COMBUSTIVEL_MAX, Number(perfil.combustivel)));
 
                 const { atual: patente } = calcularPatente(perfil.saldo);
                 perfil.patente = patente.nome;
@@ -1412,6 +1616,21 @@
             percentualProgressoEl.textContent = `${progresso.percentual}%`;
             barraProgressoEl.style.width = `${progresso.percentual}%`;
 
+            const combustivel = perfil.combustivel === undefined
+                ? COMBUSTIVEL_MAX
+                : Math.max(0, Math.min(COMBUSTIVEL_MAX, Number(perfil.combustivel)));
+
+            combustivelValor.textContent = Math.round(combustivel);
+            combustivelBar.style.width = `${combustivel}%`;
+            combustivelCard.classList.toggle(
+                'baixo',
+                combustivel <= LIMITE_COMBUSTIVEL_BAIXO
+            );
+
+            btnAbastecer.disabled =
+                combustivel >= COMBUSTIVEL_MAX ||
+                saldo < CUSTO_ABASTECIMENTO;
+
             atualizarBloqueioMapa();
             atualizarCorridaAtual(perfil.corridaAtual || null);
 
@@ -1427,6 +1646,57 @@
                 ).catch(() => {});
             }
         }
+
+        // =========================================================
+        // ABASTECIMENTO
+        // =========================================================
+        async function abastecerTanque() {
+            const perfilRef = ref(db, `ludigins_usuarios/${usuarioId}`);
+
+            const resultado = await runTransaction(perfilRef, atual => {
+                if (!atual) return;
+
+                const saldo = Number(atual.saldo || 0);
+                const combustivelAtual = atual.combustivel === undefined
+                    ? COMBUSTIVEL_MAX
+                    : Number(atual.combustivel);
+
+                if (combustivelAtual >= COMBUSTIVEL_MAX) return;
+                if (saldo < CUSTO_ABASTECIMENTO) return;
+
+                return {
+                    ...atual,
+                    saldo: saldo - CUSTO_ABASTECIMENTO,
+                    combustivel: COMBUSTIVEL_MAX,
+                    atualizadoEm: Date.now()
+                };
+            });
+
+            if (!resultado.committed) {
+                const atual = perfilAtual || {};
+                const combustivel = atual.combustivel === undefined
+                    ? COMBUSTIVEL_MAX
+                    : Number(atual.combustivel);
+
+                if (combustivel >= COMBUSTIVEL_MAX) {
+                    mostrarAviso('O tanque já está cheio.', 'ok');
+                } else {
+                    mostrarAviso('Você precisa de 5 Ludigins para abastecer.', 'erro');
+                }
+                return;
+            }
+
+            await registrarEvento(
+                `${usuarioNome} abasteceu o táxi por 5 Ludigins.`
+            );
+
+            mostrarAviso(
+                'Tanque cheio! Foram descontados 5 Ludigins da sua carteira.',
+                'ok'
+            );
+        }
+
+        btnAbastecer.addEventListener('click', abastecerTanque);
 
         // =========================================================
         // CARRINHOS ONLINE / MOVIMENTO EM TEMPO REAL
@@ -1593,7 +1863,8 @@
             const corridaId = corridaAtualCache.id;
             mostrarCenaEmbarque(
                 Number(corridaAtualCache.passageiroX),
-                Number(corridaAtualCache.passageiroY)
+                Number(corridaAtualCache.passageiroY),
+                Number(corridaAtualCache.quantidadePassageiros || 1)
             );
 
             corridaTimer.textContent =
@@ -1874,7 +2145,7 @@
             mapa.querySelectorAll('.embarque-cena').forEach(el => el.remove());
         }
 
-        function mostrarCenaEmbarque(x, y) {
+        function mostrarCenaEmbarque(x, y, quantidade = 1) {
             removerCenaEmbarque();
 
             const cena = document.createElement('div');
@@ -1882,10 +2153,16 @@
             cena.style.left = `${Number(x)}%`;
             cena.style.top = `${Number(y)}%`;
 
+            const qtd = Math.max(1, Math.min(3, Number(quantidade || 1)));
+            const pessoas = [
+                '<span class="embarque-pessoa p1">🧍</span>',
+                '<span class="embarque-pessoa p2">🧍‍♀️</span>',
+                '<span class="embarque-pessoa p3">🧍</span>'
+            ].slice(0, qtd).join('');
+
             cena.innerHTML = `
                 <div class="embarque-passageiros">
-                    <span class="embarque-pessoa p1">🧍</span>
-                    <span class="embarque-pessoa p2">🧍‍♀️</span>
+                    ${pessoas}
                     <span class="embarque-mala">🧳</span>
                 </div>
             `;
@@ -1982,38 +2259,39 @@
         }
 
         function criarDadosCorrida(posicoesOcupadas = []) {
-            const rota = ROTAS[aleatorio(0, ROTAS.length - 1)];
-
-            let x;
-            let y;
+            let origemPonto = null;
+            let destinoPonto = null;
             let tentativas = 0;
 
-            // Mantém os passageiros bem separados entre si e longe
-            // da região central onde o jogador normalmente começa.
             do {
-                x = aleatorio(8, 92);
-                y = aleatorio(10, 90);
+                origemPonto = PONTOS_CIDADE[aleatorio(0, PONTOS_CIDADE.length - 1)];
+                destinoPonto = PONTOS_CIDADE[aleatorio(0, PONTOS_CIDADE.length - 1)];
                 tentativas++;
             } while (
                 (
-                    distanciaEntre({ x, y }, { x: 49, y: 52 }) < 28 ||
+                    !origemPonto ||
+                    !destinoPonto ||
+                    origemPonto.nome === destinoPonto.nome ||
+                    distanciaEntre(origemPonto, destinoPonto) < 20 ||
                     posicoesOcupadas.some(p =>
-                        distanciaEntre({ x, y }, p) < 25
+                        distanciaEntre(origemPonto, p) < 13
                     )
                 ) &&
-                tentativas < 80
+                tentativas < 100
             );
 
-            const destinoPonto = criarPontoDestino(x, y);
+            origemPonto = origemPonto || PONTOS_CIDADE[0];
+            destinoPonto = destinoPonto || PONTOS_CIDADE[1];
 
             return {
-                origem: rota[0],
-                destino: rota[1],
+                origem: origemPonto.nome,
+                destino: destinoPonto.nome,
+                quantidadePassageiros: aleatorio(1, 3),
                 valor: aleatorio(MIN_RECOMPENSA, MAX_RECOMPENSA),
-                x,
-                y,
-                destinoX: destinoPonto.x,
-                destinoY: destinoPonto.y,
+                x: Number(origemPonto.x),
+                y: Number(origemPonto.y),
+                destinoX: Number(destinoPonto.x),
+                destinoY: Number(destinoPonto.y),
                 status: 'disponivel',
                 criadoEm: Date.now(),
                 data: dataHoje(),
@@ -2163,13 +2441,26 @@
                         `;
                         pin.disabled = true;
                     } else {
+                        const qtdPassageiros = Math.max(
+                            1,
+                            Math.min(3, Number(corrida.quantidadePassageiros || 1))
+                        );
+
+                        const iconesPassageiros = Array.from(
+                            { length: qtdPassageiros },
+                            (_, i) => i === 1 ? '🧍‍♀️' : '🧍'
+                        ).join('');
+
                         pin.innerHTML = `
                             <div class="ride-bubble">
-                                <div class="ride-person">
-                                    🧍
-                                    <span class="ride-luggage">🧳</span>
-                                </div>
+                                <div class="passageiros-grupo">${iconesPassageiros}</div>
                                 <span>${escapar(corrida.origem || 'Origem')}</span>
+                                <span class="ride-rota">
+                                    ${qtdPassageiros} passageiro${qtdPassageiros > 1 ? 's' : ''}
+                                </span>
+                                <span class="ride-destino">
+                                    🏁 ${escapar(corrida.destino || 'Destino')}
+                                </span>
                                 <strong>+${Number(corrida.valor || 0)} 🪙</strong>
                             </div>
                         `;
@@ -2213,6 +2504,18 @@
 
                 if (Number(perfil.corridasHoje || 0) >= MAX_CORRIDAS_DIA) {
                     mostrarAviso('Você já completou as 5 corridas de hoje. Volte amanhã!', 'erro');
+                    return;
+                }
+
+                const combustivel = perfil.combustivel === undefined
+                    ? COMBUSTIVEL_MAX
+                    : Number(perfil.combustivel);
+
+                if (combustivel < CONSUMO_POR_CORRIDA) {
+                    mostrarAviso(
+                        '⛽ Combustível insuficiente. Abasteça o táxi antes de aceitar outra corrida.',
+                        'erro'
+                    );
                     return;
                 }
 
@@ -2271,6 +2574,10 @@
                             origem: corridaAceita.origem,
                             destino: corridaAceita.destino,
                             valor: Number(corridaAceita.valor || 0),
+                            quantidadePassageiros: Math.max(
+                                1,
+                                Math.min(3, Number(corridaAceita.quantidadePassageiros || 1))
+                            ),
                             aceitoEm: Number(corridaAceita.aceitoEm || Date.now()),
                             data: dataHoje(),
                             passageiroX: Number(corridaAceita.x ?? 50),
@@ -2349,7 +2656,14 @@
             corridaBox.classList.add('show');
 
             corridaValor.textContent = Number(corrida.valor || 0);
-            corridaOrigem.textContent = corrida.origem || '-';
+            const qtd = Math.max(
+                1,
+                Math.min(3, Number(corrida.quantidadePassageiros || 1))
+            );
+
+            corridaOrigem.textContent =
+                `${corrida.origem || '-'} • ${qtd} passageiro${qtd > 1 ? 's' : ''}`;
+
             corridaDestino.textContent = corrida.destino || '-';
 
             if (
@@ -2508,6 +2822,15 @@
                     const novosGanhos =
                         Number(atual.ganhosHoje || 0) + valor;
 
+                    const combustivelAtual = atual.combustivel === undefined
+                        ? COMBUSTIVEL_MAX
+                        : Number(atual.combustivel);
+
+                    const novoCombustivel = Math.max(
+                        0,
+                        combustivelAtual - CONSUMO_POR_CORRIDA
+                    );
+
                     const { atual: novaPatente } =
                         calcularPatente(novoSaldo);
 
@@ -2520,6 +2843,7 @@
                         ),
                         corridasHoje: novasCorridas,
                         ganhosHoje: novosGanhos,
+                        combustivel: novoCombustivel,
                         corridaAtual: null,
                         dataCorridas: dataHoje(),
                         atualizadoEm: Date.now()
