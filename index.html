@@ -134,7 +134,7 @@
 
             <div class="actions-links">
                 <a href="#" id="btnEsqueciSenha">Esqueci a senha</a>
-                <a href="cadastro.html">Não tenho cadastro</a>
+                <a href="cadastro.html" id="linkCadastro">Não tenho cadastro</a>
             </div>
         </div>
 
@@ -209,9 +209,22 @@
         let usuarioRecuperandoKey = null;
         let dadosUsuarioRec = null;
 
+        function destinoAposLogin() {
+            const proximo = new URLSearchParams(window.location.search).get('proximo');
+            return proximo === 'OUVINTES/ouvinte_ludgins.html'
+                ? proximo
+                : 'OUVINTES/index.html';
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             inputEmail.value = "";
             inputSenha.value = "";
+
+            const linkCadastro = document.getElementById('linkCadastro');
+            const proximo = new URLSearchParams(window.location.search).get('proximo');
+            if (linkCadastro && proximo === 'OUVINTES/ouvinte_ludgins.html') {
+                linkCadastro.href = `cadastro.html?proximo=${encodeURIComponent(proximo)}`;
+            }
         });
 
         async function realizarLogin() {
@@ -245,7 +258,7 @@
                     });
 
                     if (usuarioEncontrado) {
-                        window.location.href = "OUVINTES/index.html";
+                        window.location.href = destinoAposLogin();
                     } else {
                         alert("E-mail ou senha incorretos!");
                     }

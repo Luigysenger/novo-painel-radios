@@ -426,8 +426,10 @@
                 );
 
 
-                window.location.href =
-                    "index.html";
+                const proximo = new URLSearchParams(window.location.search).get('proximo');
+                window.location.href = proximo === 'OUVINTES/ouvinte_ludgins.html'
+                    ? `index.html?proximo=${encodeURIComponent(proximo)}`
+                    : 'index.html';
 
             }
             catch (erro) {
