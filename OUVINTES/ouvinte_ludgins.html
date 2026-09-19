@@ -896,10 +896,12 @@
         }
 
         .carro-emoji {
+            --taxi-rotacao: 0deg;
             font-size: 39px;
             line-height: 1;
             filter: drop-shadow(0 3px 3px rgba(0,0,0,.45));
-            transform: translateY(-1px);
+            transform: translateY(-1px) rotate(var(--taxi-rotacao));
+            transition: transform .16s linear;
         }
 
         .carro-porta-malas,
@@ -1484,8 +1486,10 @@
 
         // Malha viária do mapa 2D.
         // O táxi se desloca somente pelos eixos das ruas.
-        const RUAS_X = [7.2, 31.3, 44.2, 61.8, 76.8, 87.4];
-        const RUAS_Y = [19.3, 39.0, 62.3, 82.0];
+        // Estes valores são os centros das ruas desenhadas no mapa.
+        // Não são coordenadas de prédios, calçadas ou jardins.
+        const RUAS_X = [18, 48, 76];
+        const RUAS_Y = [18, 43, 70];
 
         function maisProximo(valor, lista) {
             return lista.reduce((melhor, atual) =>
@@ -2431,11 +2435,15 @@
                         Math.min(1, (alvo - acumulado) / segmento.distancia)
                     );
 
+                    const dx = Number(segmento.b.x) - Number(segmento.a.x);
+                    const dy = Number(segmento.b.y) - Number(segmento.a.y);
+
                     return {
                         x: Number(segmento.a.x) +
-                            (Number(segmento.b.x) - Number(segmento.a.x)) * local,
+                            dx * local,
                         y: Number(segmento.a.y) +
-                            (Number(segmento.b.y) - Number(segmento.a.y)) * local,
+                            dy * local,
+                        angulo: Math.atan2(dy, dx) * 180 / Math.PI,
                         progresso,
                         terminou: progresso >= 1
                     };
@@ -2483,6 +2491,11 @@
 
                 el.style.left = `${pos.x}%`;
                 el.style.top = `${pos.y}%`;
+
+                const emoji = el.querySelector('.carro-emoji');
+                if (emoji && Number.isFinite(pos.angulo)) {
+                    emoji.style.setProperty('--taxi-rotacao', `${pos.angulo}deg`);
+                }
 
                 if (!pos.terminou) {
                     el.classList.add('andando');
