@@ -2500,10 +2500,10 @@
                 const emoji = el.querySelector('.carro-emoji');
                 if (emoji && pos.direcao) {
                     const visualDirecao = {
-                        direita: { rotacao: '0deg', espelho: '1' },
-                        esquerda: { rotacao: '0deg', espelho: '-1' },
-                        cima: { rotacao: '-90deg', espelho: '1' },
-                        baixo: { rotacao: '90deg', espelho: '1' }
+                        direita: { rotacao: '0deg', espelho: '-1' },
+                        esquerda: { rotacao: '0deg', espelho: '1' },
+                        cima: { rotacao: '90deg', espelho: '1' },
+                        baixo: { rotacao: '-90deg', espelho: '1' }
                     }[pos.direcao];
 
                     emoji.style.setProperty('--taxi-rotacao', visualDirecao.rotacao);
