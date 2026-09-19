@@ -1187,6 +1187,23 @@
         }
 
         @media (max-width: 700px) {
+            .app {
+                width: 100%;
+            }
+
+            .topbar {
+                gap: 10px;
+            }
+
+            .brand h1 {
+                font-size: 23px;
+            }
+
+            .btn-voltar {
+                padding: 9px 11px;
+                font-size: 11px;
+            }
+
             .perfil-patente-linha {
                 gap: 6px;
             }
@@ -1205,19 +1222,54 @@
             }
 
             .mapa {
-                min-height: 560px;
-                aspect-ratio: auto;
-                background-size: cover;
+                min-height: 0;
+                height: auto;
+                aspect-ratio: 3 / 2;
+                background-size: 100% 100%;
                 background-position: center;
             }
 
             .carro-jogador {
-                transform: translate(-50%, -50%) scale(.92);
+                transform: translate(-50%, -50%) scale(.68);
             }
 
             .ride-bubble,
             .destino-bubble {
-                min-width: 92px;
+                min-width: 66px;
+                padding: 5px;
+                font-size: 7px;
+                border-radius: 9px;
+            }
+
+            .ride-person,
+            .destino-pin {
+                transform: scale(.74);
+                transform-origin: center bottom;
+            }
+
+            .map-legenda {
+                left: 5px;
+                bottom: 5px;
+                padding: 5px 6px;
+                font-size: 8px;
+            }
+
+            .bloqueado {
+                top: 5px;
+                width: calc(100% - 10px);
+            }
+
+            .bloqueado-box {
+                max-width: none;
+                padding: 7px 9px;
+            }
+
+            .bloqueado-box h3 {
+                font-size: 12px;
+                margin-bottom: 3px;
+            }
+
+            .bloqueado-box p {
                 font-size: 9px;
             }
         }
@@ -1645,13 +1697,16 @@
         // IDENTIDADE DO OUVINTE
         // Usa a mesma lógica do painel principal.
         // =========================================================
-        let usuarioId = localStorage.getItem('usuarioKey') ||
-                        localStorage.getItem('userId') ||
-                        null;
+        const loginDoPainel = String(localStorage.getItem('usuarioLogado') || '').trim();
+        const possuiLoginValido = loginDoPainel && loginDoPainel.toLowerCase() !== 'ouvinte_anonimo';
 
-        let usuarioNome = localStorage.getItem('usuarioNome') ||
-                          localStorage.getItem('usuarioLogado') ||
-                          'Ouvinte';
+        let usuarioId = possuiLoginValido
+            ? (localStorage.getItem('usuarioKey') || localStorage.getItem('userId') || null)
+            : null;
+
+        let usuarioNome = possuiLoginValido
+            ? (localStorage.getItem('usuarioNome') || loginDoPainel)
+            : '';
 
         let perfilAtual = null;
         let corridaAtualCache = null;
@@ -1676,7 +1731,17 @@
             ).replace(/[^a-zA-Z0-9]/g, '_');
         }
 
+        function exigirLoginParaJogar() {
+            const destino = 'OUVINTES/ouvinte_ludgins.html';
+            window.location.replace(`../index.html?proximo=${encodeURIComponent(destino)}`);
+        }
+
         async function resolverUsuario() {
+            if (!possuiLoginValido) {
+                exigirLoginParaJogar();
+                return null;
+            }
+
             const alvo = String(
                 localStorage.getItem('usuarioLogado') ||
                 localStorage.getItem('usuarioNome') ||
@@ -3793,7 +3858,8 @@
         // INICIALIZAÇÃO
         // =========================================================
         async function iniciar() {
-            await resolverUsuario();
+            const usuarioResolvido = await resolverUsuario();
+            if (!usuarioResolvido) return;
             await garantirPerfil();
             await corrigirCorridaFantasma();
 
