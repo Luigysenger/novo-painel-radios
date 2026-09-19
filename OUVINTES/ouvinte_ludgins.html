@@ -711,6 +711,10 @@
             margin-top: 2px;
         }
 
+        .mobile-corridas {
+            display: none;
+        }
+
         .ride-person {
             display: grid;
             place-items: center;
@@ -1233,18 +1237,137 @@
                 transform: translate(-50%, -50%) scale(.68);
             }
 
-            .ride-bubble,
-            .destino-bubble {
-                min-width: 66px;
-                padding: 5px;
-                font-size: 7px;
-                border-radius: 9px;
+            .ride-pin {
+                display: grid;
+                place-items: center;
+                width: 25px;
+                height: 25px;
+                padding: 0;
+                border: 2px solid #fff;
+                border-radius: 50%;
+                background: #facc15;
+                box-shadow: 0 3px 10px rgba(0,0,0,.48);
             }
 
-            .ride-person,
+            .ride-pin::after {
+                content: '👤';
+                font-size: 13px;
+                line-height: 1;
+            }
+
+            .ride-pin.accepted {
+                background: #64748b;
+            }
+
+            .ride-pin.accepted::after {
+                content: '🚕';
+                font-size: 12px;
+            }
+
+            .ride-bubble,
+            .destino-bubble {
+                display: none;
+            }
+
             .destino-pin {
-                transform: scale(.74);
-                transform-origin: center bottom;
+                display: grid;
+                place-items: center;
+                width: 24px;
+                height: 24px;
+                border: 2px solid #fff;
+                border-radius: 50%;
+                background: #38bdf8;
+                box-shadow: 0 3px 10px rgba(0,0,0,.48);
+            }
+
+            .destino-pin::after {
+                content: '🏁';
+                font-size: 12px;
+            }
+
+            .mobile-corridas {
+                display: grid;
+                gap: 9px;
+                margin: 12px 1px 2px;
+            }
+
+            .mobile-corridas-titulo {
+                margin: 2px 2px 0;
+                color: #f8fafc;
+                font-size: 15px;
+                font-weight: 900;
+            }
+
+            .mobile-corrida {
+                display: grid;
+                grid-template-columns: 40px minmax(0, 1fr) auto;
+                align-items: center;
+                gap: 9px;
+                width: 100%;
+                padding: 10px;
+                border: 1px solid rgba(250,204,21,.5);
+                border-radius: 14px;
+                background: linear-gradient(135deg, rgba(69,51,11,.94), rgba(39,31,17,.96));
+                color: #fff;
+                box-shadow: 0 7px 16px rgba(0,0,0,.2);
+                text-align: left;
+                cursor: pointer;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .mobile-corrida:active {
+                transform: scale(.985);
+            }
+
+            .mobile-corrida-icone {
+                display: grid;
+                place-items: center;
+                width: 40px;
+                height: 40px;
+                border-radius: 12px;
+                background: #facc15;
+                font-size: 20px;
+            }
+
+            .mobile-corrida-info {
+                min-width: 0;
+            }
+
+            .mobile-corrida-info strong,
+            .mobile-corrida-info span {
+                display: block;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .mobile-corrida-info strong {
+                color: #fef3c7;
+                font-size: 14px;
+            }
+
+            .mobile-corrida-info span {
+                margin-top: 2px;
+                color: #cbd5e1;
+                font-size: 11px;
+                font-weight: 700;
+            }
+
+            .mobile-corrida-valor {
+                color: #facc15;
+                font-size: 16px;
+                font-weight: 900;
+                white-space: nowrap;
+            }
+
+            .mobile-corridas-vazia {
+                padding: 12px;
+                border: 1px solid rgba(148,163,184,.22);
+                border-radius: 12px;
+                color: #cbd5e1;
+                background: rgba(15,23,42,.72);
+                font-size: 12px;
+                text-align: center;
             }
 
             .map-legenda {
@@ -1435,6 +1558,8 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="mobile-corridas" id="mobileCorridas" aria-live="polite"></div>
             </div>
 
             <aside class="side">
@@ -1654,6 +1779,7 @@
         // =========================================================
         const aviso = document.getElementById('aviso');
         const mapa = document.getElementById('mapa');
+        const mobileCorridas = document.getElementById('mobileCorridas');
         const bloqueioMapa = document.getElementById('bloqueioMapa');
         const bloqueioTitulo = document.getElementById('bloqueioTitulo');
         const bloqueioTexto = document.getElementById('bloqueioTexto');
@@ -3213,6 +3339,60 @@
             mapa.querySelectorAll('.ride-pin').forEach(el => el.remove());
         }
 
+        function tentarAceitarCorrida(corrida) {
+            if (perfilAtual?.corridaAtual) {
+                mostrarAviso(
+                    'Finalize a corrida em andamento antes de aceitar outra.',
+                    'erro'
+                );
+                return;
+            }
+
+            aceitarCorrida(corrida.id);
+        }
+
+        function desenharCorridasMobile(corridas) {
+            if (!mobileCorridas) return;
+
+            const disponiveis = corridas.filter(corrida => corrida.status === 'disponivel');
+
+            if (!disponiveis.length) {
+                mobileCorridas.innerHTML = `
+                    <div class="mobile-corridas-vazia">
+                        Nenhum passageiro aguardando agora. Novas corridas aparecerão aqui.
+                    </div>
+                `;
+                return;
+            }
+
+            mobileCorridas.innerHTML = '<h3 class="mobile-corridas-titulo">Escolha uma corrida</h3>';
+
+            disponiveis.forEach(corrida => {
+                const qtdPassageiros = Math.max(
+                    1,
+                    Math.min(3, Number(corrida.quantidadePassageiros || 1))
+                );
+                const valorExibido = valorCorridaAplicado(
+                    Number(corrida.valor || 0),
+                    Number(perfilAtual?.corridasHoje || 0)
+                );
+                const card = document.createElement('button');
+
+                card.type = 'button';
+                card.className = 'mobile-corrida';
+                card.innerHTML = `
+                    <span class="mobile-corrida-icone">${qtdPassageiros > 1 ? '👥' : '🧍'}</span>
+                    <span class="mobile-corrida-info">
+                        <strong>${escapar(corrida.origem || 'Origem')}</strong>
+                        <span>🏁 ${escapar(corrida.destino || 'Destino')} · ${qtdPassageiros} passageiro${qtdPassageiros > 1 ? 's' : ''}</span>
+                    </span>
+                    <span class="mobile-corrida-valor">+${valorExibido} 🪙</span>
+                `;
+                card.addEventListener('click', () => tentarAceitarCorrida(corrida));
+                mobileCorridas.appendChild(card);
+            });
+        }
+
         function desenharCorridas(snapshot) {
             limparPins();
 
@@ -3236,10 +3416,13 @@
                 });
             }
 
-            corridas
+            const corridasVisiveis = corridas
                 .sort((a, b) => Number(a.criadoEm || 0) - Number(b.criadoEm || 0))
-                .slice(-8)
-                .forEach(corrida => {
+                .slice(-8);
+
+            desenharCorridasMobile(corridasVisiveis);
+
+            corridasVisiveis.forEach(corrida => {
                     const pin = document.createElement('button');
                     pin.className = `ride-pin ${corrida.status === 'aceita' ? 'accepted' : ''}`;
                     pin.style.left = `${Number(corrida.x || 50)}%`;
@@ -3285,17 +3468,7 @@
                             </div>
                         `;
 
-                        pin.addEventListener('click', () => {
-                            if (perfilAtual?.corridaAtual) {
-                                mostrarAviso(
-                                    'Finalize a corrida em andamento antes de aceitar outra.',
-                                    'erro'
-                                );
-                                return;
-                            }
-
-                            aceitarCorrida(corrida.id);
-                        });
+                        pin.addEventListener('click', () => tentarAceitarCorrida(corrida));
                     }
 
                     mapa.appendChild(pin);
