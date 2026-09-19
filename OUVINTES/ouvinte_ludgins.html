@@ -1486,10 +1486,10 @@
 
         // Malha viária do mapa 2D.
         // O táxi se desloca somente pelos eixos das ruas.
-        // Estes valores são os centros das ruas desenhadas no mapa.
+        // Centros exatos das ruas desenhadas na imagem do mapa.
         // Não são coordenadas de prédios, calçadas ou jardins.
-        const RUAS_X = [18, 48, 76];
-        const RUAS_Y = [18, 43, 70];
+        const RUAS_X = [7.8, 30.0, 50.7, 69.2, 86.7];
+        const RUAS_Y = [17.7, 38.4, 61.9, 80.9];
 
         function maisProximo(valor, lista) {
             return lista.reduce((melhor, atual) =>
