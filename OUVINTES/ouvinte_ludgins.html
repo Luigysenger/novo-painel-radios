@@ -897,10 +897,11 @@
 
         .carro-emoji {
             --taxi-rotacao: 0deg;
+            --taxi-espelho: 1;
             font-size: 39px;
             line-height: 1;
             filter: drop-shadow(0 3px 3px rgba(0,0,0,.45));
-            transform: translateY(-1px) rotate(var(--taxi-rotacao));
+            transform: translateY(-1px) rotate(var(--taxi-rotacao)) scaleX(var(--taxi-espelho));
             transition: transform .16s linear;
         }
 
@@ -1486,10 +1487,11 @@
 
         // Malha viária do mapa 2D.
         // O táxi se desloca somente pelos eixos das ruas.
-        // Centros exatos das ruas desenhadas na imagem do mapa.
-        // Não são coordenadas de prédios, calçadas ou jardins.
-        const RUAS_X = [7.8, 30.0, 50.7, 69.2, 86.7];
+        // Centros das avenidas horizontais reais da imagem do mapa.
+        // A rua vertical em X=30 é a única ligação contínua e segura
+        // entre elas; as demais colunas atravessam quarteirões.
         const RUAS_Y = [17.7, 38.4, 61.9, 80.9];
+        const RUA_VERTICAL_SEGURA_X = 30.0;
 
         function maisProximo(valor, lista) {
             return lista.reduce((melhor, atual) =>
@@ -1499,12 +1501,11 @@
             , lista[0]);
         }
 
-        // O carro só pode ocupar cruzamentos reais da malha de ruas.
-        // Passageiros, destinos e prédios continuam nos pontos atuais,
-        // mas o táxi para sempre na rua mais próxima.
+        // Passageiros e prédios ficam nos pontos atuais, mas o táxi sempre
+        // para sobre a avenida horizontal mais próxima.
         function pontoNaRua(x, y) {
             return {
-                x: maisProximo(Number(x), RUAS_X),
+                x: Math.max(2, Math.min(98, Number(x))),
                 y: maisProximo(Number(y), RUAS_Y)
             };
         }
@@ -1515,7 +1516,8 @@
 
             const rota = [
                 inicio,
-                { x: fim.x, y: inicio.y },
+                { x: RUA_VERTICAL_SEGURA_X, y: inicio.y },
+                { x: RUA_VERTICAL_SEGURA_X, y: fim.y },
                 fim
             ];
 
@@ -2437,13 +2439,16 @@
 
                     const dx = Number(segmento.b.x) - Number(segmento.a.x);
                     const dy = Number(segmento.b.y) - Number(segmento.a.y);
+                    const direcao = Math.abs(dx) > Math.abs(dy)
+                        ? (dx >= 0 ? 'direita' : 'esquerda')
+                        : (dy >= 0 ? 'baixo' : 'cima');
 
                     return {
                         x: Number(segmento.a.x) +
                             dx * local,
                         y: Number(segmento.a.y) +
                             dy * local,
-                        angulo: Math.atan2(dy, dx) * 180 / Math.PI,
+                        direcao,
                         progresso,
                         terminou: progresso >= 1
                     };
@@ -2493,8 +2498,16 @@
                 el.style.top = `${pos.y}%`;
 
                 const emoji = el.querySelector('.carro-emoji');
-                if (emoji && Number.isFinite(pos.angulo)) {
-                    emoji.style.setProperty('--taxi-rotacao', `${pos.angulo}deg`);
+                if (emoji && pos.direcao) {
+                    const visualDirecao = {
+                        direita: { rotacao: '0deg', espelho: '1' },
+                        esquerda: { rotacao: '0deg', espelho: '-1' },
+                        cima: { rotacao: '-90deg', espelho: '1' },
+                        baixo: { rotacao: '90deg', espelho: '1' }
+                    }[pos.direcao];
+
+                    emoji.style.setProperty('--taxi-rotacao', visualDirecao.rotacao);
+                    emoji.style.setProperty('--taxi-espelho', visualDirecao.espelho);
                 }
 
                 if (!pos.terminou) {
