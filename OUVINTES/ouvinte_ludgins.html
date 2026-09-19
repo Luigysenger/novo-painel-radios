@@ -1495,21 +1495,24 @@
             , lista[0]);
         }
 
-        function criarRotaPelasRuas(deX, deY, paraX, paraY) {
-            const x0 = Number(deX);
-            const y0 = Number(deY);
-            const x1 = Number(paraX);
-            const y1 = Number(paraY);
+        // O carro só pode ocupar cruzamentos reais da malha de ruas.
+        // Passageiros, destinos e prédios continuam nos pontos atuais,
+        // mas o táxi para sempre na rua mais próxima.
+        function pontoNaRua(x, y) {
+            return {
+                x: maisProximo(Number(x), RUAS_X),
+                y: maisProximo(Number(y), RUAS_Y)
+            };
+        }
 
-            const ruaInicioY = maisProximo(y0, RUAS_Y);
-            const ruaFimY = maisProximo(y1, RUAS_Y);
-            const avenidaX = maisProximo((x0 + x1) / 2, RUAS_X);
+        function criarRotaPelasRuas(deX, deY, paraX, paraY) {
+            const inicio = pontoNaRua(deX, deY);
+            const fim = pontoNaRua(paraX, paraY);
 
             const rota = [
-                { x: x0, y: ruaInicioY },
-                { x: avenidaX, y: ruaInicioY },
-                { x: avenidaX, y: ruaFimY },
-                { x: x1, y: ruaFimY }
+                inicio,
+                { x: fim.x, y: inicio.y },
+                fim
             ];
 
             return rota.filter((p, i, arr) =>
@@ -2067,21 +2070,22 @@
 
         async function iniciarMovimentoPosto(destino, fase, duracaoMs = 5000) {
             const jogadorRef = ref(db, `ludigins_jogo/jogadores/${usuarioId}`);
-            const inicio = {
-                x: Number(posicaoJogadorAtual.x ?? 49),
-                y: Number(posicaoJogadorAtual.y ?? 52)
-            };
+            const inicio = pontoNaRua(
+                posicaoJogadorAtual.x ?? 49,
+                posicaoJogadorAtual.y ?? 52
+            );
+            const destinoNaRua = pontoNaRua(destino.x, destino.y);
 
             const movimento = {
                 deX: inicio.x,
                 deY: inicio.y,
-                paraX: Number(destino.x),
-                paraY: Number(destino.y),
+                paraX: destinoNaRua.x,
+                paraY: destinoNaRua.y,
                 rota: criarRotaPelasRuas(
                     inicio.x,
                     inicio.y,
-                    Number(destino.x),
-                    Number(destino.y)
+                    destinoNaRua.x,
+                    destinoNaRua.y
                 ),
                 inicioEm: Date.now(),
                 duracaoMs,
@@ -2381,9 +2385,9 @@
             const x1 = Number(movimento.paraX ?? x0);
             const y1 = Number(movimento.paraY ?? y0);
 
-            const rota = Array.isArray(movimento.rota) && movimento.rota.length
-                ? movimento.rota
-                : criarRotaPelasRuas(x0, y0, x1, y1);
+            // Recalcula sempre pela malha atual, inclusive para movimentos
+            // iniciados antes desta atualização.
+            const rota = criarRotaPelasRuas(x0, y0, x1, y1);
 
             if (!rota.length) {
                 return { x: x1, y: y1, progresso, terminou: progresso >= 1 };
@@ -2462,8 +2466,9 @@
                 const pos = posicaoNoMovimento(movimento);
 
                 if (!pos) {
-                    const xParado = Number(jogador.x ?? 49);
-                    const yParado = maisProximo(Number(jogador.y ?? 52), RUAS_Y);
+                    const paradoNaRua = pontoNaRua(jogador.x ?? 49, jogador.y ?? 52);
+                    const xParado = paradoNaRua.x;
+                    const yParado = paradoNaRua.y;
 
                     el.style.left = `${xParado}%`;
                     el.style.top = `${yParado}%`;
@@ -2493,9 +2498,13 @@
                     animacoesCarrinhos.delete(id);
 
                     if (id === usuarioId) {
+                        const destinoNaRua = pontoNaRua(
+                            movimento.paraX,
+                            movimento.paraY
+                        );
                         posicaoJogadorAtual = {
-                            x: Number(movimento.paraX),
-                            y: Number(movimento.paraY)
+                            x: destinoNaRua.x,
+                            y: destinoNaRua.y
                         };
 
                         if (movimento.fase === 'buscar_passageiro') {
@@ -2565,26 +2574,30 @@
             );
 
             setTimeout(async () => {
-                const inicio = {
-                    x: Number(corridaAtualCache?.passageiroX ?? posicaoJogadorAtual.x),
-                    y: Number(corridaAtualCache?.passageiroY ?? posicaoJogadorAtual.y)
-                };
+                const inicio = pontoNaRua(
+                    corridaAtualCache?.passageiroX ?? posicaoJogadorAtual.x,
+                    corridaAtualCache?.passageiroY ?? posicaoJogadorAtual.y
+                );
 
                 const destinoEntregaX =
                     Number(corridaAtualCache?.destinoX ?? inicio.x);
                 const destinoEntregaY =
                     Number(corridaAtualCache?.destinoY ?? inicio.y);
+                const destinoEntregaNaRua = pontoNaRua(
+                    destinoEntregaX,
+                    destinoEntregaY
+                );
 
                 const movimentoEntrega = {
                     deX: inicio.x,
                     deY: inicio.y,
-                    paraX: destinoEntregaX,
-                    paraY: destinoEntregaY,
+                    paraX: destinoEntregaNaRua.x,
+                    paraY: destinoEntregaNaRua.y,
                     rota: criarRotaPelasRuas(
                         inicio.x,
                         inicio.y,
-                        destinoEntregaX,
-                        destinoEntregaY
+                        destinoEntregaNaRua.x,
+                        destinoEntregaNaRua.y
                     ),
                     inicioEm: Date.now(),
                     duracaoMs: tempoEntregaMs,
@@ -2625,10 +2638,11 @@
 
         async function processarChegadaAoDestino(movimento) {
             const jogadorRef = ref(db, `ludigins_jogo/jogadores/${usuarioId}`);
+            const destinoNaRua = pontoNaRua(movimento.paraX, movimento.paraY);
 
             await update(jogadorRef, {
-                x: Number(movimento.paraX),
-                y: Number(movimento.paraY),
+                x: destinoNaRua.x,
+                y: destinoNaRua.y,
                 movimento: null,
                 status: 'aguardando_finalizacao',
                 atualizadoEm: Date.now()
@@ -2650,6 +2664,7 @@
 
         async function finalizarMovimentoDoMeuCarrinho(movimento) {
             const jogadorRef = ref(db, `ludigins_jogo/jogadores/${usuarioId}`);
+            const destinoNaRua = pontoNaRua(movimento.paraX, movimento.paraY);
 
             await runTransaction(jogadorRef, atual => {
                 if (!atual) return;
@@ -2664,8 +2679,8 @@
 
                 return {
                     ...atual,
-                    x: Number(movimento.paraX),
-                    y: Number(movimento.paraY),
+                    x: destinoNaRua.x,
+                    y: destinoNaRua.y,
                     movimento: null,
                     status: movimento.fase === 'fila_posto'
                         ? 'fila_posto'
@@ -2710,13 +2725,14 @@
                     } else {
                         pararAnimacaoCarrinho(id);
                         el.classList.remove('andando');
-                        el.style.left = `${Number(jogador.x ?? 49)}%`;
-                        el.style.top = `${Number(jogador.y ?? 52)}%`;
+                        const paradoNaRua = pontoNaRua(jogador.x ?? 49, jogador.y ?? 52);
+                        el.style.left = `${paradoNaRua.x}%`;
+                        el.style.top = `${paradoNaRua.y}%`;
 
                         if (id === usuarioId) {
                             posicaoJogadorAtual = {
-                                x: Number(jogador.x ?? 49),
-                                y: Number(jogador.y ?? 52)
+                                x: paradoNaRua.x,
+                                y: paradoNaRua.y
                             };
                         }
                     }
@@ -2739,13 +2755,17 @@
             const anterior = snap.exists() ? (snap.val() || {}) : {};
 
             const saldo = Number(perfilAtual?.saldo || anterior.saldo || 0);
+            const posicaoInicialNaRua = pontoNaRua(
+                anterior.x ?? posicaoJogadorAtual.x ?? 49,
+                anterior.y ?? posicaoJogadorAtual.y ?? 52
+            );
 
             const dados = {
                 nome: usuarioNome,
                 saldo,
                 cor: perfilAtual?.corOuvinte || escolherCorOuvintePeloId(usuarioId),
-                x: Number(anterior.x ?? posicaoJogadorAtual.x ?? 49),
-                y: Number(anterior.y ?? posicaoJogadorAtual.y ?? 52),
+                x: posicaoInicialNaRua.x,
+                y: posicaoInicialNaRua.y,
                 movimento: anterior.movimento || null,
                 status: anterior.status || 'online',
                 atualizadoEm: Date.now()
@@ -2908,24 +2928,25 @@
         async function iniciarMovimentoAtePassageiro(corridaAceita, tempoBuscaMs) {
             const jogadorRef = ref(db, `ludigins_jogo/jogadores/${usuarioId}`);
 
-            const inicio = {
-                x: Number(posicaoJogadorAtual.x ?? 49),
-                y: Number(posicaoJogadorAtual.y ?? 52)
-            };
+            const inicio = pontoNaRua(
+                posicaoJogadorAtual.x ?? 49,
+                posicaoJogadorAtual.y ?? 52
+            );
 
             const destinoBuscaX = Number(corridaAceita.x ?? 50);
             const destinoBuscaY = Number(corridaAceita.y ?? 50);
+            const destinoBuscaNaRua = pontoNaRua(destinoBuscaX, destinoBuscaY);
 
             const movimento = {
                 deX: inicio.x,
                 deY: inicio.y,
-                paraX: destinoBuscaX,
-                paraY: destinoBuscaY,
+                paraX: destinoBuscaNaRua.x,
+                paraY: destinoBuscaNaRua.y,
                 rota: criarRotaPelasRuas(
                     inicio.x,
                     inicio.y,
-                    destinoBuscaX,
-                    destinoBuscaY
+                    destinoBuscaNaRua.x,
+                    destinoBuscaNaRua.y
                 ),
                 inicioEm: Date.now(),
                 duracaoMs: tempoBuscaMs,
