@@ -1484,7 +1484,7 @@
                 </div>
                 <div class="painel-carro-item">
                     <span>⏱️ Pico</span>
-                    <strong id="painelProximoPico">08:00–09:00</strong>
+                    <strong id="painelProximoPico">07:00–08:00</strong>
                 </div>
             </div>
             <div class="painel-pico-alerta" id="painelPicoAlerta">
@@ -1617,10 +1617,12 @@
         function infoHorarioPico(data = new Date()) {
             const minutos = data.getHours() * 60 + data.getMinutes();
             const faixas = [
-                { ini: 8 * 60, fim: 9 * 60, texto: '08:00–09:00' },
+                { ini: 7 * 60, fim: 8 * 60, texto: '07:00–08:00' },
                 { ini: 10 * 60, fim: 11 * 60, texto: '10:00–11:00' },
                 { ini: 14 * 60, fim: 15 * 60, texto: '14:00–15:00' },
-                { ini: 16 * 60, fim: 18 * 60, texto: '16:00–18:00' }
+                { ini: 17 * 60, fim: 19 * 60, texto: '17:00–19:00' },
+                { ini: 21 * 60, fim: 22 * 60, texto: '21:00–22:00' },
+                { ini: 23 * 60, fim: 24 * 60, texto: '23:00–00:00' }
             ];
 
             const atual = faixas.find(f => minutos >= f.ini && minutos < f.fim);
