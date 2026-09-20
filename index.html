@@ -211,7 +211,10 @@
 
         function destinoAposLogin() {
             const proximo = new URLSearchParams(window.location.search).get('proximo');
-            return proximo === 'OUVINTES/ouvinte_ludgins.html'
+            return [
+                'OUVINTES/index.html',
+                'OUVINTES/ouvinte_ludgins.html'
+            ].includes(proximo)
                 ? proximo
                 : 'OUVINTES/index.html';
         }
@@ -222,7 +225,10 @@
 
             const linkCadastro = document.getElementById('linkCadastro');
             const proximo = new URLSearchParams(window.location.search).get('proximo');
-            if (linkCadastro && proximo === 'OUVINTES/ouvinte_ludgins.html') {
+            if (
+                linkCadastro &&
+                ['OUVINTES/index.html', 'OUVINTES/ouvinte_ludgins.html'].includes(proximo)
+            ) {
                 linkCadastro.href = `cadastro.html?proximo=${encodeURIComponent(proximo)}`;
             }
         });
