@@ -1649,7 +1649,7 @@
                 DURANTE O PICO, TODA CORRIDA PAGA O DOBRO.
             </div>
             <div class="painel-extra-alerta" id="painelExtraAlerta">
-                🔥 100 corridas concluídas. Bônus ativo: cada corrida vale 5 Ludigins por 5 minutos.
+                ⏸️ 100 corridas concluídas. Táxi em descanso por 5 minutos para recarregar as energias.
             </div>
             <div class="painel-fila-posto" id="painelFilaPosto"></div>
         </section>
@@ -1792,8 +1792,8 @@
         // CONFIGURAÇÕES DO JOGO
         // =========================================================
         const MAX_CORRIDAS_DIA = 100;
-        const RECOMPENSA_BONUS_APOS_META = 5;
-        const DURACAO_BONUS_APOS_META_MS = 5 * 60 * 1000;
+        const BONUS_DESCANSO_META = 50;
+        const DURACAO_DESCANSO_META_MS = 5 * 60 * 1000;
         const MIN_RECOMPENSA = 1;
         const MAX_RECOMPENSA = 7;
 
@@ -1817,7 +1817,12 @@
         ];
 
         function infoHorarioPico(data = new Date()) {
-            const minutos = data.getHours() * 60 + data.getMinutes();
+            const partes = new Intl.DateTimeFormat('pt-BR', {
+                timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+            }).formatToParts(data);
+            const hora = Number(partes.find(parte => parte.type === 'hour')?.value || 0);
+            const minuto = Number(partes.find(parte => parte.type === 'minute')?.value || 0);
+            const minutos = hora * 60 + minuto;
             const faixas = [
                 { ini: 0, fim: 3 * 60, texto: '00:00–03:00' },
                 { ini: 5 * 60, fim: 6 * 60, texto: '05:00–06:00' },
@@ -1841,7 +1846,7 @@
             };
         }
 
-        function bonusAposMetaAtivo(bonusAte, agora = Date.now()) {
+        function descansoMetaAtivo(bonusAte, agora = Date.now()) {
             return Number(bonusAte || 0) > agora;
         }
 
@@ -1851,14 +1856,8 @@
             agora = new Date(),
             bonusAte = 0
         ) {
-            const bonusAtivo =
-                Number(corridasFeitas || 0) >= MAX_CORRIDAS_DIA &&
-                bonusAposMetaAtivo(bonusAte, agora.getTime());
-            const valorAntesDoPico = bonusAtivo
-                ? RECOMPENSA_BONUS_APOS_META
-                : Number(valorBase || 0);
-
-            // O horário de pico sempre dobra o valor, inclusive no bônus pós-meta.
+            const valorAntesDoPico = Number(valorBase || 0);
+            // Corridas aceitas em pico ficam travadas com o dobro do valor.
             return infoHorarioPico(agora).ativo
                 ? valorAntesDoPico * 2
                 : valorAntesDoPico;
@@ -2301,17 +2300,17 @@
             painelProximoPico.textContent = pico.ativo ? pico.faixa : pico.proxima;
 
             const extras = corridas >= MAX_CORRIDAS_DIA;
-            const bonusAtivo = bonusAposMetaAtivo(perfilAtual?.bonusAposMetaAte);
+            const descansoAtivo = descansoMetaAtivo(perfilAtual?.bonusAposMetaAte);
             painelCarro.classList.toggle('pico', pico.ativo);
             painelPicoAlerta.classList.toggle('show', pico.ativo);
-            painelExtraAlerta.classList.toggle('show', extras && bonusAtivo);
+            painelExtraAlerta.classList.toggle('show', extras && descansoAtivo);
 
             painelPicoStatus.textContent = pico.ativo
                 ? `🔥 HORÁRIO DE PICO ${pico.faixa}`
                 : 'TRÂNSITO NORMAL';
 
-            painelValorCorrida.textContent = bonusAtivo
-                ? `${pico.ativo ? RECOMPENSA_BONUS_APOS_META * 2 : RECOMPENSA_BONUS_APOS_META} LUDIGINS • BÔNUS${pico.ativo ? ' EM DOBRO' : ''}`
+            painelValorCorrida.textContent = descansoAtivo
+                ? 'DESCANSO • 5 MIN'
                 : pico.ativo
                     ? 'PAGAMENTO EM DOBRO'
                     : 'VALOR NORMAL';
@@ -4048,6 +4047,12 @@
                     return;
                 }
 
+                if (descansoMetaAtivo(perfil.bonusAposMetaAte)) {
+                    const minutos = Math.max(1, Math.ceil((Number(perfil.bonusAposMetaAte) - Date.now()) / 60000));
+                    mostrarAviso(`Você atingiu as ${MAX_CORRIDAS_DIA} corridas. Recarregue as energias: descanso de ${minutos} minuto(s).`, 'ok');
+                    return;
+                }
+
                 const combustivel = perfil.combustivel === undefined
                     ? COMBUSTIVEL_MAX
                     : Number(perfil.combustivel);
@@ -4379,10 +4384,12 @@
                     const corridasDoDia = virouDia ? 0 : Number(atual.corridasHoje || 0);
                     const ganhosDoDia = virouDia ? 0 : Number(atual.ganhosHoje || 0);
 
-                    const novoSaldo =
-                        Number(atual.saldo || 0) + valor;
-
                     const novasCorridas = corridasDoDia + 1;
+                    const atingiuMeta = novasCorridas === MAX_CORRIDAS_DIA;
+                    const bonusDescanso = atingiuMeta ? BONUS_DESCANSO_META : 0;
+
+                    const novoSaldo =
+                        Number(atual.saldo || 0) + valor + bonusDescanso;
 
                     const novasCorridasTotal =
                         Number(atual.corridasTotal || atual.corridasHoje || 0) + 1;
@@ -4392,11 +4399,11 @@
                         ? Number(atual.corridasSemana || 0) + 1
                         : 1;
 
-                    const bonusAposMetaAte = novasCorridas === MAX_CORRIDAS_DIA
-                        ? Date.now() + DURACAO_BONUS_APOS_META_MS
+                    const bonusAposMetaAte = atingiuMeta
+                        ? Date.now() + DURACAO_DESCANSO_META_MS
                         : Number(atual.bonusAposMetaAte || 0);
 
-                    const novosGanhos = ganhosDoDia + valor;
+                    const novosGanhos = ganhosDoDia + valor + bonusDescanso;
 
                     const combustivelAtual = atual.combustivel === undefined
                         ? COMBUSTIVEL_MAX
@@ -4444,7 +4451,9 @@
                         x: Number(corrida.passageiroX ?? posicaoJogadorAtual.x),
                         y: Number(corrida.passageiroY ?? posicaoJogadorAtual.y),
                         movimento: null,
-                        status: 'online',
+                        status: Number(ganho.snapshot.val()?.corridasHoje || 0) === MAX_CORRIDAS_DIA
+                            ? 'descansando'
+                            : 'online',
                         saldo: Number(ganho.snapshot.val()?.saldo || 0),
                         corridasHoje: Number(ganho.snapshot.val()?.corridasHoje || 0),
                         corridasTotal: Number(ganho.snapshot.val()?.corridasTotal || 0),
@@ -4469,7 +4478,8 @@
                 const perfilNovo = ganho.snapshot.val() || {};
                 const feitas = Number(perfilNovo.corridasHoje || 0);
                 const saldoNovo = Number(perfilNovo.saldo || 0);
-                const saldoAnterior = Math.max(0, saldoNovo - valor);
+                const bonusDescansoRecebido = feitas === MAX_CORRIDAS_DIA ? BONUS_DESCANSO_META : 0;
+                const saldoAnterior = Math.max(0, saldoNovo - valor - bonusDescansoRecebido);
                 const centenaAnterior = Math.floor(saldoAnterior / 100);
                 const centenaNova = Math.floor(saldoNovo / 100);
                 const patenteAnterior = calcularPatente(saldoAnterior);
@@ -4491,7 +4501,7 @@
 
                 if (feitas === MAX_CORRIDAS_DIA) {
                     mostrarAviso(
-                        `${MAX_CORRIDAS_DIA} corridas concluídas! Por 5 minutos, cada corrida vale ${RECOMPENSA_BONUS_APOS_META} Ludigins.`,
+                        `🎉 Você atingiu as ${MAX_CORRIDAS_DIA} corridas! Recebeu bônus de ${BONUS_DESCANSO_META} Ludigins. Recarregue as energias: seu táxi descansará por 5 minutos.`,
                         'ok'
                     );
                 } else if (feitas > MAX_CORRIDAS_DIA) {
@@ -4712,9 +4722,11 @@
             // Assim o mapa continua livre para acompanhar os outros ouvintes.
             missaoDiariaTopo.classList.toggle('show', limite);
 
+            const descansoAtivo = descansoMetaAtivo(perfilAtual.bonusAposMetaAte);
+
             if (limite) {
-                missaoDiariaTopo.textContent = bonusAposMetaAtivo(perfilAtual.bonusAposMetaAte)
-                    ? `🔥 ${feitas}/${MAX_CORRIDAS_DIA} • BÔNUS ${RECOMPENSA_BONUS_APOS_META} LUDIGINS`
+                missaoDiariaTopo.textContent = descansoAtivo
+                    ? `⏸️ ${feitas}/${MAX_CORRIDAS_DIA} • DESCANSO 5 MIN`
                     : `✅ ${feitas}/${MAX_CORRIDAS_DIA} • CORRIDAS LIBERADAS`;
             }
 
@@ -4723,6 +4735,13 @@
                 bloqueioTitulo.textContent = '🚕 Corrida em andamento';
                 bloqueioTexto.textContent =
                     'Acompanhe seu carrinho no mapa. Novas corridas ficam bloqueadas até a entrega.';
+                return;
+            }
+
+            if (descansoAtivo) {
+                bloqueioMapa.classList.add('show');
+                bloqueioTitulo.textContent = '⏸️ Táxi em descanso';
+                bloqueioTexto.textContent = `Você atingiu ${MAX_CORRIDAS_DIA} corridas e ganhou ${BONUS_DESCANSO_META} Ludigins. Aguarde 5 minutos para recarregar as energias.`;
                 return;
             }
 
