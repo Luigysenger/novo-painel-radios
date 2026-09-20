@@ -902,11 +902,24 @@
         .carro-emoji {
             --taxi-rotacao: 0deg;
             --taxi-espelho: 1;
+            --taxi-filtro: none;
             font-size: 39px;
             line-height: 1;
-            filter: drop-shadow(0 3px 3px rgba(0,0,0,.45));
+            filter: var(--taxi-filtro) drop-shadow(0 3px 3px rgba(0,0,0,.45));
             transform: translateY(-1px) rotate(var(--taxi-rotacao)) scaleX(var(--taxi-espelho));
             transition: transform .16s linear;
+        }
+
+        .carro-jogador[data-carro="verde"] .carro-emoji {
+            --taxi-filtro: hue-rotate(82deg) saturate(1.5);
+        }
+
+        .carro-jogador[data-carro="vermelho"] .carro-emoji {
+            --taxi-filtro: hue-rotate(310deg) saturate(1.8);
+        }
+
+        .carro-jogador[data-carro="azul"] .carro-emoji {
+            --taxi-filtro: hue-rotate(165deg) saturate(1.6);
         }
 
         .carro-porta-malas,
@@ -1423,7 +1436,7 @@
             <div class="card resumo">
                 <div class="mini-card">
                     <span>Corridas hoje</span>
-                    <strong><span id="corridasHoje">0</span>/10</strong>
+                    <strong><span id="corridasHoje">0</span>/60</strong>
                 </div>
                 <div class="mini-card">
                     <span>Ganhos hoje</span>
@@ -1436,6 +1449,10 @@
                 <div class="mini-card">
                     <span>Próxima patente</span>
                     <strong id="proximaPatenteMini">CHUMBO</strong>
+                </div>
+                <div class="mini-card">
+                    <span>Próximo carro</span>
+                    <strong id="proximoCarro">200 corridas</strong>
                 </div>
 
                 <div class="mini-card combustivel-card" id="combustivelCard">
@@ -1492,7 +1509,7 @@
                 DURANTE O PICO, TODA CORRIDA PAGA O DOBRO.
             </div>
             <div class="painel-extra-alerta" id="painelExtraAlerta">
-                ✅ 60 corridas concluídas. A partir de agora, cada corrida vale 4 Ludigins.
+                🔥 60 corridas concluídas. Bônus ativo: cada corrida vale 5 Ludigins por 5 minutos.
             </div>
             <div class="painel-fila-posto" id="painelFilaPosto"></div>
         </section>
@@ -1593,7 +1610,8 @@
         // CONFIGURAÇÕES DO JOGO
         // =========================================================
         const MAX_CORRIDAS_DIA = 60;
-        const RECOMPENSA_APOS_META = 4;
+        const RECOMPENSA_BONUS_APOS_META = 5;
+        const DURACAO_BONUS_APOS_META_MS = 5 * 60 * 1000;
         const MIN_RECOMPENSA = 1;
         const MAX_RECOMPENSA = 7;
 
@@ -1637,15 +1655,41 @@
             };
         }
 
-        function valorCorridaAplicado(valorBase, corridasFeitas, agora = new Date()) {
-            if (Number(corridasFeitas || 0) >= MAX_CORRIDAS_DIA) {
-                return RECOMPENSA_APOS_META;
+        function bonusAposMetaAtivo(bonusAte, agora = Date.now()) {
+            return Number(bonusAte || 0) > agora;
+        }
+
+        function valorCorridaAplicado(
+            valorBase,
+            corridasFeitas,
+            agora = new Date(),
+            bonusAte = 0
+        ) {
+            if (
+                Number(corridasFeitas || 0) >= MAX_CORRIDAS_DIA &&
+                bonusAposMetaAtivo(bonusAte, agora.getTime())
+            ) {
+                return RECOMPENSA_BONUS_APOS_META;
             }
 
             const valorNormal = Number(valorBase || 0);
             return infoHorarioPico(agora).ativo
                 ? valorNormal * 2
                 : valorNormal;
+        }
+
+        function modeloCarroPorCorridas(corridasTotal = 0) {
+            const total = Math.max(0, Number(corridasTotal || 0));
+            return EVOLUCAO_CARROS.find(modelo => total >= modelo.minimo) || EVOLUCAO_CARROS.at(-1);
+        }
+
+        function textoProximoCarro(corridasTotal = 0) {
+            const total = Math.max(0, Number(corridasTotal || 0));
+            const proximo = [...EVOLUCAO_CARROS].reverse().find(modelo => modelo.minimo > total);
+
+            return proximo
+                ? `Faltam ${proximo.minimo - total} corridas`
+                : 'Carro azul máximo';
         }
 
         // Malha viária do mapa 2D.
@@ -1702,14 +1746,11 @@
         // Embarque visual rápido; depois começa a ida até o destino.
         const TEMPO_EMBARQUE_MS = 3000;
 
-        // Cores por evolução do ouvinte:
-        // começa amarelo, depois verde, roxo, vermelho e azul.
-        const CORES_CARRINHO = [
-            '#facc15',
-            '#22c55e',
-            '#a855f7',
-            '#ef4444',
-            '#3b82f6'
+        const EVOLUCAO_CARROS = [
+            { minimo: 1000, nome: 'Azul', cor: '#3b82f6', classe: 'azul', multiplicadorTempo: .72 },
+            { minimo: 500, nome: 'Vermelho', cor: '#ef4444', classe: 'vermelho', multiplicadorTempo: .82 },
+            { minimo: 200, nome: 'Verde', cor: '#22c55e', classe: 'verde', multiplicadorTempo: .91 },
+            { minimo: 0, nome: 'Amarelo', cor: '#facc15', classe: 'amarelo', multiplicadorTempo: 1 }
         ];
 
         const CORES_OUVINTES = [
@@ -1778,6 +1819,7 @@
         const corridasHojeEl = document.getElementById('corridasHoje');
         const ganhosHojeEl = document.getElementById('ganhosHoje');
         const proximaPatenteMiniEl = document.getElementById('proximaPatenteMini');
+        const proximoCarroEl = document.getElementById('proximoCarro');
         const textoProgressoEl = document.getElementById('textoProgresso');
         const percentualProgressoEl = document.getElementById('percentualProgresso');
         const barraProgressoEl = document.getElementById('barraProgresso');
@@ -2028,16 +2070,17 @@
             painelProximoPico.textContent = pico.ativo ? pico.faixa : pico.proxima;
 
             const extras = corridas >= MAX_CORRIDAS_DIA;
+            const bonusAtivo = bonusAposMetaAtivo(perfilAtual?.bonusAposMetaAte);
             painelCarro.classList.toggle('pico', pico.ativo);
-            painelPicoAlerta.classList.toggle('show', pico.ativo && !extras);
-            painelExtraAlerta.classList.toggle('show', extras);
+            painelPicoAlerta.classList.toggle('show', pico.ativo && !bonusAtivo);
+            painelExtraAlerta.classList.toggle('show', extras && bonusAtivo);
 
             painelPicoStatus.textContent = pico.ativo
                 ? `🔥 HORÁRIO DE PICO ${pico.faixa}`
                 : 'TRÂNSITO NORMAL';
 
-            painelValorCorrida.textContent = extras
-                ? `${RECOMPENSA_APOS_META} LUDIGINS`
+            painelValorCorrida.textContent = bonusAtivo
+                ? `${RECOMPENSA_BONUS_APOS_META} LUDIGINS • BÔNUS`
                 : pico.ativo
                     ? 'PAGAMENTO EM DOBRO'
                     : 'VALOR NORMAL';
@@ -2066,7 +2109,9 @@
                         patente: 'SEM PATENTE',
                         nivel: 0,
                         corridasHoje: 0,
+                        corridasTotal: 0,
                         ganhosHoje: 0,
+                        bonusAposMetaAte: 0,
                         combustivel: COMBUSTIVEL_MAX,
                         dataCorridas: hoje,
                         corridaAtual: null,
@@ -2081,6 +2126,7 @@
                     perfil.dataCorridas = hoje;
                     perfil.corridasHoje = 0;
                     perfil.ganhosHoje = 0;
+                    perfil.bonusAposMetaAte = 0;
 
                     // Se ficou uma corrida antiga presa de outro dia, libera o ouvinte.
                     if (perfil.corridaAtual && perfil.corridaAtual.data !== hoje) {
@@ -2092,7 +2138,13 @@
                 perfil.corOuvinte = perfil.corOuvinte || escolherCorOuvintePeloId(usuarioId);
                 perfil.saldo = Number(perfil.saldo || 0);
                 perfil.corridasHoje = Number(perfil.corridasHoje || 0);
+                perfil.corridasTotal = Number(
+                    perfil.corridasTotal === undefined
+                        ? perfil.corridasHoje
+                        : perfil.corridasTotal || 0
+                );
                 perfil.ganhosHoje = Number(perfil.ganhosHoje || 0);
+                perfil.bonusAposMetaAte = Number(perfil.bonusAposMetaAte || 0);
                 perfil.combustivel = perfil.combustivel === undefined
                     ? COMBUSTIVEL_MAX
                     : Math.max(0, Math.min(COMBUSTIVEL_MAX, Number(perfil.combustivel)));
@@ -2168,6 +2220,7 @@
 
             const saldo = Number(perfil.saldo || 0);
             const corridas = Number(perfil.corridasHoje || 0);
+            const corridasTotal = Number(perfil.corridasTotal || 0);
             const ganhos = Number(perfil.ganhosHoje || 0);
             const { atual } = calcularPatente(saldo);
             const progresso = calcularProgresso(saldo);
@@ -2179,6 +2232,7 @@
             corridasHojeEl.textContent = corridas;
             ganhosHojeEl.textContent = ganhos;
             proximaPatenteMiniEl.textContent = progresso.proximaNome;
+            proximoCarroEl.textContent = textoProximoCarro(corridasTotal);
             textoProgressoEl.textContent = progresso.texto;
             percentualProgressoEl.textContent = `${progresso.percentual}%`;
             barraProgressoEl.style.width = `${progresso.percentual}%`;
@@ -2216,7 +2270,9 @@
                     {
                         nome: perfil.nome || usuarioNome,
                         saldo,
-                        cor: perfilAtual?.corOuvinte || escolherCorOuvintePeloId(usuarioId),
+                        corridasTotal: Number(perfil.corridasTotal || 0),
+                        carro: modeloCarroPorCorridas(Number(perfil.corridasTotal || 0)).classe,
+                        cor: corCarrinhoPorCorridas(Number(perfil.corridasTotal || 0)),
                         atualizadoEm: Date.now()
                     }
                 ).catch(() => {});
@@ -2257,7 +2313,7 @@
 
             await set(filaRef, {
                 nome: usuarioNome,
-                cor: perfil.corOuvinte || escolherCorOuvintePeloId(usuarioId),
+                cor: corCarrinhoPorCorridas(Number(perfil.corridasTotal || 0)),
                 solicitadoEm: Date.now(),
                 atualizadoEm: Date.now(),
                 status: 'fila'
@@ -2289,7 +2345,7 @@
                     destinoNaRua.y
                 ),
                 inicioEm: Date.now(),
-                duracaoMs,
+                duracaoMs: ajustarDuracaoPeloCarro(duracaoMs),
                 fase
             };
 
@@ -2519,17 +2575,8 @@
         // =========================================================
         // CARRINHOS ONLINE / MOVIMENTO EM TEMPO REAL
         // =========================================================
-        function indiceCorCarrinho(saldo) {
-            const { indice } = calcularPatente(Number(saldo || 0));
-
-            // Mantém exatamente a sequência pedida:
-            // amarelo -> verde -> roxo -> vermelho -> azul.
-            // Na patente máxima, permanece azul.
-            return Math.max(0, Math.min(CORES_CARRINHO.length - 1, indice));
-        }
-
-        function corCarrinhoPorSaldo(saldo) {
-            return CORES_CARRINHO[indiceCorCarrinho(saldo)];
+        function corCarrinhoPorCorridas(corridasTotal) {
+            return modeloCarroPorCorridas(corridasTotal).cor;
         }
 
         function criarElementoCarrinho(id, jogador) {
@@ -2551,11 +2598,14 @@
         function atualizarVisualCarrinho(el, jogador) {
             const visual = el.querySelector('.carro-visual');
             const nome = el.querySelector('.carro-nome');
+            const modelo = modeloCarroPorCorridas(jogador.corridasTotal);
+
+            el.dataset.carro = jogador.carro || modelo.classe;
 
             if (visual) {
                 visual.style.setProperty(
                     '--car-color',
-                    jogador.cor || escolherCorOuvintePeloId(el.dataset.jogadorId || jogador.nome || 'ouvinte')
+                    jogador.cor || modelo.cor
                 );
             }
 
@@ -2976,6 +3026,8 @@
             const anterior = snap.exists() ? (snap.val() || {}) : {};
 
             const saldo = Number(perfilAtual?.saldo || anterior.saldo || 0);
+            const corridasTotal = Number(perfilAtual?.corridasTotal || anterior.corridasTotal || 0);
+            const modeloCarro = modeloCarroPorCorridas(corridasTotal);
             const posicaoInicialNaRua = pontoNaRua(
                 anterior.x ?? posicaoJogadorAtual.x ?? 49,
                 anterior.y ?? posicaoJogadorAtual.y ?? 52
@@ -2984,7 +3036,9 @@
             const dados = {
                 nome: usuarioNome,
                 saldo,
-                cor: perfilAtual?.corOuvinte || escolherCorOuvintePeloId(usuarioId),
+                corridasTotal,
+                carro: modeloCarro.classe,
+                cor: modeloCarro.cor,
                 x: posicaoInicialNaRua.x,
                 y: posicaoInicialNaRua.y,
                 movimento: anterior.movimento || null,
@@ -2998,12 +3052,16 @@
         async function atualizarHeartbeatJogador() {
             const jogadorRef = ref(db, `ludigins_jogo/jogadores/${usuarioId}`);
             const saldo = Number(perfilAtual?.saldo || 0);
+            const corridasTotal = Number(perfilAtual?.corridasTotal || 0);
+            const modeloCarro = modeloCarroPorCorridas(corridasTotal);
 
             try {
                 await update(jogadorRef, {
                     nome: usuarioNome,
                     saldo,
-                    cor: perfilAtual?.corOuvinte || escolherCorOuvintePeloId(usuarioId),
+                    corridasTotal,
+                    carro: modeloCarro.classe,
+                    cor: modeloCarro.cor,
                     atualizadoEm: Date.now()
                 });
 
@@ -3057,10 +3115,20 @@
         }
 
         function tempoBuscaPorDistancia(distancia) {
-            if (distancia <= 22) return TEMPOS_BUSCA.PERTO;
-            if (distancia <= 36) return TEMPOS_BUSCA.MEDIO;
-            if (distancia <= 52) return TEMPOS_BUSCA.LONGE;
-            return TEMPOS_BUSCA.MUITO_LONGE;
+            const tempoBase = distancia <= 22
+                ? TEMPOS_BUSCA.PERTO
+                : distancia <= 36
+                    ? TEMPOS_BUSCA.MEDIO
+                    : distancia <= 52
+                        ? TEMPOS_BUSCA.LONGE
+                        : TEMPOS_BUSCA.MUITO_LONGE;
+
+            return ajustarDuracaoPeloCarro(tempoBase);
+        }
+
+        function ajustarDuracaoPeloCarro(duracaoMs) {
+            const modelo = modeloCarroPorCorridas(perfilAtual?.corridasTotal || 0);
+            return Math.max(900, Math.round(Number(duracaoMs || 0) * modelo.multiplicadorTempo));
         }
 
         function textoDistanciaPorTempo(tempoMs) {
@@ -3177,12 +3245,16 @@
 
             await runTransaction(jogadorRef, atual => {
                 const saldo = Number(perfilAtual?.saldo || atual?.saldo || 0);
+                const corridasTotal = Number(perfilAtual?.corridasTotal || atual?.corridasTotal || 0);
+                const modeloCarro = modeloCarroPorCorridas(corridasTotal);
 
                 return {
                     ...(atual || {}),
                     nome: usuarioNome,
                     saldo,
-                    cor: perfilAtual?.corOuvinte || escolherCorOuvintePeloId(usuarioId),
+                    corridasTotal,
+                    carro: modeloCarro.classe,
+                    cor: modeloCarro.cor,
                     x: inicio.x,
                     y: inicio.y,
                     movimento,
@@ -3378,7 +3450,9 @@
                 );
                 const valorExibido = valorCorridaAplicado(
                     Number(corrida.valor || 0),
-                    Number(perfilAtual?.corridasHoje || 0)
+                    Number(perfilAtual?.corridasHoje || 0),
+                    new Date(),
+                    Number(perfilAtual?.bonusAposMetaAte || 0)
                 );
                 const card = document.createElement('button');
 
@@ -3455,7 +3529,9 @@
 
                         const valorExibido = valorCorridaAplicado(
                             Number(corrida.valor || 0),
-                            Number(perfilAtual?.corridasHoje || 0)
+                            Number(perfilAtual?.corridasHoje || 0),
+                            new Date(),
+                            Number(perfilAtual?.bonusAposMetaAte || 0)
                         );
 
                         pin.innerHTML = `
@@ -3484,7 +3560,7 @@
         // =========================================================
         // ACEITAR CORRIDA
         // Regra: não pode aceitar outra enquanto há uma em andamento.
-        // Até 60 corridas, o pico paga o dobro. Depois disso, cada corrida vale 4 Ludigins.
+        // Após a 60ª corrida, há 5 minutos de bônus fixo de 5 Ludigins.
         // =========================================================
         async function aceitarCorrida(corridaId) {
             if (aceitandoCorrida) return;
@@ -3568,7 +3644,9 @@
                     const corridasFeitas = Number(atual.corridasHoje || 0);
                     const valorAplicado = valorCorridaAplicado(
                         Number(corridaAceita.valor || 0),
-                        corridasFeitas
+                        corridasFeitas,
+                        new Date(),
+                        Number(atual.bonusAposMetaAte || 0)
                     );
 
                     return {
@@ -3829,6 +3907,13 @@
                     const novasCorridas =
                         Number(atual.corridasHoje || 0) + 1;
 
+                    const novasCorridasTotal =
+                        Number(atual.corridasTotal || atual.corridasHoje || 0) + 1;
+
+                    const bonusAposMetaAte = novasCorridas === MAX_CORRIDAS_DIA
+                        ? Date.now() + DURACAO_BONUS_APOS_META_MS
+                        : Number(atual.bonusAposMetaAte || 0);
+
                     const novosGanhos =
                         Number(atual.ganhosHoje || 0) + valor;
 
@@ -3852,7 +3937,9 @@
                             p => p.nome === novaPatente.nome
                         ),
                         corridasHoje: novasCorridas,
+                        corridasTotal: novasCorridasTotal,
                         ganhosHoje: novosGanhos,
+                        bonusAposMetaAte,
                         combustivel: novoCombustivel,
                         corridaAtual: null,
                         dataCorridas: dataHoje(),
@@ -3876,8 +3963,12 @@
                         movimento: null,
                         status: 'online',
                         saldo: Number(ganho.snapshot.val()?.saldo || 0),
-                        cor: corCarrinhoPorSaldo(
-                            Number(ganho.snapshot.val()?.saldo || 0)
+                        corridasTotal: Number(ganho.snapshot.val()?.corridasTotal || 0),
+                        carro: modeloCarroPorCorridas(
+                            Number(ganho.snapshot.val()?.corridasTotal || 0)
+                        ).classe,
+                        cor: corCarrinhoPorCorridas(
+                            Number(ganho.snapshot.val()?.corridasTotal || 0)
                         ),
                         atualizadoEm: Date.now()
                     }
@@ -3890,9 +3981,14 @@
                 const perfilNovo = ganho.snapshot.val() || {};
                 const feitas = Number(perfilNovo.corridasHoje || 0);
 
-                if (feitas >= MAX_CORRIDAS_DIA) {
+                if (feitas === MAX_CORRIDAS_DIA) {
                     mostrarAviso(
-                        `60 corridas concluídas! Você pode continuar: agora cada corrida vale ${RECOMPENSA_APOS_META} Ludigins.`,
+                        `60 corridas concluídas! Por 5 minutos, cada corrida vale ${RECOMPENSA_BONUS_APOS_META} Ludigins.`,
+                        'ok'
+                    );
+                } else if (feitas > MAX_CORRIDAS_DIA) {
+                    mostrarAviso(
+                        `Corrida finalizada! +${valor} Ludigins. Continue aproveitando as corridas disponíveis.`,
                         'ok'
                     );
                 } else {
@@ -3974,8 +4070,9 @@
             missaoDiariaTopo.classList.toggle('show', limite);
 
             if (limite) {
-                missaoDiariaTopo.textContent =
-                    `✅ ${feitas}/${MAX_CORRIDAS_DIA} • CORRIDAS EXTRAS = ${RECOMPENSA_APOS_META} LUDIGINS`;
+                missaoDiariaTopo.textContent = bonusAposMetaAtivo(perfilAtual.bonusAposMetaAte)
+                    ? `🔥 ${feitas}/${MAX_CORRIDAS_DIA} • BÔNUS ${RECOMPENSA_BONUS_APOS_META} LUDIGINS`
+                    : `✅ ${feitas}/${MAX_CORRIDAS_DIA} • CORRIDAS LIBERADAS`;
             }
 
             if (temCorrida) {
