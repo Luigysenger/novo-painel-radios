@@ -4532,7 +4532,6 @@
                 snapshot => {
                     jogadoresRankingCache = snapshot.exists() ? (snapshot.val() || {}) : {};
                     desenharJogadoresOnline(snapshot);
-                    desenharRankings(snapshot);
                 }
             );
 
