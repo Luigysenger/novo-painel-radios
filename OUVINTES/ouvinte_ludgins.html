@@ -1027,6 +1027,138 @@
             gap: 7px;
         }
 
+        .ranking-card {
+            overflow: hidden;
+        }
+
+        .ranking-cabecalho {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .ranking-data {
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .ranking-lista {
+            list-style: none;
+            padding: 0;
+            margin: 9px 0 0;
+            display: grid;
+            gap: 6px;
+        }
+
+        .ranking-item {
+            display: grid;
+            grid-template-columns: 22px 26px minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 8px;
+            border: 1px solid rgba(148,163,184,.16);
+            border-radius: 10px;
+            background: rgba(15,23,42,.42);
+            font-size: 12px;
+        }
+
+        .ranking-posicao {
+            color: #fde68a;
+            font-weight: 900;
+        }
+
+        .ranking-carro {
+            width: 25px;
+            height: 25px;
+            display: grid;
+            place-items: center;
+            border-radius: 8px;
+            background: color-mix(in srgb, var(--ranking-cor) 34%, #0f172a);
+            border: 1px solid color-mix(in srgb, var(--ranking-cor) 80%, white 20%);
+            font-size: 16px;
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,.3));
+        }
+
+        .ranking-nome {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-weight: 800;
+        }
+
+        .ranking-total {
+            color: #cbd5e1;
+            font-size: 10px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .ranking-vazio {
+            color: var(--muted);
+            font-size: 12px;
+            padding: 8px 2px 2px;
+        }
+
+        .ranking-divisor {
+            height: 1px;
+            margin: 14px 0;
+            background: rgba(148,163,184,.18);
+        }
+
+        .chuva-confetes {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .confete {
+            position: absolute;
+            top: -18px;
+            width: 9px;
+            height: 15px;
+            border-radius: 2px;
+            background: var(--cor-confete);
+            animation: cairConfete var(--tempo-confete) cubic-bezier(.15,.65,.35,1) forwards;
+            transform: translateX(0) rotate(0deg);
+        }
+
+        @keyframes cairConfete {
+            to { transform: translate(var(--desvio-confete), 110vh) rotate(760deg); opacity: 0; }
+        }
+
+        .medalha-global {
+            position: fixed;
+            top: 22px;
+            left: 50%;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: min(92vw, 430px);
+            padding: 12px 16px;
+            border: 1px solid #fde68a;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #422006, #1e293b);
+            box-shadow: 0 18px 42px rgba(0,0,0,.48);
+            color: #fff7d6;
+            font-weight: 800;
+            text-align: left;
+            animation: medalhaEntrar .35s ease-out both;
+        }
+
+        .medalha-global span { font-size: 27px; }
+
+        @keyframes medalhaEntrar {
+            from { opacity: 0; transform: translate(-50%, -18px) scale(.9); }
+            to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+        }
+
         .feed-item {
             --ouvinte-cor: #64748b;
             padding: 9px 10px 9px 13px;
@@ -1590,6 +1722,25 @@
                         <div class="feed-item">Aguardando movimentação dos ouvintes...</div>
                     </div>
                 </div>
+
+                <div class="card side-card ranking-card">
+                    <div class="section-title ranking-cabecalho">
+                        <h2>🏆 Ranking do dia</h2>
+                        <span class="ranking-data" id="rankingData">Hoje</span>
+                    </div>
+                    <ol class="ranking-lista" id="rankingDiario">
+                        <li class="ranking-vazio">Aguardando as primeiras corridas do dia.</li>
+                    </ol>
+
+                    <div class="ranking-divisor"></div>
+
+                    <div class="section-title">
+                        <h2>📅 Classificação semanal</h2>
+                    </div>
+                    <ol class="ranking-lista" id="rankingSemanal">
+                        <li class="ranking-vazio">A classificação semanal começa com a primeira corrida.</li>
+                    </ol>
+                </div>
             </aside>
         </section>
     </main>
@@ -1835,6 +1986,9 @@
         const painelCorridaAtual = document.querySelector('.corrida-atual');
         const colunaLateral = document.querySelector('.side');
         const feed = document.getElementById('feed');
+        const rankingData = document.getElementById('rankingData');
+        const rankingDiario = document.getElementById('rankingDiario');
+        const rankingSemanal = document.getElementById('rankingSemanal');
         const combustivelCard = document.getElementById('combustivelCard');
         const combustivelValor = document.getElementById('combustivelValor');
         const combustivelBar = document.getElementById('combustivelBar');
@@ -1892,6 +2046,8 @@
         let timerAbastecimento = null;
         let processandoFilaPosto = false;
         let timerPainelCarro = null;
+        let eventosIniciaisCarregados = false;
+        const eventosCelebrados = new Set();
 
         function chaveFallback() {
             return String(
@@ -1994,6 +2150,19 @@
             const mes = String(agora.getMonth() + 1).padStart(2, '0');
             const dia = String(agora.getDate()).padStart(2, '0');
             return `${ano}-${mes}-${dia}`;
+        }
+
+        function chaveSemana(data = new Date()) {
+            const inicio = new Date(data.getFullYear(), data.getMonth(), data.getDate());
+            const deslocamento = (inicio.getDay() + 6) % 7;
+            inicio.setDate(inicio.getDate() - deslocamento);
+            return `${inicio.getFullYear()}-${String(inicio.getMonth() + 1).padStart(2, '0')}-${String(inicio.getDate()).padStart(2, '0')}`;
+        }
+
+        function textoDataRanking() {
+            return new Date().toLocaleDateString('pt-BR', {
+                day: '2-digit', month: '2-digit', weekday: 'short'
+            }).replace('.', '');
         }
 
         // =========================================================
@@ -2100,6 +2269,7 @@
 
             await runTransaction(perfilRef, atual => {
                 const hoje = dataHoje();
+                const semana = chaveSemana();
 
                 if (!atual) {
                     return {
@@ -2110,6 +2280,8 @@
                         nivel: 0,
                         corridasHoje: 0,
                         corridasTotal: 0,
+                        corridasSemana: 0,
+                        semanaCorridas: semana,
                         ganhosHoje: 0,
                         bonusAposMetaAte: 0,
                         combustivel: COMBUSTIVEL_MAX,
@@ -2134,6 +2306,11 @@
                     }
                 }
 
+                if (perfil.semanaCorridas !== semana) {
+                    perfil.semanaCorridas = semana;
+                    perfil.corridasSemana = 0;
+                }
+
                 perfil.nome = usuarioNome || perfil.nome || 'Ouvinte';
                 perfil.corOuvinte = perfil.corOuvinte || escolherCorOuvintePeloId(usuarioId);
                 perfil.saldo = Number(perfil.saldo || 0);
@@ -2143,6 +2320,7 @@
                         ? perfil.corridasHoje
                         : perfil.corridasTotal || 0
                 );
+                perfil.corridasSemana = Number(perfil.corridasSemana || 0);
                 perfil.ganhosHoje = Number(perfil.ganhosHoje || 0);
                 perfil.bonusAposMetaAte = Number(perfil.bonusAposMetaAte || 0);
                 perfil.combustivel = perfil.combustivel === undefined
@@ -3910,6 +4088,11 @@
                     const novasCorridasTotal =
                         Number(atual.corridasTotal || atual.corridasHoje || 0) + 1;
 
+                    const semanaAtual = chaveSemana();
+                    const novasCorridasSemana = atual.semanaCorridas === semanaAtual
+                        ? Number(atual.corridasSemana || 0) + 1
+                        : 1;
+
                     const bonusAposMetaAte = novasCorridas === MAX_CORRIDAS_DIA
                         ? Date.now() + DURACAO_BONUS_APOS_META_MS
                         : Number(atual.bonusAposMetaAte || 0);
@@ -3938,6 +4121,8 @@
                         ),
                         corridasHoje: novasCorridas,
                         corridasTotal: novasCorridasTotal,
+                        corridasSemana: novasCorridasSemana,
+                        semanaCorridas: semanaAtual,
                         ganhosHoje: novosGanhos,
                         bonusAposMetaAte,
                         combustivel: novoCombustivel,
@@ -3980,6 +4165,26 @@
 
                 const perfilNovo = ganho.snapshot.val() || {};
                 const feitas = Number(perfilNovo.corridasHoje || 0);
+                const saldoNovo = Number(perfilNovo.saldo || 0);
+                const saldoAnterior = Math.max(0, saldoNovo - valor);
+                const centenaAnterior = Math.floor(saldoAnterior / 100);
+                const centenaNova = Math.floor(saldoNovo / 100);
+                const patenteAnterior = calcularPatente(saldoAnterior);
+                const patenteNova = calcularPatente(saldoNovo);
+
+                if (centenaNova > centenaAnterior) {
+                    await registrarEvento(
+                        `${usuarioNome} alcançou ${centenaNova * 100} Ludigins!`,
+                        { tipo: 'confete', marco: centenaNova * 100 }
+                    );
+                }
+
+                if (patenteNova.indice > patenteAnterior.indice) {
+                    await registrarEvento(
+                        `${usuarioNome} subiu para a patente ${patenteNova.atual.nome}!`,
+                        { tipo: 'patente', patente: patenteNova.atual.nome }
+                    );
+                }
 
                 if (feitas === MAX_CORRIDAS_DIA) {
                     mostrarAviso(
@@ -4014,15 +4219,94 @@
         // =========================================================
         // FEED GLOBAL
         // =========================================================
-        async function registrarEvento(texto) {
+        async function registrarEvento(texto, extras = {}) {
             const evt = push(ref(db, 'ludigins_eventos'));
             await set(evt, {
                 texto,
                 usuarioId,
                 usuarioNome,
                 corOuvinte: perfilAtual?.corOuvinte || escolherCorOuvintePeloId(usuarioId),
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                ...extras
             });
+        }
+
+        function desenharRanking(lista, elemento, campo, vazio) {
+            if (!elemento) return;
+            const ordenados = lista
+                .filter(perfil => Number(perfil[campo] || 0) > 0)
+                .sort((a, b) => Number(b[campo] || 0) - Number(a[campo] || 0) ||
+                    String(a.nome || '').localeCompare(String(b.nome || ''), 'pt-BR'))
+                .slice(0, 5);
+
+            if (!ordenados.length) {
+                elemento.innerHTML = `<li class="ranking-vazio">${vazio}</li>`;
+                return;
+            }
+
+            elemento.innerHTML = ordenados.map((perfil, indice) => {
+                const carro = modeloCarroPorCorridas(perfil.corridasTotal || 0);
+                const corridas = Number(perfil[campo] || 0);
+                return `
+                    <li class="ranking-item">
+                        <span class="ranking-posicao">${indice + 1}º</span>
+                        <span class="ranking-carro" style="--ranking-cor:${escapar(carro.cor)}" title="Carro ${escapar(carro.nome)}">🚕</span>
+                        <span class="ranking-nome">${escapar(perfil.nome || 'Ouvinte')}</span>
+                        <span class="ranking-total">${corridas} ${corridas === 1 ? 'corrida' : 'corridas'}</span>
+                    </li>
+                `;
+            }).join('');
+        }
+
+        function desenharRankings(snapshot) {
+            const perfis = [];
+            if (snapshot.exists()) {
+                snapshot.forEach(child => perfis.push(child.val() || {}));
+            }
+
+            const hoje = dataHoje();
+            const semana = chaveSemana();
+            if (rankingData) rankingData.textContent = textoDataRanking();
+
+            desenharRanking(
+                perfis.filter(perfil => perfil.dataCorridas === hoje),
+                rankingDiario,
+                'corridasHoje',
+                'Aguardando as primeiras corridas do dia.'
+            );
+            desenharRanking(
+                perfis.filter(perfil => perfil.semanaCorridas === semana),
+                rankingSemanal,
+                'corridasSemana',
+                'A classificação semanal começa com a primeira corrida.'
+            );
+        }
+
+        function mostrarChuvaConfetes() {
+            const camada = document.createElement('div');
+            const cores = ['#facc15', '#38bdf8', '#f472b6', '#22c55e', '#a78bfa', '#fb923c'];
+            camada.className = 'chuva-confetes';
+
+            for (let i = 0; i < 82; i++) {
+                const confete = document.createElement('span');
+                confete.className = 'confete';
+                confete.style.left = `${Math.random() * 100}%`;
+                confete.style.setProperty('--cor-confete', cores[i % cores.length]);
+                confete.style.setProperty('--tempo-confete', `${2.5 + Math.random() * 1.8}s`);
+                confete.style.setProperty('--desvio-confete', `${-90 + Math.random() * 180}px`);
+                camada.appendChild(confete);
+            }
+
+            document.body.appendChild(camada);
+            setTimeout(() => camada.remove(), 4700);
+        }
+
+        function mostrarMedalhaGlobal(item) {
+            const medalha = document.createElement('div');
+            medalha.className = 'medalha-global';
+            medalha.innerHTML = `<span>🏅</span><div><strong>${escapar(item.usuarioNome || 'Um ouvinte')}</strong><br>subiu para a patente ${escapar(item.patente || 'superior')}!</div>`;
+            document.body.appendChild(medalha);
+            setTimeout(() => medalha.remove(), 5200);
         }
 
         function desenharFeed(snapshot) {
@@ -4030,8 +4314,19 @@
 
             if (snapshot.exists()) {
                 snapshot.forEach(child => {
-                    itens.push(child.val() || {});
+                    const item = { id: child.key, ...(child.val() || {}) };
+                    itens.push(item);
+                    if (eventosIniciaisCarregados && !eventosCelebrados.has(item.id)) {
+                        eventosCelebrados.add(item.id);
+                        if (item.tipo === 'confete') mostrarChuvaConfetes();
+                        if (item.tipo === 'patente') mostrarMedalhaGlobal(item);
+                    }
                 });
+            }
+
+            if (!eventosIniciaisCarregados) {
+                itens.forEach(item => eventosCelebrados.add(item.id));
+                eventosIniciaisCarregados = true;
             }
 
             itens.sort((a,b) => Number(b.timestamp || 0) - Number(a.timestamp || 0));
@@ -4140,6 +4435,13 @@
                     if (snapshot.exists()) {
                         desenharPerfil(snapshot.val());
                     }
+                }
+            );
+
+            onValue(
+                ref(db, 'ludigins_usuarios'),
+                snapshot => {
+                    desenharRankings(snapshot);
                 }
             );
 
