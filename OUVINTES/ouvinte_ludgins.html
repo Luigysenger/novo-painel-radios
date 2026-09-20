@@ -962,6 +962,14 @@
             display: none;
         }
 
+        .cidade-ludigins {
+            margin: 13px 2px 6px;
+            color: #c4b5fd;
+            font-size: 18px;
+            line-height: 1.35;
+            font-weight: 700;
+        }
+
         .side {
             display: flex;
             flex-direction: column;
@@ -1654,29 +1662,6 @@
             <div class="painel-fila-posto" id="painelFilaPosto"></div>
         </section>
 
-        <section class="card negocios-card" id="painelNegocios">
-            <div class="section-title"><h2>🏪 Seus negócios</h2></div>
-            <p class="negocios-intro" id="negociosIntro">Alcance 2.000 Ludigins para abrir a loja de negócios.</p>
-            <div class="loja-negocios" id="lojaNegocios" hidden>
-                <div class="negocio-item ativo">
-                    <strong>⛽ Posto de combustível</strong>
-                    <em>Receba metade de cada abastecimento feito no posto.</em>
-                    <button class="btn-comprar-negocio btn-proposta" data-negocio="posto_combustivel" data-nome="Posto de Combustível">Fazer proposta</button>
-                </div>
-                <div class="negocio-item"><strong>🚒 Caminhão de bombeiro</strong><em>Atendimento especial da cidade.</em><button class="btn-comprar-negocio btn-proposta" data-negocio="caminhao_bombeiro" data-nome="Caminhão de bombeiro">Fazer proposta</button></div>
-                <div class="negocio-item"><strong>🚑 Ambulância</strong><em>Serviço de emergência da cidade.</em><button class="btn-comprar-negocio btn-proposta" data-negocio="ambulancia" data-nome="Ambulância">Fazer proposta</button></div>
-                <div class="negocio-item"><strong>🛵 Entregador de lanche</strong><em>Serviço de entregas da cidade.</em><button class="btn-comprar-negocio btn-proposta" data-negocio="entregador_lanche" data-nome="Entregador de lanche">Fazer proposta</button></div>
-            </div>
-            <div class="negocio-ganhos" id="propostaCompra" hidden>
-                <strong id="propostaTitulo">Proposta de compra</strong><br>
-                Oferta: <span id="propostaValor">1.000</span> 🪙
-                <button class="btn-comprar-negocio" id="btnAumentarProposta">+ 500</button>
-                <button class="btn-comprar-negocio" id="btnEnviarProposta">Oferecer proposta</button>
-            </div>
-            <div class="negocio-ganhos" id="ganhosPosto" hidden>⛽ Ganhos do posto hoje: 0 🪙</div>
-            <div class="negocio-ganhos" id="painelPropostasLuigy" hidden>📨 Propostas recebidas<div id="listaPropostasLuigy"></div></div>
-        </section>
-
         <section class="game">
             <div class="card map-card">
                 <div class="section-title">
@@ -1718,6 +1703,7 @@
                     </div>
                 </div>
 
+                <div class="cidade-ludigins">Cidade Ludigins</div>
                 <div id="mobileCorridaAtual"></div>
                 <div class="mobile-corridas" id="mobileCorridas" aria-live="polite"></div>
             </div>
@@ -1771,6 +1757,20 @@
                     <ol class="ranking-lista" id="rankingSemanal">
                         <li class="ranking-vazio">A classificação semanal começa com a primeira corrida.</li>
                     </ol>
+                </div>
+
+                <div class="card negocios-card" id="painelNegocios">
+                    <div class="section-title"><h2>🏪 Seus negócios</h2></div>
+                    <p class="negocios-intro" id="negociosIntro">Alcance 2.000 Ludigins para abrir a loja de negócios.</p>
+                    <div class="loja-negocios" id="lojaNegocios" hidden>
+                        <div class="negocio-item ativo"><strong>⛽ Posto de combustível</strong><em>Receba metade de cada abastecimento feito no posto.</em><button class="btn-comprar-negocio btn-proposta" data-negocio="posto_combustivel" data-nome="Posto de Combustível">Fazer proposta</button></div>
+                        <div class="negocio-item"><strong>🚒 Caminhão de bombeiro</strong><em>Atendimento especial da cidade.</em><button class="btn-comprar-negocio btn-proposta" data-negocio="caminhao_bombeiro" data-nome="Caminhão de bombeiro">Fazer proposta</button></div>
+                        <div class="negocio-item"><strong>🚑 Ambulância</strong><em>Serviço de emergência da cidade.</em><button class="btn-comprar-negocio btn-proposta" data-negocio="ambulancia" data-nome="Ambulância">Fazer proposta</button></div>
+                        <div class="negocio-item"><strong>🛵 Entregador de lanche</strong><em>Serviço de entregas da cidade.</em><button class="btn-comprar-negocio btn-proposta" data-negocio="entregador_lanche" data-nome="Entregador de lanche">Fazer proposta</button></div>
+                    </div>
+                    <div class="negocio-ganhos" id="propostaCompra" hidden><strong id="propostaTitulo">Proposta de compra</strong><br>Oferta: <span id="propostaValor">1.000</span> 🪙<button class="btn-comprar-negocio" id="btnAumentarProposta">+ 500</button><button class="btn-comprar-negocio" id="btnEnviarProposta">Oferecer proposta</button></div>
+                    <div class="negocio-ganhos" id="ganhosPosto" hidden>⛽ Ganhos do posto hoje: 0 🪙</div>
+                    <div class="negocio-ganhos" id="painelPropostasLuigy" hidden>📨 Propostas recebidas<div id="listaPropostasLuigy"></div></div>
                 </div>
             </aside>
         </section>
@@ -4120,12 +4120,10 @@
 
                     if (atual.corridaAtual) return;
                     const corridasFeitas = Number(atual.corridasHoje || 0);
-                    const valorAplicado = valorCorridaAplicado(
-                        Number(corridaAceita.valor || 0),
-                        corridasFeitas,
-                        new Date(),
-                        Number(atual.bonusAposMetaAte || 0)
-                    );
+                    const momentoAceite = new Date();
+                    const picoNoAceite = infoHorarioPico(momentoAceite).ativo;
+                    const valorBase = Number(corridaAceita.valor || 0);
+                    const valorAplicado = picoNoAceite ? valorBase * 2 : valorBase;
 
                     return {
                         ...atual,
@@ -4133,14 +4131,14 @@
                             id: corridaId,
                             origem: corridaAceita.origem,
                             destino: corridaAceita.destino,
-                            valorBase: Number(corridaAceita.valor || 0),
+                            valorBase,
                             valor: valorAplicado,
-                            horarioPico: infoHorarioPico().ativo,
+                            horarioPico: picoNoAceite,
                             quantidadePassageiros: Math.max(
                                 1,
                                 Math.min(3, Number(corridaAceita.quantidadePassageiros || 1))
                             ),
-                            aceitoEm: Number(corridaAceita.aceitoEm || Date.now()),
+                            aceitoEm: Number(corridaAceita.aceitoEm || momentoAceite.getTime()),
                             data: dataHoje(),
                             passageiroX: Number(corridaAceita.x ?? 50),
                             passageiroY: Number(corridaAceita.y ?? 50),
@@ -4348,7 +4346,10 @@
 
             const corrida = { ...corridaAtualCache };
             const corridaId = corrida.id;
-            const valor = Number(corrida.valor || 0);
+            const valorBase = Number(corrida.valorBase ?? corrida.valor ?? 0);
+            const picoRegistrado = corrida.horarioPico === true ||
+                infoHorarioPico(new Date(Number(corrida.aceitoEm || Date.now()))).ativo;
+            const valor = picoRegistrado ? valorBase * 2 : Number(corrida.valor || valorBase);
 
             try {
                 // Primeiro confirma no banco que esta corrida ainda pertence a este ouvinte.
