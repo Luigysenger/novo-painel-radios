@@ -1545,7 +1545,7 @@
                     <div class="perfil-patente-linha">
                         <div class="perfil-patente" id="patenteNome">SEM PATENTE</div>
                         <div class="missao-diaria-topo" id="missaoDiariaTopo">
-                            ✅ MISSÃO 60/60 CONCLUÍDA
+                            ✅ MISSÃO 100/100 CONCLUÍDA
                         </div>
                     </div>
                     <div class="saldo">
@@ -1568,25 +1568,20 @@
             <div class="card resumo">
                 <div class="mini-card">
                     <span>Corridas hoje</span>
-                    <strong><span id="corridasHoje">0</span>/60</strong>
+                    <strong><span id="corridasHoje">0</span>/100</strong>
                 </div>
                 <div class="mini-card">
                     <span>Ganhos hoje</span>
                     <strong><span id="ganhosHoje">0</span> 🪙</strong>
                 </div>
                 <div class="mini-card">
-                    <span>Valor simbólico</span>
-                    <strong>R$ 22</strong>
+                    <span>Próximo carro</span>
+                    <strong id="proximoCarro">Faltam 200 corridas</strong>
                 </div>
                 <div class="mini-card">
                     <span>Próxima patente</span>
                     <strong id="proximaPatenteMini">CHUMBO</strong>
                 </div>
-                <div class="mini-card">
-                    <span>Próximo carro</span>
-                    <strong id="proximoCarro">200 corridas</strong>
-                </div>
-
                 <div class="mini-card combustivel-card" id="combustivelCard">
                     <span>⛽ Combustível</span>
                     <div class="combustivel-wrap">
@@ -1621,7 +1616,7 @@
             <div class="painel-carro-grid">
                 <div class="painel-carro-item">
                     <span>🚕 Corridas hoje</span>
-                    <strong id="painelCorridas">0 / 10</strong>
+                    <strong id="painelCorridas">0 / 100</strong>
                 </div>
                 <div class="painel-carro-item">
                     <span>⛽ Combustível</span>
@@ -1641,7 +1636,7 @@
                 DURANTE O PICO, TODA CORRIDA PAGA O DOBRO.
             </div>
             <div class="painel-extra-alerta" id="painelExtraAlerta">
-                🔥 60 corridas concluídas. Bônus ativo: cada corrida vale 5 Ludigins por 5 minutos.
+                🔥 100 corridas concluídas. Bônus ativo: cada corrida vale 5 Ludigins por 5 minutos.
             </div>
             <div class="painel-fila-posto" id="painelFilaPosto"></div>
         </section>
@@ -1760,7 +1755,7 @@
         // =========================================================
         // CONFIGURAÇÕES DO JOGO
         // =========================================================
-        const MAX_CORRIDAS_DIA = 60;
+        const MAX_CORRIDAS_DIA = 100;
         const RECOMPENSA_BONUS_APOS_META = 5;
         const DURACAO_BONUS_APOS_META_MS = 5 * 60 * 1000;
         const MIN_RECOMPENSA = 1;
@@ -2046,6 +2041,7 @@
         let timerAbastecimento = null;
         let processandoFilaPosto = false;
         let timerPainelCarro = null;
+        let timerViradaDia = null;
         let eventosIniciaisCarregados = false;
         const eventosCelebrados = new Set();
         let jogadoresRankingCache = {};
@@ -3674,6 +3670,27 @@
             });
         }
 
+        function agendarViradaDoDia() {
+            if (timerViradaDia) clearTimeout(timerViradaDia);
+
+            const agora = new Date();
+            const proximaMeiaNoite = new Date(
+                agora.getFullYear(), agora.getMonth(), agora.getDate() + 1, 0, 0, 1
+            );
+            const espera = Math.max(1000, proximaMeiaNoite.getTime() - agora.getTime());
+
+            timerViradaDia = setTimeout(async () => {
+                try {
+                    await garantirPerfil();
+                    await garantirCorridasDisponiveis();
+                    atualizarPainelCarro();
+                } catch (erro) {
+                    console.warn('Não foi possível atualizar o novo dia do Ludigins:', erro);
+                }
+                agendarViradaDoDia();
+            }, espera);
+        }
+
         function desenharCorridas(snapshot) {
             limparPins();
 
@@ -4104,11 +4121,15 @@
 
                     if (!atualCorrida || atualCorrida.id !== corridaId) return;
 
+                    const hoje = dataHoje();
+                    const virouDia = atual.dataCorridas !== hoje;
+                    const corridasDoDia = virouDia ? 0 : Number(atual.corridasHoje || 0);
+                    const ganhosDoDia = virouDia ? 0 : Number(atual.ganhosHoje || 0);
+
                     const novoSaldo =
                         Number(atual.saldo || 0) + valor;
 
-                    const novasCorridas =
-                        Number(atual.corridasHoje || 0) + 1;
+                    const novasCorridas = corridasDoDia + 1;
 
                     const novasCorridasTotal =
                         Number(atual.corridasTotal || atual.corridasHoje || 0) + 1;
@@ -4122,8 +4143,7 @@
                         ? Date.now() + DURACAO_BONUS_APOS_META_MS
                         : Number(atual.bonusAposMetaAte || 0);
 
-                    const novosGanhos =
-                        Number(atual.ganhosHoje || 0) + valor;
+                    const novosGanhos = ganhosDoDia + valor;
 
                     const combustivelAtual = atual.combustivel === undefined
                         ? COMBUSTIVEL_MAX
@@ -4152,7 +4172,7 @@
                         bonusAposMetaAte,
                         combustivel: novoCombustivel,
                         corridaAtual: null,
-                        dataCorridas: dataHoje(),
+                        dataCorridas: hoje,
                         atualizadoEm: Date.now()
                     };
                 });
@@ -4218,7 +4238,7 @@
 
                 if (feitas === MAX_CORRIDAS_DIA) {
                     mostrarAviso(
-                        `60 corridas concluídas! Por 5 minutos, cada corrida vale ${RECOMPENSA_BONUS_APOS_META} Ludigins.`,
+                        `${MAX_CORRIDAS_DIA} corridas concluídas! Por 5 minutos, cada corrida vale ${RECOMPENSA_BONUS_APOS_META} Ludigins.`,
                         'ok'
                     );
                 } else if (feitas > MAX_CORRIDAS_DIA) {
@@ -4500,6 +4520,7 @@
             const usuarioResolvido = await resolverUsuario();
             if (!usuarioResolvido) return;
             await garantirPerfil();
+            agendarViradaDoDia();
             await corrigirCorridaFantasma();
 
             nomeOuvinteEl.textContent = String(usuarioNome || 'OUVINTE').toUpperCase();
