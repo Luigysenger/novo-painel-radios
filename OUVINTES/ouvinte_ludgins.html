@@ -1400,7 +1400,7 @@
                     <div class="perfil-patente-linha">
                         <div class="perfil-patente" id="patenteNome">SEM PATENTE</div>
                         <div class="missao-diaria-topo" id="missaoDiariaTopo">
-                            ✅ MISSÃO 10/10 CONCLUÍDA
+                            ✅ MISSÃO 25/25 CONCLUÍDA
                         </div>
                     </div>
                     <div class="saldo">
@@ -1489,10 +1489,10 @@
             </div>
             <div class="painel-pico-alerta" id="painelPicoAlerta">
                 🔥 HORÁRIO DE PICO — MUITOS PASSAGEIROS ESTÃO ESPERANDO.
-                AS CORRIDAS CONTINUAM COM VALOR NORMAL, MESMO APÓS A 10ª.
+                DURANTE O PICO, TODA CORRIDA PAGA O DOBRO.
             </div>
             <div class="painel-extra-alerta" id="painelExtraAlerta">
-                ✅ 10 corridas concluídas. Fora do horário de pico, as corridas extras valem 1 Ludigin.
+                ✅ 25 corridas concluídas. A partir de agora, cada corrida vale 4 Ludigins.
             </div>
             <div class="painel-fila-posto" id="painelFilaPosto"></div>
         </section>
@@ -1592,7 +1592,8 @@
         // =========================================================
         // CONFIGURAÇÕES DO JOGO
         // =========================================================
-        const MAX_CORRIDAS_DIA = 10;
+        const MAX_CORRIDAS_DIA = 25;
+        const RECOMPENSA_APOS_META = 4;
         const MIN_RECOMPENSA = 1;
         const MAX_RECOMPENSA = 7;
 
@@ -1635,11 +1636,14 @@
         }
 
         function valorCorridaAplicado(valorBase, corridasFeitas, agora = new Date()) {
-            const pico = infoHorarioPico(agora).ativo;
-            if (Number(corridasFeitas || 0) < MAX_CORRIDAS_DIA || pico) {
-                return Number(valorBase || 0);
+            if (Number(corridasFeitas || 0) >= MAX_CORRIDAS_DIA) {
+                return RECOMPENSA_APOS_META;
             }
-            return 1;
+
+            const valorNormal = Number(valorBase || 0);
+            return infoHorarioPico(agora).ativo
+                ? valorNormal * 2
+                : valorNormal;
         }
 
         // Malha viária do mapa 2D.
@@ -2023,16 +2027,18 @@
 
             const extras = corridas >= MAX_CORRIDAS_DIA;
             painelCarro.classList.toggle('pico', pico.ativo);
-            painelPicoAlerta.classList.toggle('show', pico.ativo);
-            painelExtraAlerta.classList.toggle('show', extras && !pico.ativo);
+            painelPicoAlerta.classList.toggle('show', pico.ativo && !extras);
+            painelExtraAlerta.classList.toggle('show', extras);
 
             painelPicoStatus.textContent = pico.ativo
                 ? `🔥 HORÁRIO DE PICO ${pico.faixa}`
                 : 'TRÂNSITO NORMAL';
 
-            painelValorCorrida.textContent = extras && !pico.ativo
-                ? '1 LUDIGIN'
-                : 'VALOR NORMAL';
+            painelValorCorrida.textContent = extras
+                ? `${RECOMPENSA_APOS_META} LUDIGINS`
+                : pico.ativo
+                    ? 'PAGAMENTO EM DOBRO'
+                    : 'VALOR NORMAL';
         }
 
         function iniciarPainelCarro() {
@@ -3476,7 +3482,7 @@
         // =========================================================
         // ACEITAR CORRIDA
         // Regra: não pode aceitar outra enquanto há uma em andamento.
-        // Após 10 corridas, extras valem 1 Ludigin fora do pico.
+        // Até 25 corridas, o pico paga o dobro. Depois disso, cada corrida vale 4 Ludigins.
         // =========================================================
         async function aceitarCorrida(corridaId) {
             if (aceitandoCorrida) return;
@@ -3883,12 +3889,8 @@
                 const feitas = Number(perfilNovo.corridasHoje || 0);
 
                 if (feitas >= MAX_CORRIDAS_DIA) {
-                    const picoAgora = infoHorarioPico();
-
                     mostrarAviso(
-                        picoAgora.ativo
-                            ? `10 corridas concluídas! Estamos em horário de pico: você pode continuar com valores normais.`
-                            : `10 corridas concluídas! Você pode continuar; fora do pico, as extras valem 1 Ludigin.`,
+                        `25 corridas concluídas! Você pode continuar: agora cada corrida vale ${RECOMPENSA_APOS_META} Ludigins.`,
                         'ok'
                     );
                 } else {
@@ -3970,9 +3972,8 @@
             missaoDiariaTopo.classList.toggle('show', limite);
 
             if (limite) {
-                missaoDiariaTopo.textContent = infoHorarioPico().ativo
-                    ? '🔥 10/10 • PICO: VALORES NORMAIS'
-                    : '✅ 10/10 • EXTRAS = 1 LUDIGIN';
+                missaoDiariaTopo.textContent =
+                    `✅ ${feitas}/${MAX_CORRIDAS_DIA} • CORRIDAS EXTRAS = ${RECOMPENSA_APOS_META} LUDIGINS`;
             }
 
             if (temCorrida) {
