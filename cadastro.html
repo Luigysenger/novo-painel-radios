@@ -427,7 +427,10 @@
 
 
                 const proximo = new URLSearchParams(window.location.search).get('proximo');
-                window.location.href = proximo === 'OUVINTES/ouvinte_ludgins.html'
+                window.location.href = [
+                    'OUVINTES/index.html',
+                    'OUVINTES/ouvinte_ludgins.html'
+                ].includes(proximo)
                     ? `index.html?proximo=${encodeURIComponent(proximo)}`
                     : 'index.html';
 
