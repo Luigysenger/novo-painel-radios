@@ -1661,13 +1661,20 @@
                 <div class="negocio-item ativo">
                     <strong>⛽ Posto de combustível</strong>
                     <em>Receba metade de cada abastecimento feito no posto.</em>
-                    <button class="btn-comprar-negocio" id="btnComprarPosto">Comprar por 2.000 🪙</button>
+                    <button class="btn-comprar-negocio btn-proposta" data-negocio="posto_combustivel" data-nome="Posto de Combustível">Fazer proposta</button>
                 </div>
-                <div class="negocio-item"><strong>🚒 Caminhão de bombeiro</strong><em>Próxima expansão do Ludigins.</em></div>
-                <div class="negocio-item"><strong>🚑 Ambulância</strong><em>Próxima expansão do Ludigins.</em></div>
-                <div class="negocio-item"><strong>🛵 Entregador de lanche</strong><em>Próxima expansão do Ludigins.</em></div>
+                <div class="negocio-item"><strong>🚒 Caminhão de bombeiro</strong><em>Atendimento especial da cidade.</em><button class="btn-comprar-negocio btn-proposta" data-negocio="caminhao_bombeiro" data-nome="Caminhão de bombeiro">Fazer proposta</button></div>
+                <div class="negocio-item"><strong>🚑 Ambulância</strong><em>Serviço de emergência da cidade.</em><button class="btn-comprar-negocio btn-proposta" data-negocio="ambulancia" data-nome="Ambulância">Fazer proposta</button></div>
+                <div class="negocio-item"><strong>🛵 Entregador de lanche</strong><em>Serviço de entregas da cidade.</em><button class="btn-comprar-negocio btn-proposta" data-negocio="entregador_lanche" data-nome="Entregador de lanche">Fazer proposta</button></div>
+            </div>
+            <div class="negocio-ganhos" id="propostaCompra" hidden>
+                <strong id="propostaTitulo">Proposta de compra</strong><br>
+                Oferta: <span id="propostaValor">1.000</span> 🪙
+                <button class="btn-comprar-negocio" id="btnAumentarProposta">+ 500</button>
+                <button class="btn-comprar-negocio" id="btnEnviarProposta">Oferecer proposta</button>
             </div>
             <div class="negocio-ganhos" id="ganhosPosto" hidden>⛽ Ganhos do posto hoje: 0 🪙</div>
+            <div class="negocio-ganhos" id="painelPropostasLuigy" hidden>📨 Propostas recebidas<div id="listaPropostasLuigy"></div></div>
         </section>
 
         <section class="game">
@@ -2035,6 +2042,13 @@
         const lojaNegocios = document.getElementById('lojaNegocios');
         const btnComprarPosto = document.getElementById('btnComprarPosto');
         const ganhosPosto = document.getElementById('ganhosPosto');
+        const propostaCompra = document.getElementById('propostaCompra');
+        const propostaTitulo = document.getElementById('propostaTitulo');
+        const propostaValor = document.getElementById('propostaValor');
+        const btnAumentarProposta = document.getElementById('btnAumentarProposta');
+        const btnEnviarProposta = document.getElementById('btnEnviarProposta');
+        const painelPropostasLuigy = document.getElementById('painelPropostasLuigy');
+        const listaPropostasLuigy = document.getElementById('listaPropostasLuigy');
 
         function organizarPainelCorridaParaTela() {
             if (!painelCorridaAtual || !colunaLateral || !mobileCorridaAtual) return;
@@ -2083,6 +2097,11 @@
         const eventosCelebrados = new Set();
         let jogadoresRankingCache = {};
         let negocioPostoGlobal = null;
+        let negociosGlobais = {};
+        let propostasSnapshot = null;
+        let propostaSelecionada = null;
+        let valorPropostaAtual = 1000;
+        const EMAIL_PROPRIETARIO = 'luigyestilofm@hotmail.com';
 
         function chaveFallback() {
             return String(
@@ -2513,8 +2532,7 @@
         function atualizarPainelNegocios(perfil = perfilAtual || {}) {
             const saldo = Number(perfil.saldo || 0);
             const possuiPosto = !!perfil.possuiPosto;
-            const donoPosto = negocioPostoGlobal?.donoId;
-            const podeAbrirLoja = saldo >= CUSTO_POSTO || possuiPosto;
+            const podeAbrirLoja = saldo >= CUSTO_POSTO || possuiPosto || ehProprietarioMestre();
 
             lojaNegocios.hidden = !podeAbrirLoja;
             ganhosPosto.hidden = !possuiPosto;
@@ -2527,63 +2545,125 @@
             if (possuiPosto) {
                 negociosIntro.textContent = 'Você é dono do Posto de Combustível. Cada abastecimento rende metade do valor para você.';
                 ganhosPosto.textContent = `⛽ Ganhos do posto hoje: ${Number(perfil.ganhosPostoHoje || 0).toLocaleString('pt-BR')} 🪙`;
-                btnComprarPosto.disabled = true;
-                btnComprarPosto.textContent = '✅ Seu posto está funcionando';
-            } else if (donoPosto) {
-                negociosIntro.textContent = 'A loja está liberada. O posto já foi comprado por outro ouvinte; novas atividades chegarão em breve.';
-                btnComprarPosto.disabled = true;
-                btnComprarPosto.textContent = 'Posto já vendido';
             } else {
-                negociosIntro.textContent = 'Loja liberada! Invista seu saldo para ganhar também com os serviços da cidade.';
-                btnComprarPosto.disabled = saldo < CUSTO_POSTO;
-                btnComprarPosto.textContent = `Comprar por ${CUSTO_POSTO.toLocaleString('pt-BR')} 🪙`;
+                negociosIntro.textContent = ehProprietarioMestre()
+                    ? 'Você é o proprietário inicial dos negócios. Analise as propostas recebidas abaixo.'
+                    : 'Loja liberada! Escolha um negócio e envie uma proposta para o proprietário.';
             }
         }
 
-        async function comprarPosto() {
-            const perfil = perfilAtual || {};
-            if (perfil.possuiPosto || Number(perfil.saldo || 0) < CUSTO_POSTO) return;
-
-            btnComprarPosto.disabled = true;
-            const postoRef = ref(db, 'ludigins_jogo/negocios/posto_combustivel');
-            const reserva = await runTransaction(postoRef, atual => {
-                if (atual?.donoId) return;
-                return { donoId: usuarioId, donoNome: usuarioNome, compradoEm: Date.now() };
-            });
-
-            if (!reserva.committed) {
-                mostrarAviso('Esse posto acabou de ser comprado por outro ouvinte.', 'erro');
-                atualizarPainelNegocios();
-                return;
-            }
-
-            const compra = await runTransaction(ref(db, `ludigins_usuarios/${usuarioId}`), atual => {
-                if (!atual || atual.possuiPosto || Number(atual.saldo || 0) < CUSTO_POSTO) return;
-                return {
-                    ...atual,
-                    saldo: Number(atual.saldo || 0) - CUSTO_POSTO,
-                    possuiPosto: true,
-                    ganhosPostoHoje: Number(atual.ganhosPostoHoje || 0),
-                    atualizadoEm: Date.now()
-                };
-            });
-
-            if (!compra.committed) {
-                await runTransaction(postoRef, atual => atual?.donoId === usuarioId ? null : atual);
-                mostrarAviso('Não foi possível concluir a compra do posto.', 'erro');
-                atualizarPainelNegocios();
-                return;
-            }
-
-            negocioPostoGlobal = reserva.snapshot.val() || null;
-            await registrarEvento(`${usuarioNome} comprou o Posto de Combustível da cidade!`);
-            mostrarAviso('🏪 Posto comprado! Você receberá metade de cada abastecimento.', 'ok');
+        function ehProprietarioMestre() {
+            const identidade = [loginDoPainel, usuarioNome, localStorage.getItem('usuarioEmail'), localStorage.getItem('email')]
+                .filter(Boolean).join(' ').toLowerCase();
+            return identidade.includes(EMAIL_PROPRIETARIO) || identidade.includes('luigy');
         }
 
-        btnComprarPosto.addEventListener('click', () => comprarPosto().catch(erro => {
-            console.error(erro);
-            mostrarAviso('Não foi possível comprar o posto agora.', 'erro');
-        }));
+        async function garantirNegociosBase() {
+            const negocios = [
+                ['posto_combustivel', 'Posto de Combustível'],
+                ['caminhao_bombeiro', 'Caminhão de bombeiro'],
+                ['ambulancia', 'Ambulância'],
+                ['entregador_lanche', 'Entregador de lanche']
+            ];
+            await Promise.all(negocios.map(([id, nome]) => runTransaction(
+                ref(db, `ludigins_jogo/negocios/${id}`),
+                atual => {
+                    if (!atual || !atual.donoEmail) return { ...(atual || {}), donoId: 'proprietario_luigy', donoNome: 'Luigy', donoEmail: EMAIL_PROPRIETARIO, nome, criadoEm: atual?.criadoEm || Date.now() };
+                    if (ehProprietarioMestre() && atual.donoEmail === EMAIL_PROPRIETARIO && atual.donoId === 'proprietario_luigy') {
+                        return { ...atual, donoId: usuarioId, donoNome: usuarioNome || 'Luigy' };
+                    }
+                    return atual;
+                }
+            )));
+        }
+
+        function abrirProposta(negocio, nome) {
+            if (Number(perfilAtual?.saldo || 0) < CUSTO_POSTO && !ehProprietarioMestre()) {
+                mostrarAviso('Você precisa de 2.000 Ludigins para enviar propostas.', 'erro');
+                return;
+            }
+            propostaSelecionada = { negocio, nome };
+            valorPropostaAtual = 1000;
+            propostaTitulo.textContent = `Proposta: ${nome}`;
+            propostaValor.textContent = valorPropostaAtual.toLocaleString('pt-BR');
+            propostaCompra.hidden = false;
+        }
+
+        async function enviarProposta() {
+            if (!propostaSelecionada) return;
+            const propostaRef = push(ref(db, 'ludigins_jogo/propostas_negocios'));
+            await set(propostaRef, {
+                negocio: propostaSelecionada.negocio,
+                negocioNome: propostaSelecionada.nome,
+                compradorId: usuarioId,
+                compradorNome: usuarioNome,
+                valor: valorPropostaAtual,
+                status: 'pendente',
+                criadaEm: Date.now()
+            });
+            propostaCompra.hidden = true;
+            await registrarEvento(`${usuarioNome} enviou uma proposta por ${propostaSelecionada.nome}.`);
+            mostrarAviso('📨 Proposta enviada ao proprietário.', 'ok');
+        }
+
+        document.querySelectorAll('.btn-proposta').forEach(botao => botao.addEventListener('click', () =>
+            abrirProposta(botao.dataset.negocio, botao.dataset.nome)
+        ));
+        btnAumentarProposta.addEventListener('click', () => {
+            valorPropostaAtual += 500;
+            propostaValor.textContent = valorPropostaAtual.toLocaleString('pt-BR');
+        });
+        btnEnviarProposta.addEventListener('click', () => enviarProposta().catch(console.error));
+
+        function desenharPropostas(snapshot) {
+            const podeDecidir = ehProprietarioMestre() || Object.values(negociosGlobais).some(negocio => negocio?.donoId === usuarioId);
+            if (!podeDecidir) return;
+            const propostas = [];
+            if (snapshot.exists()) snapshot.forEach(child => propostas.push({ id: child.key, ...(child.val() || {}) }));
+            const pendentes = propostas.filter(item => item.status === 'pendente' && (ehProprietarioMestre() || negociosGlobais[item.negocio]?.donoId === usuarioId)).sort((a,b) => Number(b.criadaEm || 0) - Number(a.criadaEm || 0));
+            painelPropostasLuigy.hidden = false;
+            if (!pendentes.length) {
+                listaPropostasLuigy.innerHTML = '<div style="margin-top:8px">Nenhuma proposta pendente.</div>';
+                return;
+            }
+            listaPropostasLuigy.innerHTML = pendentes.map(item => `<div style="margin-top:10px"><strong>${escapar(item.compradorNome)}</strong> ofereceu ${Number(item.valor || 0).toLocaleString('pt-BR')} 🪙 por ${escapar(item.negocioNome)}<br><button class="btn-comprar-negocio" data-aceitar="${escapar(item.id)}">Aceitar</button><button class="btn-comprar-negocio" data-recusar="${escapar(item.id)}">Recusar</button></div>`).join('');
+            listaPropostasLuigy.querySelectorAll('[data-aceitar]').forEach(botao => botao.addEventListener('click', () => decidirProposta(botao.dataset.aceitar, true)));
+            listaPropostasLuigy.querySelectorAll('[data-recusar]').forEach(botao => botao.addEventListener('click', () => decidirProposta(botao.dataset.recusar, false)));
+        }
+
+        async function decidirProposta(id, aceitar) {
+            const propostaRef = ref(db, `ludigins_jogo/propostas_negocios/${id}`);
+            const snap = await get(propostaRef);
+            const proposta = snap.val() || null;
+            if (!proposta || proposta.status !== 'pendente') return;
+            if (!ehProprietarioMestre() && negociosGlobais[proposta.negocio]?.donoId !== usuarioId) return;
+
+            if (!aceitar) {
+                await update(propostaRef, { status: 'recusada', decididaEm: Date.now(), decididaPor: usuarioNome });
+                return;
+            }
+
+            const pagamento = await runTransaction(ref(db, `ludigins_usuarios/${proposta.compradorId}`), atual => {
+                if (!atual || Number(atual.saldo || 0) < Number(proposta.valor || 0)) return;
+                return { ...atual, saldo: Number(atual.saldo || 0) - Number(proposta.valor || 0), possuiPosto: proposta.negocio === 'posto_combustivel' ? true : !!atual.possuiPosto, atualizadoEm: Date.now() };
+            });
+            if (!pagamento.committed) {
+                mostrarAviso('O ouvinte não possui mais saldo para esta proposta.', 'erro');
+                return;
+            }
+
+            const donoAnterior = negociosGlobais[proposta.negocio]?.donoId;
+            if (donoAnterior && donoAnterior !== 'proprietario_luigy' && donoAnterior !== proposta.compradorId) {
+                await runTransaction(ref(db, `ludigins_usuarios/${donoAnterior}`), atual => atual
+                    ? { ...atual, saldo: Number(atual.saldo || 0) + Number(proposta.valor || 0), atualizadoEm: Date.now() }
+                    : atual
+                );
+            }
+            await update(ref(db, `ludigins_jogo/negocios/${proposta.negocio}`), { donoId: proposta.compradorId, donoNome: proposta.compradorNome, donoEmail: '', vendidoEm: Date.now(), valorVenda: proposta.valor });
+            await update(propostaRef, { status: 'aceita', decididaEm: Date.now(), decididaPor: usuarioNome });
+            await registrarEvento(`${usuarioNome} aceitou a proposta de ${proposta.compradorNome} por ${proposta.negocioNome}.`);
+            mostrarAviso('✅ Proposta aceita e propriedade transferida.', 'ok');
+        }
 
         // =========================================================
         // ABASTECIMENTO
@@ -2659,6 +2739,37 @@
                 movimento,
                 status: fase,
                 atualizadoEm: Date.now()
+            });
+        }
+
+        async function sincronizarResumoDiarioComEventos() {
+            const eventos = await get(ref(db, 'ludigins_eventos'));
+            let corridas = 0;
+            let ganhos = 0;
+            const hoje = dataHoje();
+
+            if (eventos.exists()) {
+                eventos.forEach(child => {
+                    const item = child.val() || {};
+                    if (item.usuarioId !== usuarioId || dataLocalDoTimestamp(item.timestamp) !== hoje) return;
+                    if (item.tipo === 'corrida' || /finalizou a corrida/i.test(String(item.texto || ''))) {
+                        corridas += 1;
+                        const encontrado = String(item.texto || '').match(/ganhou\s+([\d.,]+)\s+Ludigins/i);
+                        ganhos += Number(String(encontrado?.[1] || '0').replace(',', '.')) || 0;
+                    }
+                });
+            }
+
+            await runTransaction(ref(db, `ludigins_usuarios/${usuarioId}`), atual => {
+                if (!atual) return atual;
+                return {
+                    ...atual,
+                    dataCorridas: hoje,
+                    corridasHoje: corridas,
+                    ganhosHoje: ganhos,
+                    bonusAposMetaAte: corridas >= MAX_CORRIDAS_DIA ? Number(atual.bonusAposMetaAte || 0) : 0,
+                    atualizadoEm: Date.now()
+                };
             });
         }
 
@@ -3823,6 +3934,7 @@
             timerViradaDia = setTimeout(async () => {
                 try {
                     await garantirPerfil();
+                    await sincronizarResumoDiarioComEventos();
                     await garantirCorridasDisponiveis();
                     atualizarPainelCarro();
                 } catch (erro) {
@@ -4661,6 +4773,8 @@
             const usuarioResolvido = await resolverUsuario();
             if (!usuarioResolvido) return;
             await garantirPerfil();
+            await sincronizarResumoDiarioComEventos();
+            await garantirNegociosBase();
             agendarViradaDoDia();
             await corrigirCorridaFantasma();
 
@@ -4709,6 +4823,22 @@
                 snapshot => {
                     negocioPostoGlobal = snapshot.exists() ? (snapshot.val() || null) : null;
                     atualizarPainelNegocios();
+                }
+            );
+
+            onValue(
+                ref(db, 'ludigins_jogo/negocios'),
+                snapshot => {
+                    negociosGlobais = snapshot.exists() ? (snapshot.val() || {}) : {};
+                    if (propostasSnapshot) desenharPropostas(propostasSnapshot);
+                }
+            );
+
+            onValue(
+                ref(db, 'ludigins_jogo/propostas_negocios'),
+                snapshot => {
+                    propostasSnapshot = snapshot;
+                    desenharPropostas(snapshot);
                 }
             );
 
