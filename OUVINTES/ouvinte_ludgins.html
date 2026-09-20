@@ -2048,6 +2048,7 @@
         let timerPainelCarro = null;
         let eventosIniciaisCarregados = false;
         const eventosCelebrados = new Set();
+        let jogadoresRankingCache = {};
 
         function chaveFallback() {
             return String(
@@ -2163,6 +2164,14 @@
             return new Date().toLocaleDateString('pt-BR', {
                 day: '2-digit', month: '2-digit', weekday: 'short'
             }).replace('.', '');
+        }
+
+        function dataLocalDoTimestamp(timestamp) {
+            const data = new Date(Number(timestamp || 0));
+            const ano = data.getFullYear();
+            const mes = String(data.getMonth() + 1).padStart(2, '0');
+            const dia = String(data.getDate()).padStart(2, '0');
+            return `${ano}-${mes}-${dia}`;
         }
 
         // =========================================================
@@ -4180,7 +4189,8 @@
                 );
 
                 await registrarEvento(
-                    `${usuarioNome} finalizou a corrida e ganhou ${valor} Ludigins.`
+                    `${usuarioNome} finalizou a corrida e ganhou ${valor} Ludigins.`,
+                    { tipo: 'corrida' }
                 );
 
                 const perfilNovo = ganho.snapshot.val() || {};
@@ -4302,6 +4312,49 @@
             );
         }
 
+        function desenharRankingsPorEventos(eventos) {
+            const hoje = dataHoje();
+            const semana = chaveSemana();
+            const dia = {};
+            const semanal = {};
+            const totalEventos = {};
+
+            eventos.forEach(item => {
+                const texto = String(item.texto || '');
+                const ehCorrida = item.tipo === 'corrida' || /finalizou a corrida/i.test(texto);
+                if (!ehCorrida || !item.timestamp) return;
+
+                const id = String(item.usuarioId || item.usuarioNome || 'ouvinte');
+                const base = {
+                    nome: item.usuarioNome || 'Ouvinte',
+                    corridasTotal: Number(jogadoresRankingCache[id]?.corridasTotal || 0),
+                    dataCorridas: dataLocalDoTimestamp(item.timestamp),
+                    semanaCorridas: chaveSemana(new Date(Number(item.timestamp)))
+                };
+
+                totalEventos[id] = (totalEventos[id] || 0) + 1;
+
+                if (base.dataCorridas === hoje) {
+                    dia[id] = dia[id] || { ...base, corridasHoje: 0 };
+                    dia[id].corridasHoje += 1;
+                }
+
+                if (base.semanaCorridas === semana) {
+                    semanal[id] = semanal[id] || { ...base, corridasSemana: 0 };
+                    semanal[id].corridasSemana += 1;
+                }
+            });
+
+            Object.entries(totalEventos).forEach(([id, total]) => {
+                if (dia[id]) dia[id].corridasTotal = Math.max(dia[id].corridasTotal, total);
+                if (semanal[id]) semanal[id].corridasTotal = Math.max(semanal[id].corridasTotal, total);
+            });
+
+            if (rankingData) rankingData.textContent = textoDataRanking();
+            desenharRanking(Object.values(dia), rankingDiario, 'corridasHoje', 'Aguardando as primeiras corridas do dia.');
+            desenharRanking(Object.values(semanal), rankingSemanal, 'corridasSemana', 'A classificação semanal começa com a primeira corrida.');
+        }
+
         function mostrarChuvaConfetes() {
             const camada = document.createElement('div');
             const cores = ['#facc15', '#38bdf8', '#f472b6', '#22c55e', '#a78bfa', '#fb923c'];
@@ -4348,6 +4401,8 @@
                 itens.forEach(item => eventosCelebrados.add(item.id));
                 eventosIniciaisCarregados = true;
             }
+
+            desenharRankingsPorEventos(itens);
 
             itens.sort((a,b) => Number(b.timestamp || 0) - Number(a.timestamp || 0));
 
@@ -4475,6 +4530,7 @@
             onValue(
                 ref(db, 'ludigins_jogo/jogadores'),
                 snapshot => {
+                    jogadoresRankingCache = snapshot.exists() ? (snapshot.val() || {}) : {};
                     desenharJogadoresOnline(snapshot);
                     desenharRankings(snapshot);
                 }
