@@ -451,6 +451,8 @@
         .btn-comprar-negocio { width:100%; margin-top:10px; padding:9px; border:1px solid #fde68a; border-radius:10px; color:#422006; background:linear-gradient(135deg,#fde68a,#facc15); font-weight:900; cursor:pointer; }
         .btn-comprar-negocio:disabled { opacity:.52; cursor:not-allowed; }
         .negocio-ganhos { margin-top:12px; padding:10px 12px; border-radius:11px; background:rgba(34,197,94,.11); color:#bbf7d0; font-size:13px; font-weight:800; }
+        .gestao-posto { margin-top:12px; padding:13px; border:1px solid rgba(167,139,250,.55); border-radius:12px; background:rgba(76,29,149,.16); color:#ede9fe; font-size:13px; line-height:1.55; }
+        .gestao-posto select { width:100%; margin-top:8px; padding:10px; border:1px solid #c4b5fd; border-radius:9px; background:#1e1b4b; color:#fff; font-weight:800; }
 
         @media (max-width: 700px) { .loja-negocios { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 
@@ -1617,7 +1619,7 @@
                             ⚠ COMBUSTÍVEL BAIXO — ABASTEÇA PARA CONTINUAR AS CORRIDAS
                         </div>
                         <button class="btn-abastecer" id="btnAbastecer">
-                            ⛽ Encher tanque — 5 Ludigins
+                            ⛽ Encher tanque — 6 Ludigins
                         </button>
                     </div>
                 </div>
@@ -1770,6 +1772,16 @@
                     </div>
                     <div class="negocio-ganhos" id="propostaCompra" hidden><strong id="propostaTitulo">Proposta de compra</strong><br>Oferta: <span id="propostaValor">1.000</span> 🪙<button class="btn-comprar-negocio" id="btnAumentarProposta">+ 500</button><button class="btn-comprar-negocio" id="btnEnviarProposta">Oferecer proposta</button></div>
                     <div class="negocio-ganhos" id="ganhosPosto" hidden>⛽ Ganhos do posto hoje: 0 🪙</div>
+                    <div class="gestao-posto" id="gestaoPosto" hidden>
+                        <strong>⛽ Gestão do Posto de Combustível</strong><br>
+                        Preço atual: <span id="precoPostoAtual">6</span> Ludigins<br>
+                        Lucro em caixa do posto: <span id="caixaPosto">0</span> 🪙<br>
+                        Seu lucro como proprietário: <span id="lucroDonoPosto">0</span> 🪙
+                        <label for="selectPrecoPosto">Definir preço do abastecimento</label>
+                        <select id="selectPrecoPosto" aria-label="Definir preço do abastecimento">
+                            <option value="6">6 Ludigins</option><option value="8">8 Ludigins</option><option value="10">10 Ludigins</option><option value="12">12 Ludigins</option><option value="14">14 Ludigins</option><option value="16">16 Ludigins</option><option value="18">18 Ludigins</option><option value="20">20 Ludigins</option>
+                        </select>
+                    </div>
                     <div class="negocio-ganhos" id="painelPropostasLuigy" hidden>📨 Propostas recebidas<div id="listaPropostasLuigy"></div></div>
                 </div>
             </aside>
@@ -1801,9 +1813,9 @@
         const COMBUSTIVEL_MAX = 100;
         const CONSUMO_POR_CORRIDA = 15;
         const LIMITE_COMBUSTIVEL_BAIXO = 20;
-        const CUSTO_ABASTECIMENTO = 5;
+        const PRECO_ABASTECIMENTO_PADRAO = 6;
+        const PRECOS_ABASTECIMENTO = [6, 8, 10, 12, 14, 16, 18, 20];
         const CUSTO_POSTO = 2000;
-        const REPASSE_POSTO = CUSTO_ABASTECIMENTO / 2;
 
         const TEMPO_ABASTECIMENTO_MS = 7000;
         const POSTO_POSICAO = { x: 76, y: 39.0 };
@@ -2041,6 +2053,11 @@
         const lojaNegocios = document.getElementById('lojaNegocios');
         const btnComprarPosto = document.getElementById('btnComprarPosto');
         const ganhosPosto = document.getElementById('ganhosPosto');
+        const gestaoPosto = document.getElementById('gestaoPosto');
+        const precoPostoAtual = document.getElementById('precoPostoAtual');
+        const caixaPosto = document.getElementById('caixaPosto');
+        const lucroDonoPosto = document.getElementById('lucroDonoPosto');
+        const selectPrecoPosto = document.getElementById('selectPrecoPosto');
         const propostaCompra = document.getElementById('propostaCompra');
         const propostaTitulo = document.getElementById('propostaTitulo');
         const propostaValor = document.getElementById('propostaValor');
@@ -2100,6 +2117,7 @@
         let propostasSnapshot = null;
         let propostaSelecionada = null;
         let valorPropostaAtual = 1000;
+        let gestaoPostoAberta = false;
         const EMAIL_PROPRIETARIO = 'luigyestilofm@hotmail.com';
 
         function chaveFallback() {
@@ -2497,13 +2515,13 @@
 
             btnAbastecer.disabled =
                 combustivel >= COMBUSTIVEL_MAX ||
-                saldo < CUSTO_ABASTECIMENTO ||
+                saldo < precoAbastecimentoAtual() ||
                 !!perfil.corridaAtual ||
                 jaNaFilaPosto;
 
             btnAbastecer.textContent = jaNaFilaPosto
                 ? '⛽ Aguardando no posto...'
-                : '⛽ Ir ao posto — 5 Ludigins';
+                : `⛽ Ir ao posto — ${precoAbastecimentoAtual()} Ludigins`;
 
             atualizarPainelCarro();
             atualizarBloqueioMapa();
@@ -2528,13 +2546,19 @@
             }
         }
 
+        function precoAbastecimentoAtual() {
+            const preco = Number(negocioPostoGlobal?.precoCombustivel || PRECO_ABASTECIMENTO_PADRAO);
+            return PRECOS_ABASTECIMENTO.includes(preco) ? preco : PRECO_ABASTECIMENTO_PADRAO;
+        }
+
         function atualizarPainelNegocios(perfil = perfilAtual || {}) {
             const saldo = Number(perfil.saldo || 0);
-            const possuiPosto = !!perfil.possuiPosto;
+            const possuiPosto = !!perfil.possuiPosto || negocioPostoGlobal?.donoId === usuarioId;
             const podeAbrirLoja = saldo >= CUSTO_POSTO || possuiPosto || ehProprietarioMestre();
 
             lojaNegocios.hidden = !podeAbrirLoja;
             ganhosPosto.hidden = !possuiPosto;
+            gestaoPosto.hidden = !possuiPosto || !gestaoPostoAberta;
 
             if (!podeAbrirLoja) {
                 negociosIntro.textContent = `Faltam ${(CUSTO_POSTO - saldo).toLocaleString('pt-BR')} Ludigins para abrir a loja de negócios.`;
@@ -2542,13 +2566,21 @@
             }
 
             if (possuiPosto) {
-                negociosIntro.textContent = 'Você é dono do Posto de Combustível. Cada abastecimento rende metade do valor para você.';
+                negociosIntro.textContent = 'Você é dono do Posto de Combustível. Cada abastecimento é dividido igualmente entre você e a caixa do posto.';
                 ganhosPosto.textContent = `⛽ Ganhos do posto hoje: ${Number(perfil.ganhosPostoHoje || 0).toLocaleString('pt-BR')} 🪙`;
+                const preco = precoAbastecimentoAtual();
+                precoPostoAtual.textContent = preco;
+                caixaPosto.textContent = Number(negocioPostoGlobal?.caixa || 0).toLocaleString('pt-BR');
+                lucroDonoPosto.textContent = Number(perfil.ganhosPostoTotal || 0).toLocaleString('pt-BR');
+                selectPrecoPosto.value = String(preco);
             } else {
                 negociosIntro.textContent = ehProprietarioMestre()
                     ? 'Você é o proprietário inicial dos negócios. Analise as propostas recebidas abaixo.'
                     : 'Loja liberada! Escolha um negócio e envie uma proposta para o proprietário.';
             }
+
+            const botaoPosto = document.querySelector('[data-negocio="posto_combustivel"]');
+            if (botaoPosto) botaoPosto.textContent = possuiPosto ? 'Ver gestão do posto' : 'Fazer proposta';
         }
 
         function ehProprietarioMestre() {
@@ -2567,7 +2599,8 @@
             await Promise.all(negocios.map(([id, nome]) => runTransaction(
                 ref(db, `ludigins_jogo/negocios/${id}`),
                 atual => {
-                    if (!atual || !atual.donoEmail) return { ...(atual || {}), donoId: 'proprietario_luigy', donoNome: 'Luigy', donoEmail: EMAIL_PROPRIETARIO, nome, criadoEm: atual?.criadoEm || Date.now() };
+                    if (!atual || !atual.donoId) return { ...(atual || {}), donoId: 'proprietario_luigy', donoNome: 'Luigy', donoEmail: EMAIL_PROPRIETARIO, nome, criadoEm: atual?.criadoEm || Date.now(), ...(id === 'posto_combustivel' ? { precoCombustivel: PRECO_ABASTECIMENTO_PADRAO, caixa: 0 } : {}) };
+                    if (id === 'posto_combustivel' && (!PRECOS_ABASTECIMENTO.includes(Number(atual.precoCombustivel)) || atual.caixa === undefined)) return { ...atual, precoCombustivel: PRECOS_ABASTECIMENTO.includes(Number(atual.precoCombustivel)) ? Number(atual.precoCombustivel) : PRECO_ABASTECIMENTO_PADRAO, caixa: Number(atual.caixa || 0) };
                     if (ehProprietarioMestre() && atual.donoEmail === EMAIL_PROPRIETARIO && atual.donoId === 'proprietario_luigy') {
                         return { ...atual, donoId: usuarioId, donoNome: usuarioNome || 'Luigy' };
                     }
@@ -2605,14 +2638,32 @@
             mostrarAviso('📨 Proposta enviada ao proprietário.', 'ok');
         }
 
-        document.querySelectorAll('.btn-proposta').forEach(botao => botao.addEventListener('click', () =>
-            abrirProposta(botao.dataset.negocio, botao.dataset.nome)
-        ));
+        document.querySelectorAll('.btn-proposta').forEach(botao => botao.addEventListener('click', () => {
+            if (botao.dataset.negocio === 'posto_combustivel' && negocioPostoGlobal?.donoId === usuarioId) {
+                gestaoPostoAberta = !gestaoPostoAberta;
+                atualizarPainelNegocios();
+                return;
+            }
+            abrirProposta(botao.dataset.negocio, botao.dataset.nome);
+        }));
         btnAumentarProposta.addEventListener('click', () => {
             valorPropostaAtual += 500;
             propostaValor.textContent = valorPropostaAtual.toLocaleString('pt-BR');
         });
         btnEnviarProposta.addEventListener('click', () => enviarProposta().catch(console.error));
+
+        selectPrecoPosto.addEventListener('change', async () => {
+            if (negocioPostoGlobal?.donoId !== usuarioId) {
+                mostrarAviso('Apenas o proprietário atual pode ajustar o preço.', 'erro');
+                atualizarPainelNegocios();
+                return;
+            }
+            const preco = Number(selectPrecoPosto.value);
+            if (!PRECOS_ABASTECIMENTO.includes(preco)) return;
+            await update(ref(db, 'ludigins_jogo/negocios/posto_combustivel'), { precoCombustivel: preco, atualizadoEm: Date.now() });
+            await registrarEvento(`${usuarioNome} ajustou o combustível para ${preco} Ludigins.`);
+            mostrarAviso(`⛽ Preço do combustível atualizado para ${preco} Ludigins.`, 'ok');
+        });
 
         function desenharPropostas(snapshot) {
             const podeDecidir = ehProprietarioMestre() || Object.values(negociosGlobais).some(negocio => negocio?.donoId === usuarioId);
@@ -2652,6 +2703,12 @@
             }
 
             const donoAnterior = negociosGlobais[proposta.negocio]?.donoId;
+            if (proposta.negocio === 'posto_combustivel' && donoAnterior && donoAnterior !== proposta.compradorId && donoAnterior !== 'proprietario_luigy') {
+                await runTransaction(ref(db, `ludigins_usuarios/${donoAnterior}`), atual => atual
+                    ? { ...atual, possuiPosto: false, atualizadoEm: Date.now() }
+                    : atual
+                );
+            }
             if (donoAnterior && donoAnterior !== 'proprietario_luigy' && donoAnterior !== proposta.compradorId) {
                 await runTransaction(ref(db, `ludigins_usuarios/${donoAnterior}`), atual => atual
                     ? { ...atual, saldo: Number(atual.saldo || 0) + Number(proposta.valor || 0), atualizadoEm: Date.now() }
@@ -2683,8 +2740,9 @@
                 return;
             }
 
-            if (Number(perfil.saldo || 0) < CUSTO_ABASTECIMENTO) {
-                mostrarAviso('Você precisa de 5 Ludigins para abastecer.', 'erro');
+            const preco = precoAbastecimentoAtual();
+            if (Number(perfil.saldo || 0) < preco) {
+                mostrarAviso(`Você precisa de ${preco} Ludigins para abastecer.`, 'erro');
                 return;
             }
 
@@ -2772,9 +2830,10 @@
             });
         }
 
-        async function creditarDonoPosto() {
+        async function creditarDonoPosto(preco) {
             const donoId = negocioPostoGlobal?.donoId;
             if (!donoId) return;
+            const metade = preco / 2;
 
             await runTransaction(ref(db, `ludigins_usuarios/${donoId}`), atual => {
                 if (!atual) return;
@@ -2785,10 +2844,16 @@
 
                 return {
                     ...atual,
-                    saldo: Number(atual.saldo || 0) + REPASSE_POSTO,
-                    ganhosPostoHoje: ganhosHoje + REPASSE_POSTO,
+                    saldo: Number(atual.saldo || 0) + metade,
+                    ganhosPostoHoje: ganhosHoje + metade,
+                    ganhosPostoTotal: Number(atual.ganhosPostoTotal || 0) + metade,
                     atualizadoEm: Date.now()
                 };
+            });
+
+            await runTransaction(ref(db, 'ludigins_jogo/negocios/posto_combustivel'), atual => {
+                if (!atual) return atual;
+                return { ...atual, caixa: Number(atual.caixa || 0) + metade, atualizadoEm: Date.now() };
             });
         }
 
@@ -2799,6 +2864,7 @@
             }
 
             const perfilRef = ref(db, `ludigins_usuarios/${usuarioId}`);
+            const preco = precoAbastecimentoAtual();
 
             const resultado = await runTransaction(perfilRef, atual => {
                 if (!atual) return;
@@ -2809,11 +2875,11 @@
                     : Number(atual.combustivel);
 
                 if (combustivelAtual >= COMBUSTIVEL_MAX) return;
-                if (saldo < CUSTO_ABASTECIMENTO) return;
+                if (saldo < preco) return;
 
                 return {
                     ...atual,
-                    saldo: saldo - CUSTO_ABASTECIMENTO,
+                    saldo: saldo - preco,
                     combustivel: COMBUSTIVEL_MAX,
                     atualizadoEm: Date.now()
                 };
@@ -2845,13 +2911,13 @@
             });
 
             await registrarEvento(
-                `${usuarioNome} abasteceu o táxi por 5 Ludigins.`
+                `${usuarioNome} abasteceu o táxi por ${preco} Ludigins.`
             );
 
-            await creditarDonoPosto();
+            await creditarDonoPosto(preco);
 
             mostrarAviso(
-                '⛽ Abastecimento concluído! Foram descontados 5 Ludigins.',
+                `⛽ Abastecimento concluído! Foram descontados ${preco} Ludigins.`,
                 'ok'
             );
         }
