@@ -1400,7 +1400,7 @@
                     <div class="perfil-patente-linha">
                         <div class="perfil-patente" id="patenteNome">SEM PATENTE</div>
                         <div class="missao-diaria-topo" id="missaoDiariaTopo">
-                            ✅ MISSÃO 25/25 CONCLUÍDA
+                            ✅ MISSÃO 60/60 CONCLUÍDA
                         </div>
                     </div>
                     <div class="saldo">
@@ -1492,7 +1492,7 @@
                 DURANTE O PICO, TODA CORRIDA PAGA O DOBRO.
             </div>
             <div class="painel-extra-alerta" id="painelExtraAlerta">
-                ✅ 25 corridas concluídas. A partir de agora, cada corrida vale 4 Ludigins.
+                ✅ 60 corridas concluídas. A partir de agora, cada corrida vale 4 Ludigins.
             </div>
             <div class="painel-fila-posto" id="painelFilaPosto"></div>
         </section>
@@ -1592,7 +1592,7 @@
         // =========================================================
         // CONFIGURAÇÕES DO JOGO
         // =========================================================
-        const MAX_CORRIDAS_DIA = 25;
+        const MAX_CORRIDAS_DIA = 60;
         const RECOMPENSA_APOS_META = 4;
         const MIN_RECOMPENSA = 1;
         const MAX_RECOMPENSA = 7;
@@ -3484,7 +3484,7 @@
         // =========================================================
         // ACEITAR CORRIDA
         // Regra: não pode aceitar outra enquanto há uma em andamento.
-        // Até 25 corridas, o pico paga o dobro. Depois disso, cada corrida vale 4 Ludigins.
+        // Até 60 corridas, o pico paga o dobro. Depois disso, cada corrida vale 4 Ludigins.
         // =========================================================
         async function aceitarCorrida(corridaId) {
             if (aceitandoCorrida) return;
@@ -3892,7 +3892,7 @@
 
                 if (feitas >= MAX_CORRIDAS_DIA) {
                     mostrarAviso(
-                        `25 corridas concluídas! Você pode continuar: agora cada corrida vale ${RECOMPENSA_APOS_META} Ludigins.`,
+                        `60 corridas concluídas! Você pode continuar: agora cada corrida vale ${RECOMPENSA_APOS_META} Ludigins.`,
                         'ok'
                     );
                 } else {
