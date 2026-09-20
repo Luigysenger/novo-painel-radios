@@ -705,6 +705,25 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        .ride-valor-mapa {
+            position: absolute;
+            left: 50%;
+            top: -12px;
+            transform: translateX(-50%);
+            z-index: 1;
+            padding: 2px 5px;
+            border-radius: 999px;
+            background: rgba(15,23,42,.92);
+            border: 1px solid rgba(250,204,21,.95);
+            box-shadow: 0 2px 6px rgba(0,0,0,.38);
+            color: #fef08a;
+            font-size: 9px;
+            line-height: 1;
+            font-weight: 900;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
         .ride-bubble {
             min-width: 104px;
             padding: 8px 10px;
@@ -4073,8 +4092,10 @@
                             new Date(),
                             Number(perfilAtual?.bonusAposMetaAte || 0)
                         );
+                        pin.setAttribute('aria-label', `Corrida de ${valorExibido} Ludigins`);
 
                         pin.innerHTML = `
+                            <span class="ride-valor-mapa">+${valorExibido}</span>
                             <div class="ride-bubble">
                                 <div class="passageiros-grupo">${iconesPassageiros}</div>
                                 <span>${escapar(corrida.origem || 'Origem')}</span>
