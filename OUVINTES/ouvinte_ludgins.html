@@ -2448,7 +2448,11 @@
                     {
                         nome: perfil.nome || usuarioNome,
                         saldo,
+                        corridasHoje: Number(perfil.corridasHoje || 0),
                         corridasTotal: Number(perfil.corridasTotal || 0),
+                        corridasSemana: Number(perfil.corridasSemana || 0),
+                        dataCorridas: perfil.dataCorridas || dataHoje(),
+                        semanaCorridas: perfil.semanaCorridas || chaveSemana(),
                         carro: modeloCarroPorCorridas(Number(perfil.corridasTotal || 0)).classe,
                         cor: corCarrinhoPorCorridas(Number(perfil.corridasTotal || 0)),
                         atualizadoEm: Date.now()
@@ -3204,7 +3208,9 @@
             const anterior = snap.exists() ? (snap.val() || {}) : {};
 
             const saldo = Number(perfilAtual?.saldo || anterior.saldo || 0);
+            const corridasHoje = Number(perfilAtual?.corridasHoje || anterior.corridasHoje || 0);
             const corridasTotal = Number(perfilAtual?.corridasTotal || anterior.corridasTotal || 0);
+            const corridasSemana = Number(perfilAtual?.corridasSemana || anterior.corridasSemana || 0);
             const modeloCarro = modeloCarroPorCorridas(corridasTotal);
             const posicaoInicialNaRua = pontoNaRua(
                 anterior.x ?? posicaoJogadorAtual.x ?? 49,
@@ -3214,7 +3220,11 @@
             const dados = {
                 nome: usuarioNome,
                 saldo,
+                corridasHoje,
                 corridasTotal,
+                corridasSemana,
+                dataCorridas: perfilAtual?.dataCorridas || anterior.dataCorridas || dataHoje(),
+                semanaCorridas: perfilAtual?.semanaCorridas || anterior.semanaCorridas || chaveSemana(),
                 carro: modeloCarro.classe,
                 cor: modeloCarro.cor,
                 x: posicaoInicialNaRua.x,
@@ -3230,14 +3240,20 @@
         async function atualizarHeartbeatJogador() {
             const jogadorRef = ref(db, `ludigins_jogo/jogadores/${usuarioId}`);
             const saldo = Number(perfilAtual?.saldo || 0);
+            const corridasHoje = Number(perfilAtual?.corridasHoje || 0);
             const corridasTotal = Number(perfilAtual?.corridasTotal || 0);
+            const corridasSemana = Number(perfilAtual?.corridasSemana || 0);
             const modeloCarro = modeloCarroPorCorridas(corridasTotal);
 
             try {
                 await update(jogadorRef, {
                     nome: usuarioNome,
                     saldo,
+                    corridasHoje,
                     corridasTotal,
+                    corridasSemana,
+                    dataCorridas: perfilAtual?.dataCorridas || dataHoje(),
+                    semanaCorridas: perfilAtual?.semanaCorridas || chaveSemana(),
                     carro: modeloCarro.classe,
                     cor: modeloCarro.cor,
                     atualizadoEm: Date.now()
@@ -4148,7 +4164,11 @@
                         movimento: null,
                         status: 'online',
                         saldo: Number(ganho.snapshot.val()?.saldo || 0),
+                        corridasHoje: Number(ganho.snapshot.val()?.corridasHoje || 0),
                         corridasTotal: Number(ganho.snapshot.val()?.corridasTotal || 0),
+                        corridasSemana: Number(ganho.snapshot.val()?.corridasSemana || 0),
+                        dataCorridas: ganho.snapshot.val()?.dataCorridas || dataHoje(),
+                        semanaCorridas: ganho.snapshot.val()?.semanaCorridas || chaveSemana(),
                         carro: modeloCarroPorCorridas(
                             Number(ganho.snapshot.val()?.corridasTotal || 0)
                         ).classe,
@@ -4439,13 +4459,6 @@
             );
 
             onValue(
-                ref(db, 'ludigins_usuarios'),
-                snapshot => {
-                    desenharRankings(snapshot);
-                }
-            );
-
-            onValue(
                 ref(db, 'ludigins_corridas/ativas'),
                 snapshot => {
                     desenharCorridas(snapshot);
@@ -4463,6 +4476,7 @@
                 ref(db, 'ludigins_jogo/jogadores'),
                 snapshot => {
                     desenharJogadoresOnline(snapshot);
+                    desenharRankings(snapshot);
                 }
             );
 
