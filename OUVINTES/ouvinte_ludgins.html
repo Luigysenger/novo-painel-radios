@@ -441,6 +441,19 @@
             font-size: 14px;
         }
 
+        .negocios-card { margin-top: 16px; padding: 18px; }
+        .negocios-intro { color: var(--muted); font-size: 13px; line-height: 1.45; }
+        .loja-negocios { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-top:14px; }
+        .negocio-item { min-height:126px; padding:12px; border:1px solid rgba(148,163,184,.18); border-radius:13px; background:rgba(15,23,42,.48); }
+        .negocio-item.ativo { border-color:rgba(250,204,21,.65); background:linear-gradient(135deg,rgba(120,53,15,.42),rgba(15,23,42,.55)); }
+        .negocio-item em { display:block; margin-top:8px; color:var(--muted); font-size:11px; font-style:normal; }
+        .negocio-item strong { display:block; margin-top:5px; color:#f8fafc; font-size:14px; }
+        .btn-comprar-negocio { width:100%; margin-top:10px; padding:9px; border:1px solid #fde68a; border-radius:10px; color:#422006; background:linear-gradient(135deg,#fde68a,#facc15); font-weight:900; cursor:pointer; }
+        .btn-comprar-negocio:disabled { opacity:.52; cursor:not-allowed; }
+        .negocio-ganhos { margin-top:12px; padding:10px 12px; border-radius:11px; background:rgba(34,197,94,.11); color:#bbf7d0; font-size:13px; font-weight:800; }
+
+        @media (max-width: 700px) { .loja-negocios { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+
         .painel-pico-alerta,
         .painel-extra-alerta,
         .painel-fila-posto {
@@ -1641,6 +1654,22 @@
             <div class="painel-fila-posto" id="painelFilaPosto"></div>
         </section>
 
+        <section class="card negocios-card" id="painelNegocios">
+            <div class="section-title"><h2>🏪 Seus negócios</h2></div>
+            <p class="negocios-intro" id="negociosIntro">Alcance 2.000 Ludigins para abrir a loja de negócios.</p>
+            <div class="loja-negocios" id="lojaNegocios" hidden>
+                <div class="negocio-item ativo">
+                    <strong>⛽ Posto de combustível</strong>
+                    <em>Receba metade de cada abastecimento feito no posto.</em>
+                    <button class="btn-comprar-negocio" id="btnComprarPosto">Comprar por 2.000 🪙</button>
+                </div>
+                <div class="negocio-item"><strong>🚒 Caminhão de bombeiro</strong><em>Próxima expansão do Ludigins.</em></div>
+                <div class="negocio-item"><strong>🚑 Ambulância</strong><em>Próxima expansão do Ludigins.</em></div>
+                <div class="negocio-item"><strong>🛵 Entregador de lanche</strong><em>Próxima expansão do Ludigins.</em></div>
+            </div>
+            <div class="negocio-ganhos" id="ganhosPosto" hidden>⛽ Ganhos do posto hoje: 0 🪙</div>
+        </section>
+
         <section class="game">
             <div class="card map-card">
                 <div class="section-title">
@@ -1766,6 +1795,8 @@
         const CONSUMO_POR_CORRIDA = 15;
         const LIMITE_COMBUSTIVEL_BAIXO = 20;
         const CUSTO_ABASTECIMENTO = 5;
+        const CUSTO_POSTO = 2000;
+        const REPASSE_POSTO = CUSTO_ABASTECIMENTO / 2;
 
         const TEMPO_ABASTECIMENTO_MS = 7000;
         const POSTO_POSICAO = { x: 76, y: 39.0 };
@@ -1781,6 +1812,8 @@
         function infoHorarioPico(data = new Date()) {
             const minutos = data.getHours() * 60 + data.getMinutes();
             const faixas = [
+                { ini: 0, fim: 3 * 60, texto: '00:00–03:00' },
+                { ini: 5 * 60, fim: 6 * 60, texto: '05:00–06:00' },
                 { ini: 7 * 60, fim: 8 * 60, texto: '07:00–08:00' },
                 { ini: 10 * 60, fim: 11 * 60, texto: '10:00–11:00' },
                 { ini: 14 * 60, fim: 15 * 60, texto: '14:00–15:00' },
@@ -1998,6 +2031,10 @@
         const painelPicoAlerta = document.getElementById('painelPicoAlerta');
         const painelExtraAlerta = document.getElementById('painelExtraAlerta');
         const painelFilaPosto = document.getElementById('painelFilaPosto');
+        const negociosIntro = document.getElementById('negociosIntro');
+        const lojaNegocios = document.getElementById('lojaNegocios');
+        const btnComprarPosto = document.getElementById('btnComprarPosto');
+        const ganhosPosto = document.getElementById('ganhosPosto');
 
         function organizarPainelCorridaParaTela() {
             if (!painelCorridaAtual || !colunaLateral || !mobileCorridaAtual) return;
@@ -2045,6 +2082,7 @@
         let eventosIniciaisCarregados = false;
         const eventosCelebrados = new Set();
         let jogadoresRankingCache = {};
+        let negocioPostoGlobal = null;
 
         function chaveFallback() {
             return String(
@@ -2288,6 +2326,8 @@
                         corridasSemana: 0,
                         semanaCorridas: semana,
                         ganhosHoje: 0,
+                        ganhosPostoHoje: 0,
+                        possuiPosto: false,
                         bonusAposMetaAte: 0,
                         combustivel: COMBUSTIVEL_MAX,
                         dataCorridas: hoje,
@@ -2303,6 +2343,7 @@
                     perfil.dataCorridas = hoje;
                     perfil.corridasHoje = 0;
                     perfil.ganhosHoje = 0;
+                    perfil.ganhosPostoHoje = 0;
                     perfil.bonusAposMetaAte = 0;
 
                     // Se ficou uma corrida antiga presa de outro dia, libera o ouvinte.
@@ -2327,6 +2368,8 @@
                 );
                 perfil.corridasSemana = Number(perfil.corridasSemana || 0);
                 perfil.ganhosHoje = Number(perfil.ganhosHoje || 0);
+                perfil.ganhosPostoHoje = Number(perfil.ganhosPostoHoje || 0);
+                perfil.possuiPosto = !!perfil.possuiPosto;
                 perfil.bonusAposMetaAte = Number(perfil.bonusAposMetaAte || 0);
                 perfil.combustivel = perfil.combustivel === undefined
                     ? COMBUSTIVEL_MAX
@@ -2419,6 +2462,7 @@
             textoProgressoEl.textContent = progresso.texto;
             percentualProgressoEl.textContent = `${progresso.percentual}%`;
             barraProgressoEl.style.width = `${progresso.percentual}%`;
+            atualizarPainelNegocios(perfil);
 
             const combustivel = perfil.combustivel === undefined
                 ? COMBUSTIVEL_MAX
@@ -2465,6 +2509,81 @@
                 ).catch(() => {});
             }
         }
+
+        function atualizarPainelNegocios(perfil = perfilAtual || {}) {
+            const saldo = Number(perfil.saldo || 0);
+            const possuiPosto = !!perfil.possuiPosto;
+            const donoPosto = negocioPostoGlobal?.donoId;
+            const podeAbrirLoja = saldo >= CUSTO_POSTO || possuiPosto;
+
+            lojaNegocios.hidden = !podeAbrirLoja;
+            ganhosPosto.hidden = !possuiPosto;
+
+            if (!podeAbrirLoja) {
+                negociosIntro.textContent = `Faltam ${(CUSTO_POSTO - saldo).toLocaleString('pt-BR')} Ludigins para abrir a loja de negócios.`;
+                return;
+            }
+
+            if (possuiPosto) {
+                negociosIntro.textContent = 'Você é dono do Posto de Combustível. Cada abastecimento rende metade do valor para você.';
+                ganhosPosto.textContent = `⛽ Ganhos do posto hoje: ${Number(perfil.ganhosPostoHoje || 0).toLocaleString('pt-BR')} 🪙`;
+                btnComprarPosto.disabled = true;
+                btnComprarPosto.textContent = '✅ Seu posto está funcionando';
+            } else if (donoPosto) {
+                negociosIntro.textContent = 'A loja está liberada. O posto já foi comprado por outro ouvinte; novas atividades chegarão em breve.';
+                btnComprarPosto.disabled = true;
+                btnComprarPosto.textContent = 'Posto já vendido';
+            } else {
+                negociosIntro.textContent = 'Loja liberada! Invista seu saldo para ganhar também com os serviços da cidade.';
+                btnComprarPosto.disabled = saldo < CUSTO_POSTO;
+                btnComprarPosto.textContent = `Comprar por ${CUSTO_POSTO.toLocaleString('pt-BR')} 🪙`;
+            }
+        }
+
+        async function comprarPosto() {
+            const perfil = perfilAtual || {};
+            if (perfil.possuiPosto || Number(perfil.saldo || 0) < CUSTO_POSTO) return;
+
+            btnComprarPosto.disabled = true;
+            const postoRef = ref(db, 'ludigins_jogo/negocios/posto_combustivel');
+            const reserva = await runTransaction(postoRef, atual => {
+                if (atual?.donoId) return;
+                return { donoId: usuarioId, donoNome: usuarioNome, compradoEm: Date.now() };
+            });
+
+            if (!reserva.committed) {
+                mostrarAviso('Esse posto acabou de ser comprado por outro ouvinte.', 'erro');
+                atualizarPainelNegocios();
+                return;
+            }
+
+            const compra = await runTransaction(ref(db, `ludigins_usuarios/${usuarioId}`), atual => {
+                if (!atual || atual.possuiPosto || Number(atual.saldo || 0) < CUSTO_POSTO) return;
+                return {
+                    ...atual,
+                    saldo: Number(atual.saldo || 0) - CUSTO_POSTO,
+                    possuiPosto: true,
+                    ganhosPostoHoje: Number(atual.ganhosPostoHoje || 0),
+                    atualizadoEm: Date.now()
+                };
+            });
+
+            if (!compra.committed) {
+                await runTransaction(postoRef, atual => atual?.donoId === usuarioId ? null : atual);
+                mostrarAviso('Não foi possível concluir a compra do posto.', 'erro');
+                atualizarPainelNegocios();
+                return;
+            }
+
+            negocioPostoGlobal = reserva.snapshot.val() || null;
+            await registrarEvento(`${usuarioNome} comprou o Posto de Combustível da cidade!`);
+            mostrarAviso('🏪 Posto comprado! Você receberá metade de cada abastecimento.', 'ok');
+        }
+
+        btnComprarPosto.addEventListener('click', () => comprarPosto().catch(erro => {
+            console.error(erro);
+            mostrarAviso('Não foi possível comprar o posto agora.', 'erro');
+        }));
 
         // =========================================================
         // ABASTECIMENTO
@@ -2543,6 +2662,26 @@
             });
         }
 
+        async function creditarDonoPosto() {
+            const donoId = negocioPostoGlobal?.donoId;
+            if (!donoId) return;
+
+            await runTransaction(ref(db, `ludigins_usuarios/${donoId}`), atual => {
+                if (!atual) return;
+                const hoje = dataHoje();
+                const ganhosHoje = atual.dataCorridas === hoje
+                    ? Number(atual.ganhosPostoHoje || 0)
+                    : 0;
+
+                return {
+                    ...atual,
+                    saldo: Number(atual.saldo || 0) + REPASSE_POSTO,
+                    ganhosPostoHoje: ganhosHoje + REPASSE_POSTO,
+                    atualizadoEm: Date.now()
+                };
+            });
+        }
+
         async function concluirAbastecimento() {
             if (timerAbastecimento) {
                 clearTimeout(timerAbastecimento);
@@ -2598,6 +2737,8 @@
             await registrarEvento(
                 `${usuarioNome} abasteceu o táxi por 5 Ludigins.`
             );
+
+            await creditarDonoPosto();
 
             mostrarAviso(
                 '⛽ Abastecimento concluído! Foram descontados 5 Ludigins.',
@@ -4560,6 +4701,14 @@
                 ref(db, 'ludigins_jogo/posto_fila'),
                 snapshot => {
                     processarFilaPosto(snapshot).catch(console.warn);
+                }
+            );
+
+            onValue(
+                ref(db, 'ludigins_jogo/negocios/posto_combustivel'),
+                snapshot => {
+                    negocioPostoGlobal = snapshot.exists() ? (snapshot.val() || null) : null;
+                    atualizarPainelNegocios();
                 }
             );
 
