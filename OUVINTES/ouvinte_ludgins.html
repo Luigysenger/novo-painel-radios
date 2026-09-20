@@ -1851,17 +1851,17 @@
             agora = new Date(),
             bonusAte = 0
         ) {
-            if (
+            const bonusAtivo =
                 Number(corridasFeitas || 0) >= MAX_CORRIDAS_DIA &&
-                bonusAposMetaAtivo(bonusAte, agora.getTime())
-            ) {
-                return RECOMPENSA_BONUS_APOS_META;
-            }
+                bonusAposMetaAtivo(bonusAte, agora.getTime());
+            const valorAntesDoPico = bonusAtivo
+                ? RECOMPENSA_BONUS_APOS_META
+                : Number(valorBase || 0);
 
-            const valorNormal = Number(valorBase || 0);
+            // O horário de pico sempre dobra o valor, inclusive no bônus pós-meta.
             return infoHorarioPico(agora).ativo
-                ? valorNormal * 2
-                : valorNormal;
+                ? valorAntesDoPico * 2
+                : valorAntesDoPico;
         }
 
         function modeloCarroPorCorridas(corridasTotal = 0) {
@@ -2303,7 +2303,7 @@
             const extras = corridas >= MAX_CORRIDAS_DIA;
             const bonusAtivo = bonusAposMetaAtivo(perfilAtual?.bonusAposMetaAte);
             painelCarro.classList.toggle('pico', pico.ativo);
-            painelPicoAlerta.classList.toggle('show', pico.ativo && !bonusAtivo);
+            painelPicoAlerta.classList.toggle('show', pico.ativo);
             painelExtraAlerta.classList.toggle('show', extras && bonusAtivo);
 
             painelPicoStatus.textContent = pico.ativo
@@ -2311,7 +2311,7 @@
                 : 'TRÂNSITO NORMAL';
 
             painelValorCorrida.textContent = bonusAtivo
-                ? `${RECOMPENSA_BONUS_APOS_META} LUDIGINS • BÔNUS`
+                ? `${pico.ativo ? RECOMPENSA_BONUS_APOS_META * 2 : RECOMPENSA_BONUS_APOS_META} LUDIGINS • BÔNUS${pico.ativo ? ' EM DOBRO' : ''}`
                 : pico.ativo
                     ? 'PAGAMENTO EM DOBRO'
                     : 'VALOR NORMAL';
