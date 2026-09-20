@@ -4,6 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Ouvinte - Sistema de Rádios</title>
+
+    <script>
+        (() => {
+            const usuarioLogado = String(localStorage.getItem('usuarioLogado') || '')
+                .trim()
+                .toLowerCase();
+
+            if (!usuarioLogado || usuarioLogado === 'ouvinte_anonimo') {
+                window.location.replace(
+                    '../index.html?proximo=OUVINTES%2Findex.html'
+                );
+            }
+        })();
+    </script>
     <style>
         /* ESTILO DO BALÃO DE NOTIFICAÇÃO */
         #balaoAviso {
