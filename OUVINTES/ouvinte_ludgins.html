@@ -529,6 +529,44 @@
             margin-bottom: 4px;
         }
 
+        /* Passageiros desenhados em CSS: ficam iguais em Chrome, Safari,
+           Windows, macOS e celular, sem depender da fonte de emojis. */
+        .passageiro-mapa {
+            position: relative;
+            display: inline-block;
+            width: 14px;
+            height: 23px;
+            flex: 0 0 14px;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,.55));
+        }
+
+        .passageiro-mapa::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 3px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #facc15;
+            border: 1.5px solid #fff;
+        }
+
+        .passageiro-mapa::after {
+            content: '';
+            position: absolute;
+            left: 1px;
+            bottom: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 7px 7px 3px 3px;
+            background: #2563eb;
+            border: 1.5px solid #fff;
+        }
+
+        .passageiro-mapa:nth-child(2)::after { background: #a855f7; }
+        .passageiro-mapa:nth-child(3)::after { background: #16a34a; }
+
         .ride-rota {
             display: block;
             margin-top: 3px;
@@ -765,7 +803,7 @@
         }
 
         .ride-bubble.compact { min-width:0; padding:0; background:transparent; border:0; box-shadow:none; }
-        .ride-bubble.compact .passageiros-grupo { margin:0; font-size:26px; filter:drop-shadow(0 2px 2px rgba(0,0,0,.55)); }
+        .ride-bubble.compact .passageiros-grupo { margin:0; }
 
         .mobile-corridas {
             display: none;
@@ -4431,9 +4469,8 @@
 
                         const iconesPassageiros = Array.from(
                             { length: qtdPassageiros },
-                            (_, i) => i === 1 ? '🧍‍♀️' : '🧍'
+                            () => '<span class="passageiro-mapa" aria-hidden="true"></span>'
                         ).join('');
-
                         const valorExibido = valorCorridaAplicado(
                             Number(corrida.valor || 0),
                             Number(perfilAtual?.corridasHoje || 0),
