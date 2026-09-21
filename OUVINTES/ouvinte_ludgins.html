@@ -730,7 +730,18 @@
             pointer-events: none;
         }
 
-        .caminhao-bombeiro-mapa { position:absolute; z-index:12; transform:translate(-50%,-50%); pointer-events:none; font-size:32px; filter:drop-shadow(0 3px 4px rgba(0,0,0,.55)); transition:left 1.25s ease, top 1.25s ease; }
+        .caminhao-bombeiro-mapa { position:absolute; z-index:12; transform:translate(-50%,-50%); pointer-events:none; font-size:32px; filter:drop-shadow(0 3px 4px rgba(0,0,0,.55)); }
+        .caminhao-bombeiro-mapa.andando { animation:caminhaoVibrando .28s infinite alternate ease-in-out; }
+        .caminhao-bombeiro-mapa.aparecendo { animation:caminhaoAparecendo .34s 4 ease-in-out; }
+        .caminhao-bombeiro-mapa.aguardando { animation:caminhaoVibrando 1.2s infinite alternate ease-in-out; }
+        .resfriamento-pingos { position:absolute; z-index:13; width:50px; height:58px; transform:translate(-50%,-100%); pointer-events:none; }
+        .resfriamento-pingos span { position:absolute; top:0; width:7px; height:11px; border-radius:70% 0 70% 70%; background:#7dd3fc; box-shadow:0 1px 5px rgba(125,211,252,.9); animation:pingoCaindo .72s infinite ease-in; }
+        .resfriamento-pingos span:nth-child(1) { left:6px; animation-delay:0s; }
+        .resfriamento-pingos span:nth-child(2) { left:22px; animation-delay:.22s; }
+        .resfriamento-pingos span:nth-child(3) { left:37px; animation-delay:.42s; }
+        @keyframes caminhaoVibrando { from { transform:translate(-50%,-50%) translateY(0); } to { transform:translate(-50%,-50%) translateY(-1.5px); } }
+        @keyframes caminhaoAparecendo { 0%,100% { opacity:1; } 50% { opacity:.12; } }
+        @keyframes pingoCaindo { 0% { transform:translateY(0) rotate(45deg); opacity:0; } 18% { opacity:1; } 100% { transform:translateY(44px) rotate(45deg); opacity:0; } }
 
         .ride-bubble {
             min-width: 104px;
@@ -1946,6 +1957,8 @@
         // entre elas; as demais colunas atravessam quarteirões.
         const RUAS_Y = [17.7, 38.4, 61.9, 80.9];
         const RUA_VERTICAL_SEGURA_X = 30.0;
+        // Base do bombeiro: rua inferior à esquerda, ao lado da Academia.
+        const BASE_CAMINHAO_BOMBEIRO = { x: 7, y: 80.9 };
 
         function maisProximo(valor, lista) {
             return lista.reduce((melhor, atual) =>
@@ -2187,6 +2200,9 @@
         let jogadoresRankingCache = {};
         let negocioPostoGlobal = null;
         let negocioBombeiroGlobal = null;
+        let estadoCaminhaoBombeiro = null;
+        let animacaoCaminhaoBombeiro = null;
+        let timerCaminhaoBombeiro = null;
         let negociosGlobais = {};
         let propostasSnapshot = null;
         let propostaSelecionada = null;
@@ -2990,16 +3006,149 @@
             return !!jogador && Number(jogador.atualizadoEm || 0) > Date.now() - 60000 && jogador.status !== 'offline';
         }
 
-        function mostrarCaminhaoBombeiro() {
-            const alvo = pontoNaRua(posicaoJogadorAtual.x, posicaoJogadorAtual.y);
+        function distanciaDaRota(rota) {
+            return rota.slice(1).reduce((total, ponto, indice) => {
+                const anterior = rota[indice];
+                return total + Math.abs(ponto.x - anterior.x) + Math.abs(ponto.y - anterior.y);
+            }, 0);
+        }
+
+        function duracaoCaminhaoNaVelocidadeDoTaxi(origem, destino) {
+            const distancia = distanciaDaRota(criarRotaPelasRuas(origem.x, origem.y, destino.x, destino.y));
+            const tempoBase = distancia <= 22
+                ? TEMPOS_BUSCA.PERTO
+                : distancia <= 36
+                    ? TEMPOS_BUSCA.MEDIO
+                    : distancia <= 52
+                        ? TEMPOS_BUSCA.LONGE
+                        : TEMPOS_BUSCA.MUITO_LONGE;
+
+            // Usa a mesma regra de velocidade do táxi que chamou o atendimento.
+            return ajustarDuracaoPeloCarro(tempoBase);
+        }
+
+        function pontoDeAtendimentoDoBombeiro(alvoTaxi, origem) {
+            const deslocamento = origem.x <= alvoTaxi.x ? -3.8 : 3.8;
+            return pontoNaRua(
+                Math.max(3, Math.min(97, alvoTaxi.x + deslocamento)),
+                alvoTaxi.y
+            );
+        }
+
+        function caminhaoEstaOcupado(estado = estadoCaminhaoBombeiro) {
+            if (!['indo_atendimento', 'resfriando', 'voltando'].includes(estado?.fase)) return false;
+            const margem = estado.fase === 'resfriando' ? 5000 : Number(estado.duracaoMs || 0) + 1500;
+            return Date.now() < Number(estado.inicioEm || 0) + margem;
+        }
+
+        function pararAnimacaoCaminhaoBombeiro() {
+            if (animacaoCaminhaoBombeiro) cancelAnimationFrame(animacaoCaminhaoBombeiro);
+            animacaoCaminhaoBombeiro = null;
+        }
+
+        function desenharCaminhaoBombeiro(estado = estadoCaminhaoBombeiro) {
+            pararAnimacaoCaminhaoBombeiro();
+            clearTimeout(timerCaminhaoBombeiro);
+            mapa.querySelectorAll('.caminhao-bombeiro-mapa, .resfriamento-pingos').forEach(el => el.remove());
+
+            if (!estado || estado.fase === 'oculto') return;
+            if (estado.fase === 'aguardando' && Number(estado.visivelAte || 0) <= Date.now()) return;
+
             const el = document.createElement('div');
             el.className = 'caminhao-bombeiro-mapa';
             el.textContent = '🚒';
-            el.style.left = '7%';
-            el.style.top = '62%';
             mapa.appendChild(el);
-            requestAnimationFrame(() => { el.style.left = `${alvo.x}%`; el.style.top = `${alvo.y}%`; });
-            setTimeout(() => el.remove(), 4200);
+
+            const movimentando = ['indo_atendimento', 'voltando'].includes(estado.fase);
+            const posicaoParada = pontoNaRua(estado.x ?? BASE_CAMINHAO_BOMBEIRO.x, estado.y ?? BASE_CAMINHAO_BOMBEIRO.y);
+
+            if (!movimentando) {
+                el.style.left = `${posicaoParada.x}%`;
+                el.style.top = `${posicaoParada.y}%`;
+                el.classList.toggle('aguardando', estado.fase === 'aguardando');
+                el.classList.toggle('aparecendo', estado.fase === 'indo_atendimento' || (Date.now() - Number(estado.inicioEm || 0) < 1600));
+            } else {
+                const atualizar = () => {
+                    const posicao = posicaoNoMovimento(estado);
+                    if (!posicao) return;
+                    el.style.left = `${posicao.x}%`;
+                    el.style.top = `${posicao.y}%`;
+                    el.classList.toggle('andando', !posicao.terminou);
+                    el.classList.toggle('aparecendo', Date.now() - Number(estado.inicioEm || 0) < 1600);
+                    if (!posicao.terminou) animacaoCaminhaoBombeiro = requestAnimationFrame(atualizar);
+                };
+                atualizar();
+            }
+
+            if (estado.fase === 'resfriando') {
+                const pingos = document.createElement('div');
+                pingos.className = 'resfriamento-pingos';
+                pingos.style.left = `${Number(estado.alvoTaxiX)}%`;
+                pingos.style.top = `${Number(estado.alvoTaxiY)}%`;
+                pingos.innerHTML = '<span></span><span></span><span></span>';
+                mapa.appendChild(pingos);
+            }
+
+            if (estado.fase === 'aguardando') {
+                timerCaminhaoBombeiro = setTimeout(
+                    () => desenharCaminhaoBombeiro(estado),
+                    Math.max(0, Number(estado.visivelAte || 0) - Date.now()) + 30
+                );
+            }
+        }
+
+        async function iniciarAtendimentoCaminhaoBombeiro() {
+            const origem = BASE_CAMINHAO_BOMBEIRO;
+            const alvoTaxi = pontoNaRua(posicaoJogadorAtual.x, posicaoJogadorAtual.y);
+            const alvoCaminhao = pontoDeAtendimentoDoBombeiro(alvoTaxi, origem);
+            const duracaoIda = duracaoCaminhaoNaVelocidadeDoTaxi(origem, alvoCaminhao);
+            const inicioEm = Date.now();
+
+            await set(ref(db, 'ludigins_jogo/caminhao_bombeiro_mapa'), {
+                fase: 'indo_atendimento',
+                deX: origem.x,
+                deY: origem.y,
+                paraX: alvoCaminhao.x,
+                paraY: alvoCaminhao.y,
+                alvoTaxiX: alvoTaxi.x,
+                alvoTaxiY: alvoTaxi.y,
+                inicioEm,
+                duracaoMs: duracaoIda,
+                atualizadoEm: inicioEm
+            });
+
+            setTimeout(async () => {
+                const inicioResfriamento = Date.now();
+                await set(ref(db, 'ludigins_jogo/caminhao_bombeiro_mapa'), {
+                    fase: 'resfriando', x: alvoCaminhao.x, y: alvoCaminhao.y,
+                    alvoTaxiX: alvoTaxi.x, alvoTaxiY: alvoTaxi.y,
+                    inicioEm: inicioResfriamento, atualizadoEm: inicioResfriamento
+                });
+
+                setTimeout(async () => {
+                    const inicioVolta = Date.now();
+                    const duracaoVolta = duracaoCaminhaoNaVelocidadeDoTaxi(alvoCaminhao, BASE_CAMINHAO_BOMBEIRO);
+                    await set(ref(db, 'ludigins_jogo/caminhao_bombeiro_mapa'), {
+                        fase: 'voltando', deX: alvoCaminhao.x, deY: alvoCaminhao.y,
+                        paraX: BASE_CAMINHAO_BOMBEIRO.x, paraY: BASE_CAMINHAO_BOMBEIRO.y,
+                        inicioEm: inicioVolta, duracaoMs: duracaoVolta, atualizadoEm: inicioVolta
+                    });
+
+                    setTimeout(async () => {
+                        const chegada = Date.now();
+                        await set(ref(db, 'ludigins_jogo/caminhao_bombeiro_mapa'), {
+                            fase: 'aguardando', x: BASE_CAMINHAO_BOMBEIRO.x, y: BASE_CAMINHAO_BOMBEIRO.y,
+                            inicioEm: chegada, visivelAte: chegada + 120000, atualizadoEm: chegada
+                        });
+                        setTimeout(() => runTransaction(
+                            ref(db, 'ludigins_jogo/caminhao_bombeiro_mapa'),
+                            atual => atual?.fase === 'aguardando' && Number(atual.inicioEm || 0) === chegada
+                                ? { ...atual, fase: 'oculto', atualizadoEm: Date.now() }
+                                : atual
+                        ).catch(console.warn), 120000);
+                    }, duracaoVolta);
+                }, 3200);
+            }, duracaoIda);
         }
 
         async function tentarAbastecerCaminhao(snapshot) {
@@ -3023,6 +3172,10 @@
             if (Number(perfil.aquecimentoCorridas || 0) < MAX_AQUECIMENTO_CORRIDAS) return;
             const negocio = negocioBombeiroGlobal;
             if (!negocio) { mostrarAviso('O caminhão de bombeiro ainda não está disponível.', 'erro'); return; }
+            if (caminhaoEstaOcupado()) {
+                mostrarAviso('🚒 O caminhão já está atendendo outro táxi. Aguarde ele voltar.', 'erro');
+                return;
+            }
             const automatico = negocio.modoAtendimento === 'automatico';
             if (!automatico && !donoBombeiroEstaOnline()) {
                 mostrarAviso('🚒 Atendimento em tempo real: o proprietário do caminhão está off-line.', 'erro');
@@ -3037,7 +3190,7 @@
                 return { ...atual, saldo: Number(atual.saldo || 0) - CUSTO_RESFRIAMENTO, aquecimentoCorridas: 0, atualizadoEm: Date.now() };
             });
             if (!pagamento.committed) { mostrarAviso('Você precisa de 4 Ludigins para chamar o bombeiro.', 'erro'); return; }
-            mostrarCaminhaoBombeiro();
+            await iniciarAtendimentoCaminhaoBombeiro();
             const metade = CUSTO_RESFRIAMENTO / 2;
             await runTransaction(ref(db, 'ludigins_jogo/negocios/caminhao_bombeiro'), atual => atual
                 ? { ...atual, caixa: Number(atual.caixa || 0) + metade, combustivel: Math.max(0, Number(atual.combustivel || 0) - CONSUMO_BOMBEIRO_POR_ATENDIMENTO), atendimentos: Number(atual.atendimentos || 0) + 1, atualizadoEm: Date.now() }
@@ -5129,6 +5282,14 @@
                 snapshot => {
                     negocioBombeiroGlobal = snapshot.exists() ? (snapshot.val() || null) : null;
                     atualizarPainelNegocios();
+                }
+            );
+
+            onValue(
+                ref(db, 'ludigins_jogo/caminhao_bombeiro_mapa'),
+                snapshot => {
+                    estadoCaminhaoBombeiro = snapshot.exists() ? (snapshot.val() || null) : null;
+                    desenharCaminhaoBombeiro();
                 }
             );
 
