@@ -453,6 +453,12 @@
         .negocio-ganhos { margin-top:12px; padding:10px 12px; border-radius:11px; background:rgba(34,197,94,.11); color:#bbf7d0; font-size:13px; font-weight:800; }
         .gestao-posto { margin-top:12px; padding:13px; border:1px solid rgba(167,139,250,.55); border-radius:12px; background:rgba(76,29,149,.16); color:#ede9fe; font-size:13px; line-height:1.55; }
         .gestao-posto select { width:100%; margin-top:8px; padding:10px; border:1px solid #c4b5fd; border-radius:9px; background:#1e1b4b; color:#fff; font-weight:800; }
+        .aquecimento-card { grid-column:1 / -1; border-color:rgba(251,146,60,.45); background:linear-gradient(135deg,rgba(124,45,18,.30),rgba(255,255,255,.04)); }
+        .aquecimento-track { height:10px; margin-top:9px; overflow:hidden; border-radius:999px; background:rgba(15,23,42,.78); }
+        .aquecimento-bar { height:100%; width:0; border-radius:inherit; background:linear-gradient(90deg,#fbbf24,#f97316,#ef4444); transition:width .35s ease; }
+        .aquecimento-card.maximo { border-color:#fb7185; animation:piscaCombustivel .8s infinite; }
+        .btn-resfriar { display:none; width:100%; margin-top:10px; padding:10px; border:1px solid #7dd3fc; border-radius:10px; background:linear-gradient(135deg,#bae6fd,#67e8f9); color:#082f49; font-weight:900; cursor:pointer; }
+        .aquecimento-card.maximo .btn-resfriar { display:block; }
 
         @media (max-width: 700px) { .loja-negocios { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 
@@ -723,6 +729,8 @@
             white-space: nowrap;
             pointer-events: none;
         }
+
+        .caminhao-bombeiro-mapa { position:absolute; z-index:12; transform:translate(-50%,-50%); pointer-events:none; font-size:32px; filter:drop-shadow(0 3px 4px rgba(0,0,0,.55)); transition:left 1.25s ease, top 1.25s ease; }
 
         .ride-bubble {
             min-width: 104px;
@@ -1723,6 +1731,13 @@
                         </div>
                     </div>
                 </div>
+                <div class="mini-card aquecimento-card" id="aquecimentoCard">
+                    <span>🚒 Aquecimento do táxi</span>
+                    <strong><span id="aquecimentoValor">0</span>%</strong>
+                    <small id="aquecimentoTexto">O táxi está resfriado.</small>
+                    <div class="aquecimento-track"><div class="aquecimento-bar" id="aquecimentoBar"></div></div>
+                    <button class="btn-resfriar" id="btnResfriar">🚒 Chamar bombeiro — 4 Ludigins</button>
+                </div>
 
                 <div class="cidade-ludigins">Cidade Ludigins</div>
                 <div id="mobileCorridaAtual"></div>
@@ -1801,6 +1816,14 @@
                             <option value="6">6 Ludigins</option><option value="8">8 Ludigins</option><option value="10">10 Ludigins</option><option value="12">12 Ludigins</option><option value="14">14 Ludigins</option><option value="16">16 Ludigins</option><option value="18">18 Ludigins</option><option value="20">20 Ludigins</option>
                         </select>
                     </div>
+                    <div class="gestao-posto" id="gestaoBombeiro" hidden>
+                        <strong>🚒 Gestão do Caminhão de Bombeiro</strong><br>
+                        Combustível do caminhão: <span id="combustivelBombeiro">100</span>%<br>
+                        Caixa do caminhão: <span id="caixaBombeiro">0</span> 🪙<br>
+                        Seu lucro como proprietário: <span id="lucroBombeiro">0</span> 🪙<br>
+                        <button class="btn-comprar-negocio" id="btnModoBombeiro">Atendimento automático</button>
+                        <small id="statusBombeiro">Atendimento em tempo real: o dono precisa estar on-line.</small>
+                    </div>
                     <div class="negocio-ganhos" id="painelPropostasLuigy" hidden>📨 Propostas recebidas<div id="listaPropostasLuigy"></div></div>
                 </div>
             </aside>
@@ -1833,6 +1856,10 @@
         const CONSUMO_POR_CORRIDA = 15;
         const LIMITE_COMBUSTIVEL_BAIXO = 20;
         const PRECO_ABASTECIMENTO_PADRAO = 6;
+        const MAX_AQUECIMENTO_CORRIDAS = 11;
+        const CUSTO_RESFRIAMENTO = 4;
+        const CONSUMO_BOMBEIRO_POR_ATENDIMENTO = 15;
+        const CUSTO_ABASTECER_BOMBEIRO = PRECO_ABASTECIMENTO_PADRAO * 2;
         const PRECOS_ABASTECIMENTO = [6, 8, 10, 12, 14, 16, 18, 20];
         const CUSTO_POSTO = 2000;
 
@@ -2058,6 +2085,11 @@
         const combustivelValor = document.getElementById('combustivelValor');
         const combustivelBar = document.getElementById('combustivelBar');
         const btnAbastecer = document.getElementById('btnAbastecer');
+        const aquecimentoCard = document.getElementById('aquecimentoCard');
+        const aquecimentoValor = document.getElementById('aquecimentoValor');
+        const aquecimentoTexto = document.getElementById('aquecimentoTexto');
+        const aquecimentoBar = document.getElementById('aquecimentoBar');
+        const btnResfriar = document.getElementById('btnResfriar');
         const painelCarro = document.getElementById('painelCarro');
         const painelRelogio = document.getElementById('painelRelogio');
         const painelPicoStatus = document.getElementById('painelPicoStatus');
@@ -2077,6 +2109,12 @@
         const caixaPosto = document.getElementById('caixaPosto');
         const lucroDonoPosto = document.getElementById('lucroDonoPosto');
         const selectPrecoPosto = document.getElementById('selectPrecoPosto');
+        const gestaoBombeiro = document.getElementById('gestaoBombeiro');
+        const combustivelBombeiro = document.getElementById('combustivelBombeiro');
+        const caixaBombeiro = document.getElementById('caixaBombeiro');
+        const lucroBombeiro = document.getElementById('lucroBombeiro');
+        const btnModoBombeiro = document.getElementById('btnModoBombeiro');
+        const statusBombeiro = document.getElementById('statusBombeiro');
         const propostaCompra = document.getElementById('propostaCompra');
         const propostaTitulo = document.getElementById('propostaTitulo');
         const propostaValor = document.getElementById('propostaValor');
@@ -2132,11 +2170,13 @@
         const eventosCelebrados = new Set();
         let jogadoresRankingCache = {};
         let negocioPostoGlobal = null;
+        let negocioBombeiroGlobal = null;
         let negociosGlobais = {};
         let propostasSnapshot = null;
         let propostaSelecionada = null;
         let valorPropostaAtual = 1000;
         let gestaoPostoAberta = false;
+        let gestaoBombeiroAberta = false;
         const EMAIL_PROPRIETARIO = 'luigyestilofm@hotmail.com';
 
         function chaveFallback() {
@@ -2384,6 +2424,9 @@
                         ganhosPostoHoje: 0,
                         ganhosPostoTotal: 0,
                         possuiPosto: false,
+                        possuiBombeiro: false,
+                        aquecimentoCorridas: 0,
+                        ganhosBombeiroTotal: 0,
                         bonusAposMetaAte: 0,
                         combustivel: COMBUSTIVEL_MAX,
                         dataCorridas: hoje,
@@ -2427,6 +2470,9 @@
                 perfil.ganhosPostoHoje = Math.round(Number(perfil.ganhosPostoHoje || 0));
                 perfil.ganhosPostoTotal = Math.round(Number(perfil.ganhosPostoTotal || 0));
                 perfil.possuiPosto = !!perfil.possuiPosto;
+                perfil.possuiBombeiro = !!perfil.possuiBombeiro;
+                perfil.aquecimentoCorridas = Math.max(0, Math.min(MAX_AQUECIMENTO_CORRIDAS, Number(perfil.aquecimentoCorridas || 0)));
+                perfil.ganhosBombeiroTotal = Math.round(Number(perfil.ganhosBombeiroTotal || 0));
                 perfil.bonusAposMetaAte = Number(perfil.bonusAposMetaAte || 0);
                 perfil.combustivel = perfil.combustivel === undefined
                     ? COMBUSTIVEL_MAX
@@ -2532,6 +2578,16 @@
                 combustivel <= LIMITE_COMBUSTIVEL_BAIXO
             );
 
+            const corridasAquecidas = Math.max(0, Math.min(MAX_AQUECIMENTO_CORRIDAS, Number(perfil.aquecimentoCorridas || 0)));
+            const aquecimento = Math.round((corridasAquecidas / MAX_AQUECIMENTO_CORRIDAS) * 100);
+            aquecimentoValor.textContent = aquecimento;
+            aquecimentoBar.style.width = `${aquecimento}%`;
+            const precisaResfriar = corridasAquecidas >= MAX_AQUECIMENTO_CORRIDAS;
+            aquecimentoCard.classList.toggle('maximo', precisaResfriar);
+            aquecimentoTexto.textContent = precisaResfriar
+                ? 'Temperatura máxima. Chame o bombeiro antes da próxima corrida.'
+                : `${MAX_AQUECIMENTO_CORRIDAS - corridasAquecidas} corrida(s) até a temperatura máxima.`;
+
             const jaNaFilaPosto = filaPostoCache.some(item => item.id === usuarioId);
 
             btnAbastecer.disabled =
@@ -2575,11 +2631,13 @@
         function atualizarPainelNegocios(perfil = perfilAtual || {}) {
             const saldo = Number(perfil.saldo || 0);
             const possuiPosto = !!perfil.possuiPosto || negocioPostoGlobal?.donoId === usuarioId;
-            const podeAbrirLoja = saldo >= CUSTO_POSTO || possuiPosto || ehProprietarioMestre();
+            const possuiBombeiro = !!perfil.possuiBombeiro || negocioBombeiroGlobal?.donoId === usuarioId;
+            const podeAbrirLoja = saldo >= CUSTO_POSTO || possuiPosto || possuiBombeiro || ehProprietarioMestre();
 
             lojaNegocios.hidden = !podeAbrirLoja;
             ganhosPosto.hidden = !possuiPosto;
             gestaoPosto.hidden = !possuiPosto || !gestaoPostoAberta;
+            gestaoBombeiro.hidden = !possuiBombeiro || !gestaoBombeiroAberta;
 
             if (!podeAbrirLoja) {
                 negociosIntro.textContent = `Faltam ${(CUSTO_POSTO - saldo).toLocaleString('pt-BR')} Ludigins para abrir a loja de negócios.`;
@@ -2602,6 +2660,19 @@
 
             const botaoPosto = document.querySelector('[data-negocio="posto_combustivel"]');
             if (botaoPosto) botaoPosto.textContent = possuiPosto ? 'Ver gestão do posto' : 'Fazer proposta';
+            const botaoBombeiro = document.querySelector('[data-negocio="caminhao_bombeiro"]');
+            if (botaoBombeiro) botaoBombeiro.textContent = possuiBombeiro ? 'Ver gestão do caminhão' : 'Fazer proposta';
+
+            if (possuiBombeiro) {
+                const automatico = negocioBombeiroGlobal?.modoAtendimento === 'automatico';
+                combustivelBombeiro.textContent = Math.round(Number(negocioBombeiroGlobal?.combustivel || 100));
+                caixaBombeiro.textContent = Math.round(Number(negocioBombeiroGlobal?.caixa || 0)).toLocaleString('pt-BR');
+                lucroBombeiro.textContent = Math.round(Number(perfil.ganhosBombeiroTotal || 0)).toLocaleString('pt-BR');
+                btnModoBombeiro.textContent = automatico ? '✓ Atendimento automático ligado' : 'Atendimento automático';
+                statusBombeiro.textContent = automatico
+                    ? `O caminhão atende sozinho e abastece por ${CUSTO_ABASTECER_BOMBEIRO} Ludigins quando necessário.`
+                    : 'Atendimento em tempo real: o dono precisa estar on-line.';
+            }
         }
 
         function ehProprietarioMestre() {
@@ -2620,8 +2691,9 @@
             await Promise.all(negocios.map(([id, nome]) => runTransaction(
                 ref(db, `ludigins_jogo/negocios/${id}`),
                 atual => {
-                    if (!atual || !atual.donoId) return { ...(atual || {}), donoId: 'proprietario_luigy', donoNome: 'Luigy', donoEmail: EMAIL_PROPRIETARIO, nome, criadoEm: atual?.criadoEm || Date.now(), ...(id === 'posto_combustivel' ? { precoCombustivel: PRECO_ABASTECIMENTO_PADRAO, caixa: 0 } : {}) };
+                    if (!atual || !atual.donoId) return { ...(atual || {}), donoId: 'proprietario_luigy', donoNome: 'Luigy', donoEmail: EMAIL_PROPRIETARIO, nome, criadoEm: atual?.criadoEm || Date.now(), ...(id === 'posto_combustivel' ? { precoCombustivel: PRECO_ABASTECIMENTO_PADRAO, caixa: 0 } : {}), ...(id === 'caminhao_bombeiro' ? { caixa: 0, combustivel: 100, modoAtendimento: 'tempo_real' } : {}) };
                     if (id === 'posto_combustivel' && (!PRECOS_ABASTECIMENTO.includes(Number(atual.precoCombustivel)) || atual.caixa === undefined)) return { ...atual, precoCombustivel: PRECOS_ABASTECIMENTO.includes(Number(atual.precoCombustivel)) ? Number(atual.precoCombustivel) : PRECO_ABASTECIMENTO_PADRAO, caixa: Number(atual.caixa || 0) };
+                    if (id === 'caminhao_bombeiro' && (atual.caixa === undefined || atual.combustivel === undefined || !atual.modoAtendimento)) return { ...atual, caixa: Number(atual.caixa || 0), combustivel: atual.combustivel === undefined ? 100 : Number(atual.combustivel), modoAtendimento: atual.modoAtendimento || 'tempo_real' };
                     if (ehProprietarioMestre() && atual.donoEmail === EMAIL_PROPRIETARIO && atual.donoId === 'proprietario_luigy') {
                         return { ...atual, donoId: usuarioId, donoNome: usuarioNome || 'Luigy' };
                     }
@@ -2665,6 +2737,11 @@
                 atualizarPainelNegocios();
                 return;
             }
+            if (botao.dataset.negocio === 'caminhao_bombeiro' && negocioBombeiroGlobal?.donoId === usuarioId) {
+                gestaoBombeiroAberta = !gestaoBombeiroAberta;
+                atualizarPainelNegocios();
+                return;
+            }
             abrirProposta(botao.dataset.negocio, botao.dataset.nome);
         }));
         btnAumentarProposta.addEventListener('click', () => {
@@ -2684,6 +2761,13 @@
             await update(ref(db, 'ludigins_jogo/negocios/posto_combustivel'), { precoCombustivel: preco, atualizadoEm: Date.now() });
             await registrarEvento(`${usuarioNome} ajustou o combustível para ${preco} Ludigins.`);
             mostrarAviso(`⛽ Preço do combustível atualizado para ${preco} Ludigins.`, 'ok');
+        });
+
+        btnModoBombeiro.addEventListener('click', async () => {
+            if (negocioBombeiroGlobal?.donoId !== usuarioId) return;
+            const modoAtendimento = negocioBombeiroGlobal?.modoAtendimento === 'automatico' ? 'tempo_real' : 'automatico';
+            await update(ref(db, 'ludigins_jogo/negocios/caminhao_bombeiro'), { modoAtendimento, atualizadoEm: Date.now() });
+            await registrarEvento(`${usuarioNome} colocou o caminhão de bombeiro em ${modoAtendimento === 'automatico' ? 'atendimento automático' : 'atendimento em tempo real'}.`);
         });
 
         function desenharPropostas(snapshot) {
@@ -2716,7 +2800,7 @@
 
             const pagamento = await runTransaction(ref(db, `ludigins_usuarios/${proposta.compradorId}`), atual => {
                 if (!atual || Number(atual.saldo || 0) < Number(proposta.valor || 0)) return;
-                return { ...atual, saldo: Number(atual.saldo || 0) - Number(proposta.valor || 0), possuiPosto: proposta.negocio === 'posto_combustivel' ? true : !!atual.possuiPosto, atualizadoEm: Date.now() };
+                return { ...atual, saldo: Number(atual.saldo || 0) - Number(proposta.valor || 0), possuiPosto: proposta.negocio === 'posto_combustivel' ? true : !!atual.possuiPosto, possuiBombeiro: proposta.negocio === 'caminhao_bombeiro' ? true : !!atual.possuiBombeiro, atualizadoEm: Date.now() };
             });
             if (!pagamento.committed) {
                 mostrarAviso('O ouvinte não possui mais saldo para esta proposta.', 'erro');
@@ -2727,6 +2811,12 @@
             if (proposta.negocio === 'posto_combustivel' && donoAnterior && donoAnterior !== proposta.compradorId && donoAnterior !== 'proprietario_luigy') {
                 await runTransaction(ref(db, `ludigins_usuarios/${donoAnterior}`), atual => atual
                     ? { ...atual, possuiPosto: false, atualizadoEm: Date.now() }
+                    : atual
+                );
+            }
+            if (proposta.negocio === 'caminhao_bombeiro' && donoAnterior && donoAnterior !== proposta.compradorId && donoAnterior !== 'proprietario_luigy') {
+                await runTransaction(ref(db, `ludigins_usuarios/${donoAnterior}`), atual => atual
+                    ? { ...atual, possuiBombeiro: false, atualizadoEm: Date.now() }
                     : atual
                 );
             }
@@ -2878,6 +2968,81 @@
             });
         }
 
+        function donoBombeiroEstaOnline() {
+            const donoId = negocioBombeiroGlobal?.donoId;
+            const jogador = donoId ? jogadoresOnlineCache[donoId] : null;
+            return !!jogador && Number(jogador.atualizadoEm || 0) > Date.now() - 60000 && jogador.status !== 'offline';
+        }
+
+        function mostrarCaminhaoBombeiro() {
+            const alvo = pontoNaRua(posicaoJogadorAtual.x, posicaoJogadorAtual.y);
+            const el = document.createElement('div');
+            el.className = 'caminhao-bombeiro-mapa';
+            el.textContent = '🚒';
+            el.style.left = '7%';
+            el.style.top = '62%';
+            mapa.appendChild(el);
+            requestAnimationFrame(() => { el.style.left = `${alvo.x}%`; el.style.top = `${alvo.y}%`; });
+            setTimeout(() => el.remove(), 4200);
+        }
+
+        async function tentarAbastecerCaminhao(snapshot) {
+            const negocio = negocioBombeiroGlobal;
+            if (!negocio || negocio.modoAtendimento !== 'automatico' || Number(negocio.combustivel || 100) > LIMITE_COMBUSTIVEL_BAIXO) return;
+            const fila = [];
+            if (snapshot?.exists()) snapshot.forEach(item => { if (item.key !== 'caminhao_bombeiro') fila.push(item.val() || {}); });
+            if (fila.length || Number(negocio.caixa || 0) < CUSTO_ABASTECER_BOMBEIRO) return;
+            const resultado = await runTransaction(ref(db, 'ludigins_jogo/negocios/caminhao_bombeiro'), atual => {
+                if (!atual || atual.modoAtendimento !== 'automatico' || Number(atual.combustivel || 100) > LIMITE_COMBUSTIVEL_BAIXO || Number(atual.caixa || 0) < CUSTO_ABASTECER_BOMBEIRO) return;
+                return { ...atual, combustivel: 100, caixa: Number(atual.caixa || 0) - CUSTO_ABASTECER_BOMBEIRO, atualizadoEm: Date.now() };
+            });
+            if (resultado.committed) {
+                await set(ref(db, 'ludigins_jogo/posto_fila/caminhao_bombeiro'), null);
+                await registrarEvento(`🚒 O caminhão de bombeiro abasteceu automaticamente por ${CUSTO_ABASTECER_BOMBEIRO} Ludigins.`);
+            }
+        }
+
+        async function chamarBombeiro() {
+            const perfil = perfilAtual || {};
+            if (Number(perfil.aquecimentoCorridas || 0) < MAX_AQUECIMENTO_CORRIDAS) return;
+            const negocio = negocioBombeiroGlobal;
+            if (!negocio) { mostrarAviso('O caminhão de bombeiro ainda não está disponível.', 'erro'); return; }
+            const automatico = negocio.modoAtendimento === 'automatico';
+            if (!automatico && !donoBombeiroEstaOnline()) {
+                mostrarAviso('🚒 Atendimento em tempo real: o proprietário do caminhão está off-line.', 'erro');
+                return;
+            }
+            if (Number(negocio.combustivel || 0) < CONSUMO_BOMBEIRO_POR_ATENDIMENTO) {
+                mostrarAviso('🚒 O caminhão está sem combustível suficiente para atender.', 'erro');
+                return;
+            }
+            const pagamento = await runTransaction(ref(db, `ludigins_usuarios/${usuarioId}`), atual => {
+                if (!atual || Number(atual.aquecimentoCorridas || 0) < MAX_AQUECIMENTO_CORRIDAS || Number(atual.saldo || 0) < CUSTO_RESFRIAMENTO) return;
+                return { ...atual, saldo: Number(atual.saldo || 0) - CUSTO_RESFRIAMENTO, aquecimentoCorridas: 0, atualizadoEm: Date.now() };
+            });
+            if (!pagamento.committed) { mostrarAviso('Você precisa de 4 Ludigins para chamar o bombeiro.', 'erro'); return; }
+            mostrarCaminhaoBombeiro();
+            const metade = CUSTO_RESFRIAMENTO / 2;
+            await runTransaction(ref(db, 'ludigins_jogo/negocios/caminhao_bombeiro'), atual => atual
+                ? { ...atual, caixa: Number(atual.caixa || 0) + metade, combustivel: Math.max(0, Number(atual.combustivel || 0) - CONSUMO_BOMBEIRO_POR_ATENDIMENTO), atendimentos: Number(atual.atendimentos || 0) + 1, atualizadoEm: Date.now() }
+                : atual
+            );
+            const donoId = negocio.donoId;
+            if (donoId) await runTransaction(ref(db, `ludigins_usuarios/${donoId}`), atual => atual
+                ? { ...atual, saldo: Number(atual.saldo || 0) + metade, ganhosBombeiroTotal: Number(atual.ganhosBombeiroTotal || 0) + metade, atualizadoEm: Date.now() }
+                : atual
+            );
+            await registrarEvento(`🚒 ${usuarioNome} chamou o bombeiro para resfriar o táxi por ${CUSTO_RESFRIAMENTO} Ludigins.`);
+            mostrarAviso('🚒 Táxi resfriado! Você já pode aceitar novas corridas.', 'ok');
+            const filaSnap = await get(ref(db, 'ludigins_jogo/posto_fila'));
+            if (automatico && Number(negocio.combustivel || 0) - CONSUMO_BOMBEIRO_POR_ATENDIMENTO <= LIMITE_COMBUSTIVEL_BAIXO) {
+                await set(ref(db, 'ludigins_jogo/posto_fila/caminhao_bombeiro'), { nome: 'Caminhão de bombeiro', solicitadoEm: Date.now(), atualizadoEm: Date.now(), status: 'fila' });
+                await tentarAbastecerCaminhao(filaSnap);
+            }
+        }
+
+        btnResfriar.addEventListener('click', () => chamarBombeiro().catch(console.error));
+
         async function concluirAbastecimento() {
             if (timerAbastecimento) {
                 clearTimeout(timerAbastecimento);
@@ -2990,6 +3155,7 @@
         }
 
         async function processarFilaPosto(snapshot) {
+            tentarAbastecerCaminhao(snapshot).catch(console.warn);
             const agora = Date.now();
             const itens = [];
 
@@ -4142,6 +4308,11 @@
                     return;
                 }
 
+                if (Number(perfil.aquecimentoCorridas || 0) >= MAX_AQUECIMENTO_CORRIDAS) {
+                    mostrarAviso('🚒 Seu táxi chegou à temperatura máxima. Chame o bombeiro para resfriar antes da próxima corrida.', 'erro');
+                    return;
+                }
+
                 const combustivel = perfil.combustivel === undefined
                     ? COMBUSTIVEL_MAX
                     : Number(perfil.combustivel);
@@ -4503,6 +4674,10 @@
                         0,
                         combustivelAtual - CONSUMO_POR_CORRIDA
                     );
+                    const novoAquecimento = Math.min(
+                        MAX_AQUECIMENTO_CORRIDAS,
+                        Number(atual.aquecimentoCorridas || 0) + 1
+                    );
 
                     const { atual: novaPatente } =
                         calcularPatente(novoSaldo);
@@ -4521,6 +4696,7 @@
                         ganhosHoje: novosGanhos,
                         bonusAposMetaAte,
                         combustivel: novoCombustivel,
+                        aquecimentoCorridas: novoAquecimento,
                         corridaAtual: null,
                         dataCorridas: hoje,
                         atualizadoEm: Date.now()
@@ -4535,11 +4711,16 @@
                 removerDestinoPin();
                 removerCenaEmbarque();
 
+                const pontoFinal = pontoNaRua(
+                    Number(corrida.destinoX ?? posicaoJogadorAtual.x),
+                    Number(corrida.destinoY ?? posicaoJogadorAtual.y)
+                );
+                posicaoJogadorAtual = pontoFinal;
                 await update(
                     ref(db, `ludigins_jogo/jogadores/${usuarioId}`),
                     {
-                        x: Number(corrida.passageiroX ?? posicaoJogadorAtual.x),
-                        y: Number(corrida.passageiroY ?? posicaoJogadorAtual.y),
+                        x: pontoFinal.x,
+                        y: pontoFinal.y,
                         movimento: null,
                         status: Number(ganho.snapshot.val()?.corridasHoje || 0) === MAX_CORRIDAS_DIA
                             ? 'descansando'
@@ -4931,6 +5112,14 @@
                 ref(db, 'ludigins_jogo/negocios/posto_combustivel'),
                 snapshot => {
                     negocioPostoGlobal = snapshot.exists() ? (snapshot.val() || null) : null;
+                    atualizarPainelNegocios();
+                }
+            );
+
+            onValue(
+                ref(db, 'ludigins_jogo/negocios/caminhao_bombeiro'),
+                snapshot => {
+                    negocioBombeiroGlobal = snapshot.exists() ? (snapshot.val() || null) : null;
                     atualizarPainelNegocios();
                 }
             );
