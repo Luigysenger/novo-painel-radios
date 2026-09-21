@@ -2195,6 +2195,7 @@
         let processandoFilaPosto = false;
         let timerPainelCarro = null;
         let timerViradaDia = null;
+        let timerGeradorCorridas = null;
         let eventosIniciaisCarregados = false;
         const eventosCelebrados = new Set();
         let jogadoresRankingCache = {};
@@ -2307,11 +2308,13 @@
         // DATA LOCAL DO JOGO
         // =========================================================
         function dataHoje() {
-            const agora = new Date();
-            const ano = agora.getFullYear();
-            const mes = String(agora.getMonth() + 1).padStart(2, '0');
-            const dia = String(agora.getDate()).padStart(2, '0');
-            return `${ano}-${mes}-${dia}`;
+            // O jogo usa uma única data para todos os aparelhos, inclusive no Mac.
+            const partes = new Intl.DateTimeFormat('en-CA', {
+                timeZone: 'America/Sao_Paulo',
+                year: 'numeric', month: '2-digit', day: '2-digit'
+            }).formatToParts(new Date());
+            const pegar = tipo => partes.find(parte => parte.type === tipo)?.value;
+            return `${pegar('year')}-${pegar('month')}-${pegar('day')}`;
         }
 
         function chaveSemana(data = new Date()) {
@@ -4287,6 +4290,16 @@
             mapa.querySelectorAll('.ride-pin').forEach(el => el.remove());
         }
 
+        function iniciarGeradorCorridas() {
+            if (timerGeradorCorridas) clearInterval(timerGeradorCorridas);
+
+            // Reconfere periodicamente: se alguém aceitar uma corrida em outro
+            // aparelho, os novos passageiros voltam a aparecer para todos.
+            timerGeradorCorridas = setInterval(() => {
+                garantirCorridasDisponiveis().catch(console.warn);
+            }, 12000);
+        }
+
         function tentarAceitarCorrida(corrida) {
             if (perfilAtual?.corridaAtual) {
                 mostrarAviso(
@@ -5315,6 +5328,7 @@
             // Primeira criação do mapa compartilhado.
             const corridasSnap = await get(ref(db, 'ludigins_corridas/ativas'));
             await garantirCorridasDisponiveis(corridasSnap);
+            iniciarGeradorCorridas();
         }
 
         iniciar().catch(erro => {
