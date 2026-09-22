@@ -1564,6 +1564,202 @@
             }
         }
 
+        /* =========================================================
+           RÁDIO RETRÔ — KOMBI INTERATIVA
+           A ilustração conserva a proporção original em toda tela.
+           ========================================================= */
+        #retroRadioContainer {
+            background: radial-gradient(circle at 50% 40%, #25495a 0%, #10242f 48%, #050b10 100%);
+            padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+        }
+        .kombi-retro-stage {
+            width: 100%;
+            height: 100%;
+            display: grid;
+            place-items: center;
+            background: radial-gradient(ellipse at center, rgba(60,181,190,.22), transparent 60%);
+        }
+        .kombi-retro {
+            position: relative;
+            width: min(96vw, 96dvh);
+            height: min(96vw, 96dvh);
+            max-width: 1440px;
+            max-height: 1440px;
+            filter: drop-shadow(0 20px 28px rgba(0,0,0,.48));
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .kombi-retro-image {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 3%;
+        }
+        .kombi-exit {
+            position: absolute;
+            top: 4.5%;
+            right: 6%;
+            z-index: 3;
+            border: 1px solid rgba(255,255,255,.78);
+            border-radius: 999px;
+            padding: .7em 1em;
+            background: rgba(4,16,20,.78);
+            color: #fff7d6;
+            font: 800 clamp(10px, 1.25vw, 17px)/1 system-ui, sans-serif;
+            cursor: pointer;
+            box-shadow: 0 3px 12px rgba(0,0,0,.35);
+            touch-action: manipulation;
+        }
+        .kombi-exit:hover { background: rgba(12,52,62,.96); }
+        .kombi-dial-copy {
+            position: absolute;
+            z-index: 2;
+            top: 18.3%;
+            left: 24%;
+            width: 52%;
+            color: #ffe08a;
+            text-align: center;
+            font-family: Georgia, serif;
+            text-shadow: 0 1px 2px #000, 0 0 8px rgba(255,192,49,.6);
+            pointer-events: none;
+        }
+        .kombi-dial-copy strong {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: clamp(9px, 1.35vw, 19px);
+            letter-spacing: .03em;
+        }
+        .kombi-dial-copy span {
+            display: block;
+            margin-top: .18em;
+            font: 800 clamp(8px, 1.05vw, 15px)/1.1 "Courier New", monospace;
+            letter-spacing: .12em;
+        }
+        .kombi-amber-light {
+            position: absolute;
+            z-index: 3;
+            top: 31.8%;
+            left: 49.25%;
+            width: 2.2%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: #a75d00;
+            border: 1px solid rgba(55,27,0,.75);
+            box-shadow: inset 0 1px 2px rgba(0,0,0,.75), 0 0 2px #e59a17;
+            transition: background .2s, box-shadow .2s;
+        }
+        .kombi-amber-light.on {
+            background: #ffd15c;
+            box-shadow: 0 0 8px 3px rgba(255,185,37,.95), 0 0 22px 6px rgba(255,171,0,.5), inset 0 1px 2px #fff7c9;
+        }
+        .kombi-arrow {
+            position: absolute;
+            z-index: 4;
+            top: 42.1%;
+            width: 6.2%;
+            aspect-ratio: 1;
+            padding: 0;
+            border: 0;
+            border-radius: 50%;
+            background: transparent;
+            color: rgba(255,255,255,.84);
+            font-size: clamp(12px, 2.3vw, 32px);
+            font-weight: 900;
+            cursor: pointer;
+            text-shadow: 0 1px 2px #000;
+            touch-action: manipulation;
+        }
+        .kombi-arrow:hover, .kombi-arrow:focus-visible { color: #ffdf6a; filter: drop-shadow(0 0 5px #ffce37); outline: none; }
+        .kombi-arrow-prev { left: 63.5%; }
+        .kombi-arrow-next { left: 70%; }
+        .kombi-control {
+            position: absolute;
+            z-index: 4;
+            top: 40.5%;
+            width: 10.7%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            cursor: grab;
+            touch-action: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .kombi-control:active { cursor: grabbing; }
+        .kombi-tuning { left: 26%; }
+        .kombi-volume { left: 38.3%; }
+        .kombi-control-pointer {
+            position: absolute;
+            inset: 10%;
+            border-radius: 50%;
+            pointer-events: none;
+            transition: transform .05s ease-out;
+        }
+        .kombi-control-pointer::after {
+            content: "";
+            position: absolute;
+            top: 3%;
+            left: calc(50% - 1px);
+            width: 2px;
+            height: 20%;
+            border-radius: 2px;
+            background: #ffe17b;
+            box-shadow: 0 0 5px #ffc938;
+        }
+        .kombi-control span {
+            position: absolute;
+            top: 104%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 170%;
+            color: #fff1bb;
+            text-align: center;
+            font: 900 clamp(7px, 1vw, 14px)/1 system-ui, sans-serif;
+            letter-spacing: .04em;
+            text-shadow: 0 1px 2px #000;
+            pointer-events: none;
+        }
+        .kombi-headlight {
+            position: absolute;
+            z-index: 2;
+            top: 61.9%;
+            width: 10%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,232,.12) 0 20%, rgba(255,220,91,.05) 43%, transparent 70%);
+            transition: background .08s, box-shadow .08s;
+            pointer-events: none;
+        }
+        .kombi-headlight-left { left: 17.5%; }
+        .kombi-headlight-right { right: 17.5%; }
+        .kombi-retro.troca-radio .kombi-headlight {
+            background: radial-gradient(circle, #fffde9 0 17%, #ffe77c 38%, rgba(255,202,29,.68) 58%, transparent 72%);
+            box-shadow: 0 0 12px 6px rgba(255,217,86,.95), 0 0 32px 12px rgba(255,191,29,.62);
+        }
+        .kombi-hint {
+            position: absolute;
+            z-index: 3;
+            bottom: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,.88);
+            background: rgba(0,0,0,.35);
+            padding: .32em .8em;
+            border-radius: 999px;
+            font: 700 clamp(8px, 1vw, 13px)/1.2 system-ui, sans-serif;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+        @media (min-width: 900px) and (min-aspect-ratio: 4/3) {
+            .kombi-retro { width: min(96vw, 96dvh); height: min(96vw, 96dvh); }
+        }
+        @media (max-width: 600px) {
+            .kombi-retro { width: min(100vw, 100dvh); height: min(100vw, 100dvh); }
+            .kombi-exit { top: 3%; right: 4%; padding: .58em .75em; }
+            .kombi-hint { bottom: 2.8%; }
+        }
+
         .hidden { display: none !important; }
 
     </style>
@@ -1576,51 +1772,33 @@
     </div>
 
     <!-- MODO RÁDIO RETRÔ TELA CHEIA -->
-    <div id="retroRadioContainer" class="hidden">
-        <div class="retro-cabinet">
-            <div class="retro-top-panel">
-                <div class="retro-led" id="retroLedIndicator"></div>
-                <button class="btn-exit-retro" id="btnSairRetro">Voltar ao Painel Normal</button>
-            </div>
+    <div id="retroRadioContainer" class="hidden" aria-label="Rádio Retrô">
+        <div class="kombi-retro-stage">
+            <div class="kombi-retro" id="kombiRetro">
+                <img class="kombi-retro-image" src="./retro-kombi-radio.jpg" alt="Rádio retrô em formato de Kombi">
 
-            <div class="retro-dial-glass">
-                <div class="retro-station-title" id="retroTitleDisplay">Nenhuma Rádio Selecionada</div>
-                <div class="retro-digital-tuner" aria-label="Modulador digital do rádio retrô">
-                    <span class="retro-tuner-label">STEREO</span>
-                    <div class="retro-digital-display" id="retroFreqDisplay">FM --.-</div>
-                    <div class="retro-level-meter" aria-label="Nível do sinal">
-                        <span class="retro-level-bar" style="--h:8px;--d:0s"></span>
-                        <span class="retro-level-bar" style="--h:12px;--d:.08s"></span>
-                        <span class="retro-level-bar" style="--h:16px;--d:.16s"></span>
-                        <span class="retro-level-bar" style="--h:20px;--d:.24s"></span>
-                        <span class="retro-level-bar" style="--h:24px;--d:.32s"></span>
-                        <span class="retro-level-bar" style="--h:28px;--d:.40s"></span>
-                        <span class="retro-level-bar" style="--h:22px;--d:.48s"></span>
-                        <span class="retro-level-bar" style="--h:17px;--d:.56s"></span>
-                    </div>
+                <button class="kombi-exit" id="btnSairRetro">← Painel normal</button>
+                <div class="kombi-dial-copy" aria-live="polite">
+                    <strong id="retroTitleDisplay">Selecione uma Rádio</strong>
+                    <span id="retroFreqDisplay">FM --.-</span>
                 </div>
-            </div>
+                <div class="kombi-amber-light" id="retroLedIndicator" title="Luz do rádio"></div>
 
-            <div class="retro-speaker-grille">
-                <div class="retro-brand-badge">VINTAGE SOUND</div>
-            </div>
+                <button class="kombi-arrow kombi-arrow-prev" id="btnRetroAnterior" aria-label="Rádio anterior">◀</button>
+                <button class="kombi-arrow kombi-arrow-next" id="btnRetroProxima" aria-label="Próxima rádio">▶</button>
 
-            <div class="retro-controls-row">
-                <!-- Botão Giratório de Sintonia / Passar Rádio -->
-                <div class="retro-knob-container" id="knobSintonia" title="Deslize para trocar de rádio">
-                    <div class="retro-knob" id="dialSintonia">
-                        <div class="retro-knob-indicator"></div>
-                    </div>
-                    <span class="retro-knob-label">SINTONIA</span>
+                <div class="kombi-control kombi-tuning" id="knobSintonia" role="button" tabindex="0" aria-label="Sintonia: deslize ou toque para mudar de rádio" title="Deslize para trocar de rádio">
+                    <div class="kombi-control-pointer" id="dialSintonia"></div>
+                    <span>SINTONIA</span>
+                </div>
+                <div class="kombi-control kombi-volume" id="knobVolume" role="button" tabindex="0" aria-label="Volume: deslize para ajustar" title="Deslize para ajustar o volume">
+                    <div class="kombi-control-pointer" id="dialVolume"></div>
+                    <span id="labelVolumeText">VOL: 0</span>
                 </div>
 
-                <!-- Botão Giratório de Volume / Ligar Desligar (0 a 30) -->
-                <div class="retro-knob-container" id="knobVolume" title="Deslize para ajustar volume (0-80) ou clique para desligar">
-                    <div class="retro-knob" id="dialVolume">
-                        <div class="retro-knob-indicator"></div>
-                    </div>
-                    <span class="retro-knob-label" id="labelVolumeText">VOL: 0</span>
-                </div>
+                <div class="kombi-headlight kombi-headlight-left" aria-hidden="true"></div>
+                <div class="kombi-headlight kombi-headlight-right" aria-hidden="true"></div>
+                <div class="kombi-hint">Toque nas setas ou deslize os controles</div>
             </div>
         </div>
     </div>
@@ -3142,11 +3320,27 @@
         const labelVolumeText = document.getElementById('labelVolumeText');
         const knobVolumeContainer = document.getElementById('knobVolume');
         const knobSintoniaContainer = document.getElementById('knobSintonia');
+        const btnRetroAnterior = document.getElementById('btnRetroAnterior');
+        const btnRetroProxima = document.getElementById('btnRetroProxima');
+        const kombiRetro = document.getElementById('kombiRetro');
 
         // O modo Retrô usa exatamente o MESMO volume do painel principal (0 a 80).
         // Não existe mais um segundo volume separado.
         let anguloVolume = (volumePlayerAtual / 80) * 270 - 135;
         let anguloSintonia = 0;
+        let ultimaRadioNoRetro = '';
+        let timerFarolRetro = null;
+
+        function piscarFaroisRetro() {
+            if (!kombiRetro) return;
+            kombiRetro.classList.remove('troca-radio');
+            void kombiRetro.offsetWidth;
+            kombiRetro.classList.add('troca-radio');
+            clearTimeout(timerFarolRetro);
+            timerFarolRetro = setTimeout(() => {
+                kombiRetro.classList.remove('troca-radio');
+            }, 720);
+        }
 
         btnAbrirRetro.addEventListener('click', () => {
             // Ao entrar no Retrô, mantém exatamente o volume atual do painel normal.
@@ -3175,6 +3369,10 @@
         });
 
         function atualizarTelaRetrô() {
+            const nomeRadioAtual = rádioAtivaNomeGlobal || '';
+            const radioMudou = !retroContainer.classList.contains('hidden') &&
+                Boolean(nomeRadioAtual) && nomeRadioAtual !== ultimaRadioNoRetro;
+
             if (rádioAtivaNomeGlobal) {
                 retroTitleDisplay.innerText = rádioAtivaNomeGlobal;
             } else {
@@ -3199,7 +3397,24 @@
             labelVolumeText.innerText = `VOL: ${volumePlayerAtual}`;
             dialVolume.style.transform = `rotate(${anguloVolume}deg)`;
             dialSintonia.style.transform = `rotate(${anguloSintonia}deg)`;
+
+            if (radioMudou) piscarFaroisRetro();
+            ultimaRadioNoRetro = nomeRadioAtual;
         }
+
+        // As duas setas do painel da Kombi trocam a rádio sem exigir arraste.
+        btnRetroAnterior.addEventListener('click', (e) => {
+            e.preventDefault();
+            radioAnterior();
+            anguloSintonia -= 45;
+            atualizarTelaRetrô();
+        });
+        btnRetroProxima.addEventListener('click', (e) => {
+            e.preventDefault();
+            proximaRadio();
+            anguloSintonia += 45;
+            atualizarTelaRetrô();
+        });
 
         // Interação por toque/arraste no Botão de Volume (0 a 80)
         let arrastandoVolume = false;
