@@ -1794,14 +1794,14 @@
             opacity: .82;
         }
         .kombi-dial-copy {
-            top: 17.8%; left: 27%; width: 46%;
+            top: 18.7%; left: 27%; width: 46%;
             color: #ffd36b;
             text-shadow: 0 1px 3px #000, 0 0 8px rgba(255,174,33,.55);
         }
-        .kombi-dial-copy strong { font-size: clamp(8px, 1.05vw, 15px); }
+        .kombi-dial-copy strong { display: none; }
         .kombi-dial-copy span { font-size: clamp(7px, .9vw, 12px); }
         .kombi-amber-light {
-            top: 26.65%; left: 48.35%; width: 3.3%;
+            top: 27.35%; left: 48.25%; width: 3.1%;
             background: #5b3908;
             border-color: #251604;
             box-shadow: inset 0 1px 3px rgba(0,0,0,.85);
@@ -1840,6 +1840,22 @@
             letter-spacing: -.12em; text-shadow: 1px 1px 0 #5b564d, -1px -1px 0 #fff8d4, 0 3px 5px rgba(0,0,0,.72);
             pointer-events: none;
         }
+        .kombi-license-plate {
+            position: absolute; z-index: 4; top: 80.25%; left: 50%; transform: translateX(-50%);
+            width: 17.6%; min-height: 4.15%; display: flex; align-items: center; justify-content: center;
+            overflow: hidden; padding: .12em .5em; border: clamp(1px, .18vw, 3px) solid #d8dde3;
+            border-radius: clamp(2px, .35vw, 5px); background: linear-gradient(180deg, #f9fafc 0 21%, #edf1f5 21% 100%);
+            color: #192435; box-shadow: 0 1px 0 rgba(255,255,255,.92) inset, 0 2px 5px rgba(0,0,0,.7);
+            font: 900 clamp(6px, .76vw, 11px)/1 Arial, sans-serif; letter-spacing: .08em;
+            text-transform: uppercase; white-space: nowrap; text-shadow: none; pointer-events: none;
+        }
+        .kombi-license-plate::before {
+            content: "RÁDIO"; position: absolute; top: 7%; left: 0; width: 100%; color: #f8fbff;
+            background: #194e8c; text-align: center; font-size: .46em; letter-spacing: .18em; line-height: 1.35;
+        }
+        .kombi-license-plate span {
+            display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; margin-top: .35em;
+        }
         .sr-only {
             position: absolute !important;
             width: 1px !important; height: 1px !important;
@@ -1861,11 +1877,11 @@
             50% { background: radial-gradient(circle, #fffde6 0 18%, #ffd94f 42%, rgba(255,186,13,.48) 61%, transparent 73%); box-shadow: 0 0 13px 7px rgba(255,214,91,.86); }
         }
         .kombi-turn-signal {
-            position: absolute; z-index: 3; top: 67.2%; width: 4.4%; aspect-ratio: 1;
+            position: absolute; z-index: 3; top: 68.65%; width: 4.35%; aspect-ratio: 1;
             border-radius: 50%; background: transparent; pointer-events: none;
         }
-        .kombi-turn-signal-left { left: 13.7%; }
-        .kombi-turn-signal-right { right: 13.7%; }
+        .kombi-turn-signal-left { left: 10.42%; }
+        .kombi-turn-signal-right { right: 10.42%; }
         .kombi-retro.sinal-esquerda .kombi-turn-signal-left,
         .kombi-retro.sinal-direita .kombi-turn-signal-right { animation: piscaDirecional .28s step-end 3; }
         @keyframes piscaDirecional {
@@ -1904,7 +1920,6 @@
 
                 <button class="kombi-exit" id="btnSairRetro">← Painel normal</button>
                 <div class="kombi-dial-copy" aria-live="polite">
-                    <strong id="retroTitleDisplay">Selecione uma Rádio</strong>
                     <span id="retroFreqDisplay">FM --.-</span>
                 </div>
                 <div class="kombi-amber-light" id="retroLedIndicator" title="Luz do rádio"></div>
@@ -1924,12 +1939,11 @@
                 </div>
 
                 <div class="kombi-ls-badge" aria-hidden="true">LS</div>
+                <div class="kombi-license-plate" aria-live="polite"><span id="retroTitleDisplay">Selecione uma Rádio</span></div>
                 <div class="kombi-headlight kombi-headlight-left" aria-hidden="true"></div>
                 <div class="kombi-headlight kombi-headlight-right" aria-hidden="true"></div>
                 <div class="kombi-turn-signal kombi-turn-signal-left" aria-hidden="true"></div>
                 <div class="kombi-turn-signal kombi-turn-signal-right" aria-hidden="true"></div>
-                <div class="kombi-wiper kombi-wiper-left" aria-hidden="true"></div>
-                <div class="kombi-wiper kombi-wiper-right" aria-hidden="true"></div>
             </div>
         </div>
     </div>
