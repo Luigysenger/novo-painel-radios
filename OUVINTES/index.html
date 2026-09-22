@@ -1762,9 +1762,27 @@
 
         /* Arte noturna: os comandos são os controles reais desenhados na Kombi. */
         .kombi-retro-stage { background: #050c14; }
+        #retroRadioContainer { display: block; padding: 0; }
+        .kombi-retro-stage {
+            position: absolute; inset: 0; height: auto;
+            overflow: hidden;
+            background: #040b12;
+        }
+        .kombi-retro-stage::before {
+            content: ""; position: absolute; inset: -5%;
+            background: linear-gradient(rgba(2,8,14,.56), rgba(2,8,14,.56)), url("./retro-kombi-interativa-v3.png") center / cover no-repeat;
+            filter: blur(18px) saturate(.82);
+            transform: scale(1.08);
+        }
+        .kombi-retro-stage::after {
+            content: ""; position: absolute; inset: 0;
+            background: radial-gradient(circle at center, transparent 36%, rgba(1,7,12,.4) 100%);
+            pointer-events: none;
+        }
         .kombi-retro {
             width: min(98vw, 98dvh);
             height: min(98vw, 98dvh);
+            z-index: 1;
             filter: drop-shadow(0 20px 32px rgba(0,0,0,.62));
         }
         .kombi-retro-image { border-radius: 2.2%; }
@@ -1783,7 +1801,7 @@
         .kombi-dial-copy strong { font-size: clamp(8px, 1.05vw, 15px); }
         .kombi-dial-copy span { font-size: clamp(7px, .9vw, 12px); }
         .kombi-amber-light {
-            top: 33.1%; left: 48.25%; width: 3.5%;
+            top: 26.65%; left: 48.35%; width: 3.3%;
             background: #5b3908;
             border-color: #251604;
             box-shadow: inset 0 1px 3px rgba(0,0,0,.85);
@@ -1807,15 +1825,15 @@
         .kombi-volume-step {
             position: absolute; z-index: 5; left: 18%; width: 64%; height: 42%;
             border: 0; padding: 0; border-radius: 50%; cursor: pointer;
-            color: rgba(25,25,25,.88); background: transparent;
+            color: transparent; background: transparent;
             font: 900 clamp(12px, 2.2vw, 29px)/1 system-ui, sans-serif;
             text-shadow: 0 1px rgba(255,255,255,.42);
             -webkit-tap-highlight-color: transparent; touch-action: none;
         }
         .kombi-volume-up { top: 4%; }
         .kombi-volume-down { bottom: 4%; }
-        .kombi-volume-step:hover, .kombi-volume-step:focus-visible { color: #f5ae19; outline: none; }
-        .kombi-volume-step:active { color: #fff4bd; text-shadow: 0 0 7px #f7b524; }
+        .kombi-volume-step:hover, .kombi-volume-step:focus-visible { background: rgba(255,224,119,.10); outline: none; }
+        .kombi-volume-step:active { background: rgba(255,235,157,.26); }
         .kombi-ls-badge {
             position: absolute; z-index: 3; top: 60.8%; left: 50%; transform: translateX(-50%);
             color: #d7d9d6; font: italic 900 clamp(20px, 4vw, 55px)/1 Georgia, serif;
@@ -1830,7 +1848,7 @@
             white-space: nowrap !important; border: 0 !important;
         }
         .kombi-headlight {
-            top: 52.3%; width: 15.4%;
+            top: 52.4%; width: 15.2%;
             background: radial-gradient(circle, rgba(255,244,181,.08) 0 24%, rgba(255,203,45,.02) 48%, transparent 70%);
         }
         .kombi-headlight-left { left: 11.2%; }
@@ -1843,7 +1861,7 @@
             50% { background: radial-gradient(circle, #fffde6 0 18%, #ffd94f 42%, rgba(255,186,13,.48) 61%, transparent 73%); box-shadow: 0 0 13px 7px rgba(255,214,91,.86); }
         }
         .kombi-turn-signal {
-            position: absolute; z-index: 3; top: 67.8%; width: 4.6%; aspect-ratio: 1;
+            position: absolute; z-index: 3; top: 67.2%; width: 4.4%; aspect-ratio: 1;
             border-radius: 50%; background: transparent; pointer-events: none;
         }
         .kombi-turn-signal-left { left: 13.7%; }
@@ -1855,17 +1873,17 @@
             50% { background: radial-gradient(circle, #fff7b2 0 20%, #ffb30e 45%, rgba(255,126,0,.46) 70%, transparent 74%); box-shadow: 0 0 12px 5px rgba(255,159,14,.92); }
         }
         .kombi-wiper {
-            position: absolute; z-index: 3; top: 34.2%; width: 17.8%; height: .62%;
+            position: absolute; z-index: 3; top: 30.5%; width: 17.5%; height: .62%;
             background: linear-gradient(180deg, #171918 0%, #e9e5d8 36%, #777a78 52%, #161817 100%);
             border-radius: 999px; opacity: 0; pointer-events: none;
             box-shadow: 0 1px 1px rgba(255,255,255,.15), 0 2px 2px rgba(0,0,0,.72);
         }
-        .kombi-wiper-left { left: 23.2%; transform: rotate(21deg); transform-origin: 100% 50%; }
-        .kombi-wiper-right { right: 23.2%; transform: scaleX(-1) rotate(21deg); transform-origin: 0 50%; }
+        .kombi-wiper-left { left: 17%; transform: rotate(20deg); transform-origin: 100% 50%; }
+        .kombi-wiper-right { right: 17%; transform: rotate(-20deg); transform-origin: 0 50%; }
         .kombi-retro.limpadores-ativos .kombi-wiper { opacity: .96; animation: limpadorEsquerdo 1.65s ease-in-out infinite; }
         .kombi-retro.limpadores-ativos .kombi-wiper-right { animation-name: limpadorDireito; }
-        @keyframes limpadorEsquerdo { 0%,100% { transform: rotate(21deg); } 50% { transform: rotate(-27deg); } }
-        @keyframes limpadorDireito { 0%,100% { transform: scaleX(-1) rotate(21deg); } 50% { transform: scaleX(-1) rotate(-27deg); } }
+        @keyframes limpadorEsquerdo { 0%,100% { transform: rotate(20deg); } 50% { transform: rotate(-25deg); } }
+        @keyframes limpadorDireito { 0%,100% { transform: rotate(-20deg); } 50% { transform: rotate(25deg); } }
 
         .hidden { display: none !important; }
 
@@ -1882,7 +1900,7 @@
     <div id="retroRadioContainer" class="hidden" aria-label="Rádio Retrô">
         <div class="kombi-retro-stage">
             <div class="kombi-retro" id="kombiRetro">
-                <img class="kombi-retro-image" src="./retro-kombi-noturna-v2.png" alt="Rádio retrô em formato de Kombi">
+                <img class="kombi-retro-image" src="./retro-kombi-interativa-v3.png" alt="Rádio retrô em formato de Kombi">
 
                 <button class="kombi-exit" id="btnSairRetro">← Painel normal</button>
                 <div class="kombi-dial-copy" aria-live="polite">
