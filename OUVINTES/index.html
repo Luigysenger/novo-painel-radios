@@ -2386,6 +2386,117 @@
         const sidebarRadioList = document.getElementById('sidebarRadioList');
         const centerRadiosGrid = document.getElementById('centerRadiosGrid');
 
+        // Mantém a estação ativa estável em carro, Bluetooth e tela bloqueada.
+        const chaveUltimaRadioLocal = `ultimaRadioOuvinte_${chaveFirebaseUser}`;
+        let ultimaRadioIdSalva = localStorage.getItem(chaveUltimaRadioLocal) || '';
+        let deveRetomarUltimaRadio = Boolean(ultimaRadioIdSalva);
+        let timerRecuperacaoStream = null;
+        let tentativasRecuperacaoStream = 0;
+        let recuperacaoEmAndamento = false;
+
+        function obterRadioAtiva() {
+            return todasRadiosGlobal.find(radio => radio.id === ultimaRadioIdSalva) || null;
+        }
+
+        function salvarUltimaRadio(radio) {
+            if (!radio || !radio.id) return;
+
+            ultimaRadioIdSalva = radio.id;
+            deveRetomarUltimaRadio = true;
+            localStorage.setItem(chaveUltimaRadioLocal, radio.id);
+
+            update(
+                ref(db, `ouvintes_preferencias/${chaveFirebaseUser}`),
+                {
+                    ultimaRadioId: radio.id,
+                    deveRetomarUltimaRadio: true
+                }
+            ).catch(() => {});
+        }
+
+        function cancelarRecuperacaoStream() {
+            clearTimeout(timerRecuperacaoStream);
+            timerRecuperacaoStream = null;
+        }
+
+        async function iniciarStreamEstavel(radio, reconectando = false) {
+            if (!radio || !radio.url) return;
+
+            cancelarRecuperacaoStream();
+
+            try {
+                if (reconectando) {
+                    audioElement.pause();
+                    audioElement.removeAttribute('src');
+                    audioElement.load();
+                }
+
+                audioElement.src = radio.url;
+                audioElement.load();
+                await audioElement.play();
+
+                atualizarEstadoMediaSession('playing');
+                btnPlayPause.innerText = "⏹️";
+                playerStatusText.innerText = `Ouvindo Rádio: ${radio.nome}`;
+            } catch (erro) {
+                agendarRecuperacaoStream('não foi possível iniciar');
+            }
+        }
+
+        function agendarRecuperacaoStream(motivo) {
+            if (!deveRetomarUltimaRadio || recuperacaoEmAndamento || !obterRadioAtiva()) return;
+
+            cancelarRecuperacaoStream();
+            const espera = Math.min(12000, 1800 + tentativasRecuperacaoStream * 1800);
+
+            timerRecuperacaoStream = setTimeout(async () => {
+                const radio = obterRadioAtiva();
+                if (!radio || !deveRetomarUltimaRadio) return;
+
+                recuperacaoEmAndamento = true;
+                tentativasRecuperacaoStream += 1;
+                await iniciarStreamEstavel(radio, true);
+                recuperacaoEmAndamento = false;
+            }, espera);
+
+            console.warn('Reconectando a rádio em breve:', motivo);
+        }
+
+        audioElement.preload = 'auto';
+
+        audioElement.addEventListener('playing', () => {
+            cancelarRecuperacaoStream();
+            tentativasRecuperacaoStream = 0;
+            recuperacaoEmAndamento = false;
+            atualizarEstadoMediaSession('playing');
+        });
+
+        audioElement.addEventListener('stalled', () => {
+            agendarRecuperacaoStream('stream sem resposta');
+        });
+
+        audioElement.addEventListener('error', () => {
+            agendarRecuperacaoStream('erro no stream');
+        });
+
+        audioElement.addEventListener('ended', () => {
+            agendarRecuperacaoStream('stream encerrado');
+        });
+
+        audioElement.addEventListener('waiting', () => {
+            cancelarRecuperacaoStream();
+            timerRecuperacaoStream = setTimeout(() => {
+                agendarRecuperacaoStream('buffering prolongado');
+            }, 10000);
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && deveRetomarUltimaRadio && audioElement.paused) {
+                const radio = obterRadioAtiva();
+                if (radio) iniciarStreamEstavel(radio, true);
+            }
+        });
+
         // =====================================================
         // CONTROLES DE MÍDIA DO CELULAR / BLUETOOTH / CARRO
         // Integração isolada via Media Session API.
@@ -2861,6 +2972,12 @@
                     if (dados.volumePlayer !== undefined && dados.volumePlayer !== null) {
                         volumePlayerAtual = normalizarVolumePlayer(dados.volumePlayer);
                     }
+
+                    if (dados.ultimaRadioId) {
+                        ultimaRadioIdSalva = dados.ultimaRadioId;
+                        deveRetomarUltimaRadio = dados.deveRetomarUltimaRadio !== false;
+                        localStorage.setItem(chaveUltimaRadioLocal, ultimaRadioIdSalva);
+                    }
                 }
 
                 // Se o ouvinte nunca salvou volume, começa em 15.
@@ -2878,6 +2995,12 @@
                 }
 
                 renderizarTudo();
+
+                // Ao abrir novamente no carro, volta para a última rádio ouvida.
+                const ultimaRadio = obterRadioAtiva();
+                if (ultimaRadio && deveRetomarUltimaRadio) {
+                    tocarRadioPorObjeto(ultimaRadio);
+                }
             } catch (err) {
                 console.error("Erro ao carregar dados:", err);
             }
@@ -2889,7 +3012,9 @@
                 await set(prefRef, {
                     favoritas: radiosFavoritasIds,
                     customizacoes: customizacoesOuvinte,
-                    volumePlayer: volumePlayerAtual
+                    volumePlayer: volumePlayerAtual,
+                    ultimaRadioId: ultimaRadioIdSalva || null,
+                    deveRetomarUltimaRadio: deveRetomarUltimaRadio
                 });
             } catch (err) {
                 console.error("Erro ao salvar preferências:", err);
@@ -3183,6 +3308,7 @@
             const radiosAtivasNoCentro = radiosFavoritasIds.map(id => todasRadiosGlobal.find(r => r.id === id)).filter(Boolean);
             indiceRadioAtual = radiosAtivasNoCentro.findIndex(r => r.id === radio.id);
             rádioAtivaNomeGlobal = radio.nome;
+            salvarUltimaRadio(radio);
 
             document.querySelectorAll('.radio-card-user').forEach(c => {
                 if (c.dataset.id === radio.id) c.classList.add('active-neon');
@@ -3204,19 +3330,7 @@
             // para os controles de mídia do celular/BT/carro.
             atualizarMediaSessionRadio(radio);
 
-            audioElement.src = radio.url;
-            audioElement.play()
-                .then(() => {
-                    atualizarEstadoMediaSession(
-                        'playing'
-                    );
-                })
-                .catch(err =>
-                    console.error(
-                        "Erro no stream:",
-                        err
-                    )
-                );
+            iniciarStreamEstavel(radio);
 
             atualizarTelaRetrô();
         }
