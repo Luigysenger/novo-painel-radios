@@ -1760,6 +1760,95 @@
             .kombi-hint { bottom: 2.8%; }
         }
 
+        /* Arte noturna: os comandos são os controles reais desenhados na Kombi. */
+        .kombi-retro-stage { background: #050c14; }
+        .kombi-retro {
+            width: min(98vw, 98dvh);
+            height: min(98vw, 98dvh);
+            filter: drop-shadow(0 20px 32px rgba(0,0,0,.62));
+        }
+        .kombi-retro-image { border-radius: 2.2%; }
+        .kombi-exit {
+            top: 3%; left: 3%; right: auto;
+            background: rgba(3,12,18,.6);
+            border-color: rgba(255,214,92,.42);
+            color: #ffe9a6;
+            opacity: .82;
+        }
+        .kombi-dial-copy {
+            top: 17.8%; left: 27%; width: 46%;
+            color: #ffd36b;
+            text-shadow: 0 1px 3px #000, 0 0 8px rgba(255,174,33,.55);
+        }
+        .kombi-dial-copy strong { font-size: clamp(8px, 1.05vw, 15px); }
+        .kombi-dial-copy span { font-size: clamp(7px, .9vw, 12px); }
+        .kombi-amber-light {
+            top: 28.1%; left: 49.15%; width: 3.1%;
+            background: #5b3908;
+            border-color: #251604;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,.85);
+        }
+        .kombi-amber-light.on {
+            background: #ffcb32;
+            box-shadow: 0 0 8px 3px rgba(255,188,18,.92), 0 0 23px 7px rgba(255,149,0,.52), inset 0 1px 2px #fff5b4;
+        }
+        .kombi-arrow {
+            top: 37.6%; width: 7.4%;
+            background: transparent; color: transparent; text-shadow: none;
+        }
+        .kombi-arrow:hover, .kombi-arrow:focus-visible { background: rgba(255,215,106,.12); filter: none; }
+        .kombi-arrow-prev { left: 70.1%; }
+        .kombi-arrow-next { left: 77.4%; }
+        .kombi-control { top: 36.5%; width: 13.5%; }
+        .kombi-volume { left: 17.5%; }
+        .kombi-tuning { left: 43.2%; width: 16.2%; top: 37%; }
+        .kombi-control-pointer { inset: 0; }
+        .kombi-control-pointer::after { display: none; }
+        .sr-only {
+            position: absolute !important;
+            width: 1px !important; height: 1px !important;
+            padding: 0 !important; margin: -1px !important;
+            overflow: hidden !important; clip: rect(0,0,0,0) !important;
+            white-space: nowrap !important; border: 0 !important;
+        }
+        .kombi-headlight {
+            top: 53%; width: 17%;
+            background: radial-gradient(circle, rgba(255,244,181,.08) 0 24%, rgba(255,203,45,.02) 48%, transparent 70%);
+        }
+        .kombi-headlight-left { left: 7.1%; }
+        .kombi-headlight-right { right: 7.1%; }
+        .kombi-retro.troca-radio .kombi-headlight {
+            animation: farolPrincipal .32s ease-in-out 2;
+        }
+        @keyframes farolPrincipal {
+            0%,100% { background: radial-gradient(circle, rgba(255,244,181,.08) 0 24%, rgba(255,203,45,.02) 48%, transparent 70%); box-shadow: none; }
+            50% { background: radial-gradient(circle, #fffde6 0 18%, #ffd94f 42%, rgba(255,186,13,.48) 61%, transparent 73%); box-shadow: 0 0 13px 7px rgba(255,214,91,.86); }
+        }
+        .kombi-turn-signal {
+            position: absolute; z-index: 3; top: 70.1%; width: 4.2%; aspect-ratio: 1;
+            border-radius: 50%; background: transparent; pointer-events: none;
+        }
+        .kombi-turn-signal-left { left: 15.8%; }
+        .kombi-turn-signal-right { right: 15.8%; }
+        .kombi-retro.sinal-esquerda .kombi-turn-signal-left,
+        .kombi-retro.sinal-direita .kombi-turn-signal-right { animation: piscaDirecional .28s step-end 3; }
+        @keyframes piscaDirecional {
+            0%,100% { background: transparent; box-shadow: none; }
+            50% { background: radial-gradient(circle, #fff7b2 0 20%, #ffb30e 45%, rgba(255,126,0,.46) 70%, transparent 74%); box-shadow: 0 0 12px 5px rgba(255,159,14,.92); }
+        }
+        .kombi-wiper {
+            position: absolute; z-index: 3; top: 29.6%; width: 21%; height: .55%;
+            background: linear-gradient(180deg, rgba(17,19,18,.96), rgba(110,111,104,.9), rgba(9,11,11,.98));
+            border-radius: 999px; transform-origin: 7% 50%; opacity: 0; pointer-events: none;
+            box-shadow: 0 1px 1px rgba(255,255,255,.15), 0 2px 2px rgba(0,0,0,.72);
+        }
+        .kombi-wiper-left { left: 25%; transform: rotate(20deg); }
+        .kombi-wiper-right { right: 25%; transform: scaleX(-1) rotate(20deg); transform-origin: 93% 50%; }
+        .kombi-retro.limpadores-ativos .kombi-wiper { opacity: .96; animation: limpadorEsquerdo 1.65s ease-in-out infinite; }
+        .kombi-retro.limpadores-ativos .kombi-wiper-right { animation-name: limpadorDireito; }
+        @keyframes limpadorEsquerdo { 0%,100% { transform: rotate(20deg); } 50% { transform: rotate(-29deg); } }
+        @keyframes limpadorDireito { 0%,100% { transform: scaleX(-1) rotate(20deg); } 50% { transform: scaleX(-1) rotate(-29deg); } }
+
         .hidden { display: none !important; }
 
     </style>
@@ -1775,7 +1864,7 @@
     <div id="retroRadioContainer" class="hidden" aria-label="Rádio Retrô">
         <div class="kombi-retro-stage">
             <div class="kombi-retro" id="kombiRetro">
-                <img class="kombi-retro-image" src="./retro-kombi-radio.jpg" alt="Rádio retrô em formato de Kombi">
+                <img class="kombi-retro-image" src="./retro-kombi-noturna-v2.png" alt="Rádio retrô em formato de Kombi">
 
                 <button class="kombi-exit" id="btnSairRetro">← Painel normal</button>
                 <div class="kombi-dial-copy" aria-live="polite">
@@ -1784,21 +1873,24 @@
                 </div>
                 <div class="kombi-amber-light" id="retroLedIndicator" title="Luz do rádio"></div>
 
-                <button class="kombi-arrow kombi-arrow-prev" id="btnRetroAnterior" aria-label="Rádio anterior">◀</button>
-                <button class="kombi-arrow kombi-arrow-next" id="btnRetroProxima" aria-label="Próxima rádio">▶</button>
+                <button class="kombi-arrow kombi-arrow-prev" id="btnRetroAnterior" aria-label="Rádio anterior"></button>
+                <button class="kombi-arrow kombi-arrow-next" id="btnRetroProxima" aria-label="Próxima rádio"></button>
 
                 <div class="kombi-control kombi-tuning" id="knobSintonia" role="button" tabindex="0" aria-label="Sintonia: deslize ou toque para mudar de rádio" title="Deslize para trocar de rádio">
                     <div class="kombi-control-pointer" id="dialSintonia"></div>
-                    <span>SINTONIA</span>
+                    <span class="sr-only">Sintonia</span>
                 </div>
                 <div class="kombi-control kombi-volume" id="knobVolume" role="button" tabindex="0" aria-label="Volume: deslize para ajustar" title="Deslize para ajustar o volume">
                     <div class="kombi-control-pointer" id="dialVolume"></div>
-                    <span id="labelVolumeText">VOL: 0</span>
+                    <span class="sr-only" id="labelVolumeText">VOL: 0</span>
                 </div>
 
                 <div class="kombi-headlight kombi-headlight-left" aria-hidden="true"></div>
                 <div class="kombi-headlight kombi-headlight-right" aria-hidden="true"></div>
-                <div class="kombi-hint">Toque nas setas ou deslize os controles</div>
+                <div class="kombi-turn-signal kombi-turn-signal-left" aria-hidden="true"></div>
+                <div class="kombi-turn-signal kombi-turn-signal-right" aria-hidden="true"></div>
+                <div class="kombi-wiper kombi-wiper-left" aria-hidden="true"></div>
+                <div class="kombi-wiper kombi-wiper-right" aria-hidden="true"></div>
             </div>
         </div>
     </div>
@@ -3330,16 +3422,42 @@
         let anguloSintonia = 0;
         let ultimaRadioNoRetro = '';
         let timerFarolRetro = null;
+        let direcaoTrocaRetro = '';
+        let timerCicloLimpadoresRetro = null;
+        let timerPararLimpadoresRetro = null;
 
-        function piscarFaroisRetro() {
+        function piscarFaroisRetro(direcao = '') {
             if (!kombiRetro) return;
-            kombiRetro.classList.remove('troca-radio');
+            kombiRetro.classList.remove('troca-radio', 'sinal-esquerda', 'sinal-direita');
             void kombiRetro.offsetWidth;
             kombiRetro.classList.add('troca-radio');
+            if (direcao === 'esquerda') kombiRetro.classList.add('sinal-esquerda');
+            if (direcao === 'direita') kombiRetro.classList.add('sinal-direita');
             clearTimeout(timerFarolRetro);
             timerFarolRetro = setTimeout(() => {
-                kombiRetro.classList.remove('troca-radio');
+                kombiRetro.classList.remove('troca-radio', 'sinal-esquerda', 'sinal-direita');
             }, 720);
+        }
+
+        // Após dois minutos parado, os limpadores trabalham por dois minutos.
+        // O ciclo só fica ativo enquanto o ouvinte está no modo Retrô.
+        function pararLimpadoresRetro() {
+            clearTimeout(timerCicloLimpadoresRetro);
+            clearTimeout(timerPararLimpadoresRetro);
+            if (kombiRetro) kombiRetro.classList.remove('limpadores-ativos');
+        }
+
+        function iniciarLimpadoresRetro() {
+            pararLimpadoresRetro();
+            const executarCiclo = () => {
+                if (retroContainer.classList.contains('hidden')) return;
+                kombiRetro.classList.add('limpadores-ativos');
+                timerPararLimpadoresRetro = setTimeout(() => {
+                    kombiRetro.classList.remove('limpadores-ativos');
+                }, 2 * 60 * 1000);
+                timerCicloLimpadoresRetro = setTimeout(executarCiclo, 4 * 60 * 1000);
+            };
+            timerCicloLimpadoresRetro = setTimeout(executarCiclo, 2 * 60 * 1000);
         }
 
         btnAbrirRetro.addEventListener('click', () => {
@@ -3347,6 +3465,7 @@
             aplicarVolumePlayer(volumePlayerAtual);
             anguloVolume = (volumePlayerAtual / 80) * 270 - 135;
             retroContainer.classList.remove('hidden');
+            iniciarLimpadoresRetro();
             atualizarTelaRetrô();
         });
 
@@ -3354,6 +3473,7 @@
             // Ao voltar ao painel normal, mantém exatamente o volume escolhido no Retrô.
             aplicarVolumePlayer(volumePlayerAtual);
             retroContainer.classList.add('hidden');
+            pararLimpadoresRetro();
         });
 
         window.addEventListener('resize', () => {
@@ -3379,7 +3499,8 @@
                 retroTitleDisplay.innerText = "Selecione uma Rádio";
             }
 
-            if (!audioElement.paused && volumePlayerAtual > 0) {
+            // A luz do para-brisa só acende a partir do volume 2.
+            if (volumePlayerAtual >= 2) {
                 retroLed.classList.add('on');
             } else {
                 retroLed.classList.remove('on');
@@ -3398,19 +3519,22 @@
             dialVolume.style.transform = `rotate(${anguloVolume}deg)`;
             dialSintonia.style.transform = `rotate(${anguloSintonia}deg)`;
 
-            if (radioMudou) piscarFaroisRetro();
+            if (radioMudou) piscarFaroisRetro(direcaoTrocaRetro);
             ultimaRadioNoRetro = nomeRadioAtual;
+            direcaoTrocaRetro = '';
         }
 
         // As duas setas do painel da Kombi trocam a rádio sem exigir arraste.
         btnRetroAnterior.addEventListener('click', (e) => {
             e.preventDefault();
+            direcaoTrocaRetro = 'esquerda';
             radioAnterior();
             anguloSintonia -= 45;
             atualizarTelaRetrô();
         });
         btnRetroProxima.addEventListener('click', (e) => {
             e.preventDefault();
+            direcaoTrocaRetro = 'direita';
             proximaRadio();
             anguloSintonia += 45;
             atualizarTelaRetrô();
@@ -3571,9 +3695,11 @@
             
             if (Math.abs(deltaX) > 25) {
                 if (deltaX > 0) {
+                    direcaoTrocaRetro = 'direita';
                     proximaRadio();
                     anguloSintonia += 45;
                 } else {
+                    direcaoTrocaRetro = 'esquerda';
                     radioAnterior();
                     anguloSintonia -= 45;
                 }
@@ -3609,9 +3735,11 @@
 
             if (Math.abs(deltaX) > 25) {
                 if (deltaX > 0) {
+                    direcaoTrocaRetro = 'direita';
                     proximaRadio();
                     anguloSintonia += 45;
                 } else {
+                    direcaoTrocaRetro = 'esquerda';
                     radioAnterior();
                     anguloSintonia -= 45;
                 }
@@ -3636,9 +3764,11 @@
                 const x = e.changedTouches[0].clientX - rect.left;
 
                 if (x < rect.width / 2) {
+                    direcaoTrocaRetro = 'esquerda';
                     radioAnterior();
                     anguloSintonia -= 45;
                 } else {
+                    direcaoTrocaRetro = 'direita';
                     proximaRadio();
                     anguloSintonia += 45;
                 }
