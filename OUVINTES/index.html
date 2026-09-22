@@ -3372,7 +3372,8 @@
                 if (indiceRadioAtual === -1 && radiosAtivasNoCentro.length > 0) {
                     tocarRadioPorObjeto(radiosAtivasNoCentro[0]);
                 } else if (indiceRadioAtual !== -1) {
-                    audioElement.play();
+                    pausaIntencionalDaRadio = false;
+                    audioElement.play().catch(() => agendarRecuperacaoStream('retomada pelo painel'));
                     btnPlayPause.innerText = "⏹️";
                     playerStatusText.innerText = `Ouvindo Rádio: ${rádioAtivaNomeGlobal}`;
                     atualizarEstadoMediaSession('playing');
