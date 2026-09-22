@@ -7,15 +7,34 @@
 
     <script>
         (() => {
-            const usuarioLogado = String(localStorage.getItem('usuarioLogado') || '')
-                .trim()
-                .toLowerCase();
+            const destinoLogin = '../index.html?proximo=OUVINTES%2Findex.html';
 
-            if (!usuarioLogado || usuarioLogado === 'ouvinte_anonimo') {
-                window.location.replace(
-                    '../index.html?proximo=OUVINTES%2Findex.html'
-                );
+            function sessaoDeOuvinteValida() {
+                const usuario = String(localStorage.getItem('usuarioLogado') || '').trim();
+                const email = String(localStorage.getItem('usuarioEmail') || '').trim();
+                const sessaoAtiva = localStorage.getItem('sessaoOuvinteAtiva') === '1';
+
+                return Boolean(usuario && email && sessaoAtiva && usuario.toLowerCase() !== 'ouvinte_anonimo');
             }
+
+            function bloquearAcessoAnonimo() {
+                if (sessaoDeOuvinteValida()) return;
+
+                // Elimina qualquer identificação antiga de acesso anônimo.
+                localStorage.removeItem('usuarioLogado');
+                localStorage.removeItem('usuarioNome');
+                localStorage.removeItem('usuarioKey');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('usuarioEmail');
+                localStorage.removeItem('sessaoOuvinteAtiva');
+
+                window.location.replace(destinoLogin);
+            }
+
+            bloquearAcessoAnonimo();
+
+            // Também roda quando o navegador restaura a tela pelo botão Voltar.
+            window.addEventListener('pageshow', bloquearAcessoAnonimo);
         })();
     </script>
     <style>
@@ -2368,6 +2387,8 @@
             localStorage.removeItem('usuarioNome');
             localStorage.removeItem('usuarioKey');
             localStorage.removeItem('userId');
+            localStorage.removeItem('usuarioEmail');
+            localStorage.removeItem('sessaoOuvinteAtiva');
             window.location.href = "../index.html";
         });
 
