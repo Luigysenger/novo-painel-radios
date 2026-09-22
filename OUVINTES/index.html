@@ -1617,9 +1617,9 @@
         }
         .kombi-exit {
             position: absolute;
-            top: 4.5%;
-            right: 6%;
-            z-index: 3;
+            top: max(14px, env(safe-area-inset-top));
+            right: max(14px, env(safe-area-inset-right));
+            z-index: 6;
             border: 1px solid rgba(255,255,255,.78);
             border-radius: 999px;
             padding: .7em 1em;
@@ -1775,7 +1775,7 @@
         }
         @media (max-width: 600px) {
             .kombi-retro { width: min(100vw, 100dvh); height: min(100vw, 100dvh); }
-            .kombi-exit { top: 3%; right: 4%; padding: .58em .75em; }
+            .kombi-exit { padding: .58em .75em; }
             .kombi-hint { bottom: 2.8%; }
         }
 
@@ -1933,11 +1933,10 @@
 
     <!-- MODO RÁDIO RETRÔ TELA CHEIA -->
     <div id="retroRadioContainer" class="hidden" aria-label="Rádio Retrô">
+        <button class="kombi-exit" id="btnSairRetro">← Painel normal</button>
         <div class="kombi-retro-stage">
             <div class="kombi-retro" id="kombiRetro">
                 <img class="kombi-retro-image" src="./retro-kombi-interativa-v3.png" alt="Rádio retrô em formato de Kombi">
-
-                <button class="kombi-exit" id="btnSairRetro">← Painel normal</button>
                 <div class="kombi-dial-copy" aria-live="polite">
                     <span id="retroFreqDisplay">FM --.-</span>
                 </div>
@@ -2431,6 +2430,8 @@
                 ref(db, `ouvintes_preferencias/${chaveFirebaseUser}`),
                 {
                     ultimaRadioId: radio.id,
+                    radioAtualId: radio.id,
+                    radioAtualNome: radio.nome || 'Rádio',
                     deveRetomarUltimaRadio: true
                 }
             ).catch(() => {});
