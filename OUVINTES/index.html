@@ -2393,6 +2393,7 @@
         let timerRecuperacaoStream = null;
         let tentativasRecuperacaoStream = 0;
         let recuperacaoEmAndamento = false;
+        let pausaIntencionalDaRadio = false;
 
         function obterRadioAtiva() {
             return todasRadiosGlobal.find(radio => radio.id === ultimaRadioIdSalva) || null;
@@ -2444,7 +2445,7 @@
         }
 
         function agendarRecuperacaoStream(motivo) {
-            if (!deveRetomarUltimaRadio || recuperacaoEmAndamento || !obterRadioAtiva()) return;
+            if (!deveRetomarUltimaRadio || pausaIntencionalDaRadio || recuperacaoEmAndamento || !obterRadioAtiva()) return;
 
             cancelarRecuperacaoStream();
             const espera = Math.min(12000, 1800 + tentativasRecuperacaoStream * 1800);
@@ -2491,7 +2492,7 @@
         });
 
         document.addEventListener('visibilitychange', () => {
-            if (!document.hidden && deveRetomarUltimaRadio && audioElement.paused) {
+            if (!document.hidden && deveRetomarUltimaRadio && !pausaIntencionalDaRadio && audioElement.paused) {
                 const radio = obterRadioAtiva();
                 if (radio) iniciarStreamEstavel(radio, true);
             }
@@ -2823,6 +2824,7 @@
                         return;
                     }
 
+                    pausaIntencionalDaRadio = false;
                     await audioElement.play();
                     btnPlayPause.innerText = "⏹️";
                     playerStatusText.innerText =
@@ -2843,6 +2845,8 @@
             });
 
             registrar('pause', () => {
+                pausaIntencionalDaRadio = true;
+                cancelarRecuperacaoStream();
                 audioElement.pause();
                 btnPlayPause.innerText = "▶️";
                 playerStatusText.innerText =
@@ -2872,6 +2876,8 @@
             });
 
             registrar('stop', () => {
+                pausaIntencionalDaRadio = true;
+                cancelarRecuperacaoStream();
                 audioElement.pause();
                 btnPlayPause.innerText = "▶️";
                 playerStatusText.innerText =
@@ -3308,6 +3314,7 @@
             const radiosAtivasNoCentro = radiosFavoritasIds.map(id => todasRadiosGlobal.find(r => r.id === id)).filter(Boolean);
             indiceRadioAtual = radiosAtivasNoCentro.findIndex(r => r.id === radio.id);
             rádioAtivaNomeGlobal = radio.nome;
+            pausaIntencionalDaRadio = false;
             salvarUltimaRadio(radio);
 
             document.querySelectorAll('.radio-card-user').forEach(c => {
@@ -3371,6 +3378,8 @@
                     atualizarEstadoMediaSession('playing');
                 }
             } else {
+                pausaIntencionalDaRadio = true;
+                cancelarRecuperacaoStream();
                 audioElement.pause();
                 btnPlayPause.innerText = "▶️";
                 playerStatusText.innerText = "Rádio pausada";
