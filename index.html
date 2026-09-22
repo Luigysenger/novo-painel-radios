@@ -260,6 +260,9 @@
                         if (dados.email === email && dados.senha === senha) {
                             usuarioEncontrado = true;
                             localStorage.setItem('usuarioLogado', dados.apelido);
+                            localStorage.setItem('usuarioEmail', dados.email);
+                            localStorage.setItem('usuarioKey', childSnapshot.key);
+                            localStorage.setItem('sessaoOuvinteAtiva', '1');
                         }
                     });
 
