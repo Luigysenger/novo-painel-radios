@@ -2411,6 +2411,7 @@
         let ultimaRadioIdSalva = localStorage.getItem(chaveUltimaRadioLocal) || '';
         let deveRetomarUltimaRadio = Boolean(ultimaRadioIdSalva);
         let timerRecuperacaoStream = null;
+        let timerVigilanciaCarPlay = null;
         let tentativasRecuperacaoStream = 0;
         let recuperacaoEmAndamento = false;
         let pausaIntencionalDaRadio = false;
@@ -2440,6 +2441,25 @@
         function cancelarRecuperacaoStream() {
             clearTimeout(timerRecuperacaoStream);
             timerRecuperacaoStream = null;
+        }
+
+        // O Safari do CarPlay pode suspender uma transmissão ao vivo sem
+        // disparar "error". Esta vigília só retoma quando a rádio não foi
+        // pausada pelo próprio ouvinte.
+        function iniciarVigilanciaCarPlay() {
+            clearInterval(timerVigilanciaCarPlay);
+            timerVigilanciaCarPlay = setInterval(() => {
+                if (!deveRetomarUltimaRadio || pausaIntencionalDaRadio) return;
+
+                const radio = obterRadioAtiva();
+                if (!radio) return;
+
+                if (audioElement.paused || audioElement.error || audioElement.readyState === 0) {
+                    agendarRecuperacaoStream('sessão de áudio do carro suspensa');
+                }
+
+                reforcarControlesCarPlay();
+            }, 15000);
         }
 
         async function iniciarStreamEstavel(radio, reconectando = false) {
@@ -2492,6 +2512,8 @@
             tentativasRecuperacaoStream = 0;
             recuperacaoEmAndamento = false;
             atualizarEstadoMediaSession('playing');
+            reforcarControlesCarPlay();
+            iniciarVigilanciaCarPlay();
         });
 
         audioElement.addEventListener('stalled', () => {
@@ -2517,6 +2539,13 @@
             if (!document.hidden && deveRetomarUltimaRadio && !pausaIntencionalDaRadio && audioElement.paused) {
                 const radio = obterRadioAtiva();
                 if (radio) iniciarStreamEstavel(radio, true);
+            }
+        });
+
+        window.addEventListener('pageshow', () => {
+            reforcarControlesCarPlay();
+            if (deveRetomarUltimaRadio && !pausaIntencionalDaRadio) {
+                iniciarVigilanciaCarPlay();
             }
         });
 
@@ -2897,6 +2926,17 @@
                 radioAnterior();
             });
 
+            // Algumas centrais CarPlay substituem os ícones de faixa pelos
+            // botões "10 s". Nelas, estes mesmos botões continuam trocando
+            // de rádio, em vez de avançar uma transmissão ao vivo.
+            registrar('seekforward', () => {
+                proximaRadio();
+            });
+
+            registrar('seekbackward', () => {
+                radioAnterior();
+            });
+
             registrar('stop', () => {
                 pausaIntencionalDaRadio = true;
                 cancelarRecuperacaoStream();
@@ -2911,6 +2951,14 @@
 
                 atualizarTelaRetrô();
             });
+        }
+
+        function reforcarControlesCarPlay() {
+            registrarControlesMediaSession();
+
+            if (!('mediaSession' in navigator) || pausaIntencionalDaRadio) return;
+
+            atualizarEstadoMediaSession(audioElement.paused ? 'paused' : 'playing');
         }
 
         registrarControlesMediaSession();
