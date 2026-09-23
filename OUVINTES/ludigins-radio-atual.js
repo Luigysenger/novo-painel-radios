@@ -115,8 +115,12 @@ function atualizarRadiosNoPainel() {
         .slice(0, 12);
 
     [...feed.querySelectorAll('.feed-item')].forEach((cartao, indice) => {
-        const item = ultimos[indice];
-        if (!item) return;
+        // O feed pode ser redesenhado antes do histórico terminar de carregar.
+        // Neste caso, usa o nome visível no próprio cartão.
+        const nomeVisivel = String(
+            cartao.querySelector('strong')?.textContent || ''
+        ).trim();
+        const item = ultimos[indice] || { usuarioNome: nomeVisivel };
 
         let linha = cartao.querySelector('.feed-radio-atual');
         if (!linha) {
