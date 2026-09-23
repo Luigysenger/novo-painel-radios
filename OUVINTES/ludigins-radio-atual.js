@@ -525,7 +525,7 @@ const CUSTO_ABASTECER_MOTO = 3;
 const CUSTO_LOTE_LANCHES = 15;
 const TAMANHO_LOTE_LANCHES = 10;
 
-estilo.textContent += \`
+estilo.textContent += `
     .logistica-card {
         margin: 14px 0;
         padding: 16px;
@@ -553,7 +553,7 @@ estilo.textContent += \`
     .carreta-combustivel-mapa .r1 { left:4px; } .carreta-combustivel-mapa .r2 { right:3px; }
     .caminhao-bombeiro-mapa { transform:translate(-50%,-50%) rotate(0deg)!important; }
     #pedidoLancheJogo { margin:9px 0; padding:11px; border:2px solid #f59e0b; border-radius:14px; background:rgba(120,53,15,.24); color:#fef3c7; font-weight:800; }
-\`;
+`;
 
 function meuIdLogistica() {
     return String(localStorage.getItem('usuarioKey') || localStorage.getItem('userId') || '').trim();
