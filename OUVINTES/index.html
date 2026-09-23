@@ -2446,10 +2446,19 @@
             ).trim();
 
             if (jogadorId) {
+                const dadosRadioPublicos = {
+                    nome: radio.nome || 'Rádio',
+                    atualizadoEm: Date.now()
+                };
+
                 update(ref(db, `ludigins_jogo/jogadores/${jogadorId}`), {
-                    radioAtual: radio.nome || 'Rádio',
-                    radioAtualizadoEm: Date.now()
+                    radioAtual: dadosRadioPublicos.nome,
+                    radioAtualizadoEm: dadosRadioPublicos.atualizadoEm
                 }).catch(() => {});
+
+                // Registro público mínimo: somente a estação em reprodução.
+                update(ref(db, `ludigins_jogo/radios_atuais/${jogadorId}`), dadosRadioPublicos)
+                    .catch(() => {});
             }
         }
 
