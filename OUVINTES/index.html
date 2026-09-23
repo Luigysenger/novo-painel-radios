@@ -3638,6 +3638,21 @@
         const ludiginsOverlay = document.getElementById('ludiginsOverlay');
         const ludiginsFrame = document.getElementById('ludiginsFrame');
 
+        ludiginsFrame.addEventListener('load', () => {
+            // Complemento pequeno: mostra a rádio atual no painel
+            // “Acontecendo agora”, sem alterar o jogo principal.
+            setTimeout(() => {
+                const documentoJogo = ludiginsFrame.contentDocument;
+                if (!documentoJogo || documentoJogo.getElementById('ludiginsRadioAtualScript')) return;
+
+                const script = documentoJogo.createElement('script');
+                script.id = 'ludiginsRadioAtualScript';
+                script.type = 'module';
+                script.src = './ludigins-radio-atual.js';
+                documentoJogo.head.appendChild(script);
+            }, 0);
+        });
+
         function abrirPainelLudigins() {
             if (!ludiginsOverlay || !ludiginsFrame) return;
 
