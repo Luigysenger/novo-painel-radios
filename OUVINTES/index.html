@@ -2436,6 +2436,21 @@
                     deveRetomarUltimaRadio: true
                 }
             ).catch(() => {});
+
+            // O Ludigins usa este mesmo identificador de ouvinte para exibir
+            // a estação atual no painel "Acontecendo agora".
+            const jogadorId = String(
+                localStorage.getItem('usuarioKey') ||
+                localStorage.getItem('userId') ||
+                chaveFirebaseUser || ''
+            ).trim();
+
+            if (jogadorId) {
+                update(ref(db, `ludigins_jogo/jogadores/${jogadorId}`), {
+                    radioAtual: radio.nome || 'Rádio',
+                    radioAtualizadoEm: Date.now()
+                }).catch(() => {});
+            }
         }
 
         function cancelarRecuperacaoStream() {
