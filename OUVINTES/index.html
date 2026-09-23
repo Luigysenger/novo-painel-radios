@@ -3639,6 +3639,20 @@
         const ludiginsFrame = document.getElementById('ludiginsFrame');
 
         ludiginsFrame.addEventListener('load', () => {
+            // Reenvia a estação que já estava tocando antes da abertura do jogo.
+            const jogadorId = String(
+                localStorage.getItem('usuarioKey') ||
+                localStorage.getItem('userId') ||
+                chaveFirebaseUser || ''
+            ).trim();
+
+            if (jogadorId && rádioAtivaNomeGlobal) {
+                update(ref(db, `ludigins_jogo/jogadores/${jogadorId}`), {
+                    radioAtual: rádioAtivaNomeGlobal,
+                    radioAtualizadoEm: Date.now()
+                }).catch(() => {});
+            }
+
             // Complemento pequeno: mostra a rádio atual no painel
             // “Acontecendo agora”, sem alterar o jogo principal.
             setTimeout(() => {
