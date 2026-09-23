@@ -622,6 +622,7 @@ function renderizarLogistica() {
             htmlFatias(fatiasPosto()) +
             '<p>Uma fatia atende 10 abastecimentos.</p>' +
             (ultimaFatia ? '<div class="logistica-alerta">Última fatia: ' + Math.max(0, 5 - usos) + ' abastecimento(s) restantes antes da compra obrigatória.</div>' : '') +
+            (ultimaFatia && Number(postoNegocio.caixa || 0) < CUSTO_CARGA_CARRETA ? '<div class="logistica-alerta">⚠ Atenção: a caixa do posto não tem 120 🪙 para comprar a carga. Reponha o saldo; sem a compra, o posto poderá voltar ao proprietário anterior.</div>' : '') +
             '<p>Caixa do posto: <strong>' + inteiro(postoNegocio.caixa, 0, 999999).toLocaleString('pt-BR') + ' 🪙</strong></p>' +
             '<p>Preço atual: <strong>' + inteiro(postoNegocio.precoCombustivel, 6, 20) + ' Ludigins</strong></p>' +
             '<button class="btn-logistica" data-logistica-acao="pedir-carga">🚛 Pedir carga completa — 120 🪙</button>' +
