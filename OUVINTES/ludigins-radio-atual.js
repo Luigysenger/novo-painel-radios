@@ -216,6 +216,53 @@ function atualizarRadiosNoRanking() {
     });
 }
 
+function atualizarAtalhoFinalizarNoMac(botao, passageirosEntregues) {
+    const idAtalho = 'btnFinalizarMac';
+    const existente = document.getElementById(idAtalho);
+
+    if (!passageirosEntregues) {
+        existente?.remove();
+        botao.style.removeProperty('display');
+        return;
+    }
+
+    if (existente) return;
+
+    // Botão visível apenas após a confirmação oficial de entrega.
+    // Ele chama a mesma finalização já registrada no botão original.
+    const atalho = document.createElement('button');
+    atalho.type = 'button';
+    atalho.id = idAtalho;
+    atalho.className = botao.className;
+    atalho.textContent = botao.textContent || 'Finalizar corrida';
+    atalho.setAttribute('aria-label', 'Finalizar corrida');
+
+    atalho.addEventListener('click', () => {
+        atalho.disabled = true;
+        botao.disabled = false;
+        botao.removeAttribute('disabled');
+        botao.dataset.finalizacaoEmAndamento = '1';
+        botao.dispatchEvent(new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window
+        }));
+
+        setTimeout(() => {
+            const entregaAindaVisivel =
+                /passageiros entregues|já pode finalizar/i.test(
+                    document.getElementById('corridaTimer')?.textContent || ''
+                );
+            if (atalho.isConnected && entregaAindaVisivel) {
+                atalho.disabled = false;
+            }
+        }, 4000);
+    });
+
+    botao.insertAdjacentElement('beforebegin', atalho);
+    botao.style.display = 'none';
+}
+
 function garantirFinalizacaoDaCorrida() {
     const botao = document.getElementById('btnFinalizar');
     const aviso = document.getElementById('corridaTimer');
@@ -225,10 +272,13 @@ function garantirFinalizacaoDaCorrida() {
         /passageiros entregues|já pode finalizar/i.test(aviso.textContent || '');
 
     if (!passageirosEntregues) {
+        atualizarAtalhoFinalizarNoMac(botao, false);
         delete botao.dataset.finalizacaoEmAndamento;
         chegadaAoDestinoConfirmada = false;
         return;
     }
+
+    atualizarAtalhoFinalizarNoMac(botao, true);
 
     // No Safari/macOS, uma atualização antiga pode voltar a desativar
     // o botão após a própria tela confirmar a entrega. Registra somente
