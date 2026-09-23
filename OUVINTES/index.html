@@ -3662,7 +3662,7 @@
                 const script = documentoJogo.createElement('script');
                 script.id = 'ludiginsRadioAtualScript';
                 script.type = 'module';
-                script.src = './ludigins-radio-atual.js';
+                script.src = './ludigins-radio-atual.js?v=' + Date.now();
                 documentoJogo.head.appendChild(script);
             }, 0);
         });
