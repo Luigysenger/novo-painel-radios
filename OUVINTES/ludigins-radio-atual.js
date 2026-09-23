@@ -34,6 +34,7 @@ document.head.appendChild(estilo);
 
 let jogadores = {};
 let perfis = {};
+let radiosAtuais = {};
 let eventos = [];
 let ultimaRadioEnviada = '';
 
@@ -69,9 +70,15 @@ function perfilDoJogador(id, jogador) {
 }
 
 function radioDoItem(item) {
+    const idEvento = String(item?.usuarioId || '');
     const jogador = jogadorDoItem(item);
-    const radioDoFirebase = String(jogador.radioAtual || '').trim();
-    if (radioDoFirebase) return radioDoFirebase;
+    const idJogador = Object.entries(jogadores).find(([, valor]) => valor === jogador)?.[0] || '';
+    const registroPublico = radiosAtuais[idEvento] || radiosAtuais[idJogador] || {};
+    const radioPublica = String(registroPublico.nome || '').trim();
+    if (radioPublica) return radioPublica;
+
+    const radioDoMapa = String(jogador.radioAtual || '').trim();
+    if (radioDoMapa) return radioDoMapa;
 
     const nomeAtual = normalizar(
         localStorage.getItem('usuarioNome') || localStorage.getItem('usuarioLogado')
@@ -157,6 +164,11 @@ onValue(ref(db, 'ludigins_jogo/jogadores'), snapshot => {
     jogadores = snapshot.exists() ? (snapshot.val() || {}) : {};
     atualizarRadiosNoPainel();
     atualizarCoresDosCarros();
+});
+
+onValue(ref(db, 'ludigins_jogo/radios_atuais'), snapshot => {
+    radiosAtuais = snapshot.exists() ? (snapshot.val() || {}) : {};
+    atualizarRadiosNoPainel();
 });
 
 onValue(ref(db, 'ludigins_usuarios'), snapshot => {
