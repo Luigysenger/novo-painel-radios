@@ -822,3 +822,11 @@ async function garantirBaseLogistica() {
 }
 onValue(ref(db, 'ludigins_jogo/logistica'), snapshot => { logistica = snapshot.val() || {}; renderizarLogistica(); });
 setTimeout(() => garantirBaseLogistica().catch(() => {}), 1200);
+
+
+// Mantém os controles e os pedidos sincronizados depois dos redesenhos do jogo.
+setInterval(() => {
+    atualizarPedidoDeLanche();
+    renderizarPedidoLanche();
+    renderizarLogistica();
+}, 750);
