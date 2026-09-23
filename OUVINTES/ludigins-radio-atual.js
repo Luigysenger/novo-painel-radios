@@ -253,6 +253,32 @@ function garantirFinalizacaoDaCorrida() {
     if (botao.dataset.finalizacaoEmAndamento !== '1') {
         botao.disabled = false;
     }
+
+    // Observa a alteração que o Safari faz no atributo "disabled" e
+    // restaura o botão apenas enquanto a confirmação oficial de entrega
+    // continuar na tela.
+    if (!botao.dataset.observandoFinalizacao) {
+        const observador = new MutationObserver(() => {
+            const entregaConfirmada =
+                /passageiros entregues|já pode finalizar/i.test(
+                    aviso.textContent || ''
+                );
+
+            if (
+                entregaConfirmada &&
+                botao.disabled &&
+                botao.dataset.finalizacaoEmAndamento !== '1'
+            ) {
+                botao.disabled = false;
+            }
+        });
+
+        observador.observe(botao, {
+            attributes: true,
+            attributeFilter: ['disabled']
+        });
+        botao.dataset.observandoFinalizacao = '1';
+    }
 }
 
 document.addEventListener('click', evento => {
