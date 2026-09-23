@@ -56,6 +56,7 @@ let perfis = {};
 let radiosAtuais = {};
 let eventos = [];
 let ultimaRadioEnviada = '';
+let ultimaSituacaoVisualEnviada = '';
 
 const normalizar = valor =>
     String(valor || '').trim().toLocaleLowerCase('pt-BR');
@@ -218,10 +219,14 @@ function atualizarCoresDosCarros() {
         const id = String(carro.dataset.jogadorId || '');
         const jogador = jogadores[id] || {};
         const perfil = perfilDoJogador(id, jogador);
-        const combustivel = Number(perfil.combustivel);
-        const aquecimento = Number(perfil.aquecimentoCorridas || 0);
+        const combustivel = Number(
+            perfil.combustivel ?? jogador.combustivel
+        );
+        const aquecimento = Number(
+            perfil.aquecimentoCorridas ?? jogador.aquecimentoCorridas ?? 0
+        );
         const temRadio = Boolean(
-            String(jogador.radioAtual || '').trim() ||
+            String(radiosAtuais[id]?.nome || jogador.radioAtual || '').trim() ||
             (normalizar(jogador.nome) === nomeDoOuvinteAtual() &&
                 radioDoPainelPrincipal())
         );
@@ -235,6 +240,40 @@ function atualizarCoresDosCarros() {
         } else if (temRadio) {
             carro.classList.add('ouvindo-radio');
         }
+    });
+}
+
+function sincronizarSituacaoVisualDoCarro() {
+    const usuarioId = String(
+        localStorage.getItem('usuarioKey') ||
+        localStorage.getItem('userId') || ''
+    ).trim();
+    if (!usuarioId) return;
+
+    const meuPerfil = perfis[usuarioId] || Object.values(perfis).find(perfil =>
+        normalizar(perfil?.nome) === nomeDoOuvinteAtual()
+    ) || {};
+    const combustivel = Number(meuPerfil.combustivel);
+    const aquecimentoCorridas = Number(meuPerfil.aquecimentoCorridas || 0);
+
+    if (!Number.isFinite(combustivel)) return;
+
+    const situacao = [
+        Math.max(0, Math.min(100, combustivel)),
+        Math.max(0, aquecimentoCorridas)
+    ].join('|');
+
+    if (situacao === ultimaSituacaoVisualEnviada) return;
+    ultimaSituacaoVisualEnviada = situacao;
+
+    // Publica somente os indicadores necessários para que todos vejam
+    // os alertas do carro no mapa compartilhado.
+    update(ref(db, `ludigins_jogo/jogadores/${usuarioId}`), {
+        combustivel: Math.max(0, Math.min(100, combustivel)),
+        aquecimentoCorridas: Math.max(0, aquecimentoCorridas),
+        situacaoVisualAtualizadaEm: Date.now()
+    }).catch(() => {
+        ultimaSituacaoVisualEnviada = '';
     });
 }
 
@@ -282,12 +321,14 @@ onValue(ref(db, 'ludigins_jogo/radios_atuais'), snapshot => {
 
 onValue(ref(db, 'ludigins_usuarios'), snapshot => {
     perfis = snapshot.exists() ? (snapshot.val() || {}) : {};
+    sincronizarSituacaoVisualDoCarro();
     atualizarCoresDosCarros();
 });
 
 // Reaplica depois de qualquer redesenho do jogo, inclusive no Safari/iPhone.
 setInterval(() => {
     sincronizarRadioDoPainelPrincipal();
+    sincronizarSituacaoVisualDoCarro();
     atualizarRadiosNoPainel();
     atualizarRadiosNoRanking();
     atualizarCoresDosCarros();
