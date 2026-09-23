@@ -185,6 +185,32 @@ function atualizarRadiosNoRanking() {
     });
 }
 
+function garantirFinalizacaoDaCorrida() {
+    const botao = document.getElementById('btnFinalizar');
+    const aviso = document.getElementById('corridaTimer');
+    if (!botao || !aviso) return;
+
+    const passageirosEntregues =
+        /passageiros entregues|já pode finalizar/i.test(aviso.textContent || '');
+
+    if (!passageirosEntregues) {
+        delete botao.dataset.finalizacaoEmAndamento;
+        return;
+    }
+
+    // Safari/macOS pode redesenhar o cartão depois da chegada e recolocar
+    // o botão como desativado. A mensagem de entrega é a confirmação oficial
+    // da própria corrida, então libera somente essa finalização.
+    if (botao.dataset.finalizacaoEmAndamento !== '1') {
+        botao.disabled = false;
+    }
+}
+
+document.addEventListener('click', evento => {
+    const botao = evento.target?.closest?.('#btnFinalizar');
+    if (botao) botao.dataset.finalizacaoEmAndamento = '1';
+}, true);
+
 function atualizarCoresDosCarros() {
     if (!mapa) return;
 
@@ -265,4 +291,5 @@ setInterval(() => {
     atualizarRadiosNoPainel();
     atualizarRadiosNoRanking();
     atualizarCoresDosCarros();
+    garantirFinalizacaoDaCorrida();
 }, 500);
