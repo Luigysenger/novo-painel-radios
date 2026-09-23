@@ -830,3 +830,57 @@ setInterval(() => {
     renderizarPedidoLanche();
     renderizarLogistica();
 }, 750);
+
+
+// Mantém o histórico do posto para a devolução automática ao antigo proprietário.
+async function guardarHistoricoDoPosto() {
+    await runTransaction(ref(db, 'ludigins_jogo/negocios/posto_combustivel'), atual => {
+        if (!atual?.donoId || atual.donoRegistrado === atual.donoId) return atual;
+        return {
+            ...atual,
+            donoAnteriorId: atual.donoRegistrado || 'proprietario_luigy',
+            donoAnteriorNome: atual.donoRegistrado ? (atual.donoRegistradoNome || 'Luigy') : 'Luigy',
+            donoRegistrado: atual.donoId,
+            donoRegistradoNome: atual.donoNome || 'Luigy',
+            atualizadoEm: Date.now()
+        };
+    });
+}
+async function devolverPostoPorFaltaDeCaixa() {
+    const posto = negocios.posto_combustivel || {};
+    if (!posto.donoId || Number(posto.caixa || 0) >= CUSTO_CARGA_CARRETA) return;
+    const antigoId = posto.donoAnteriorId || 'proprietario_luigy';
+    const antigoNome = posto.donoAnteriorNome || 'Luigy';
+    await update(ref(db, 'ludigins_jogo/negocios/posto_combustivel'), {
+        donoId: antigoId, donoNome: antigoNome, devolvidoPorFaltaDeCaixaEm: Date.now(), atualizadoEm: Date.now()
+    });
+    avisoLogistica('O posto ficou sem caixa para repor combustível e voltou ao proprietário anterior.');
+}
+function adicionarOfertaCarreta() {
+    const loja = document.getElementById('lojaNegocios');
+    if (!loja || loja.querySelector('[data-negocio-logistica="carreta_combustivel"]')) return;
+    const carreta = negocios.carreta_combustivel || {};
+    if (souDonoDoNegocio(carreta)) return;
+    const item = document.createElement('div');
+    item.className = 'negocio-item';
+    item.dataset.negocioLogistica = 'carreta_combustivel';
+    item.innerHTML = '<strong>🚛 Carreta de combustível</strong><em>Entrega a carga que repõe o estoque dos postos.</em><button class="btn-comprar-negocio btn-proposta-logistica" type="button">Fazer proposta</button>';
+    loja.appendChild(item);
+}
+document.addEventListener('click', evento => {
+    const botao = evento.target?.closest?.('.btn-proposta-logistica');
+    if (!botao) return;
+    const ponte = document.querySelector('.btn-proposta[data-negocio="posto_combustivel"]');
+    if (!ponte) return;
+    const negocioAntigo = ponte.dataset.negocio;
+    const nomeAntigo = ponte.dataset.nome;
+    ponte.dataset.negocio = 'carreta_combustivel';
+    ponte.dataset.nome = 'Carreta de combustível';
+    ponte.click();
+    ponte.dataset.negocio = negocioAntigo;
+    ponte.dataset.nome = nomeAntigo;
+});
+setInterval(() => {
+    guardarHistoricoDoPosto().catch(() => {});
+    adicionarOfertaCarreta();
+}, 1400);
