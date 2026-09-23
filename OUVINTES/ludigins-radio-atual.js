@@ -732,8 +732,9 @@ document.addEventListener('change', evento => {
 function renderizarCarretaNoMapa() {
     if (!mapa) return;
     mapa.querySelectorAll('.carreta-combustivel-mapa').forEach(el => el.remove());
-    const estado = logistica.carretaMapa || {};
-    if (!estado.fase) return;
+    // A carreta fica sempre estacionada na rua definida. O estado de entrega
+    // apenas a move temporariamente até o posto.
+    const estado = logistica.carretaMapa || { fase: 'disponivel' };
     const el = document.createElement('div');
     el.className = 'carreta-combustivel-mapa';
     el.style.left = '32%';
@@ -817,7 +818,14 @@ document.addEventListener('click', evento => {
     if (evento.target?.closest?.('[data-logistica-acao="pedir-lanche"]')) pedirLanche().catch(() => avisoLogistica('Não foi possível concluir o pedido.'));
 });
 async function garantirBaseLogistica() {
-    await runTransaction(ref(db, 'ludigins_jogo/logistica'), atual => atual || {posto:{fatias:10,usosNaUltimaFatia:0},carretaMapa:{fase:'disponivel'},criadoEm:Date.now()});
+    // Completa apenas os dados que ainda não existiam em instalações antigas,
+    // sem alterar estoque, caixa, proprietário ou qualquer regra já em uso.
+    await runTransaction(ref(db, 'ludigins_jogo/logistica'), atual => ({
+        ...(atual || {}),
+        posto: atual?.posto || { fatias: 10, usosNaUltimaFatia: 0 },
+        carretaMapa: atual?.carretaMapa || { fase: 'disponivel', atualizadoEm: Date.now() },
+        criadoEm: atual?.criadoEm || Date.now()
+    }));
     await runTransaction(ref(db, 'ludigins_jogo/negocios/carreta_combustivel'), atual => atual || {
         donoId:'proprietario_luigy',donoNome:'Luigy',nome:'Carreta de combustível',caixa:0,ganhosHoje:0,entregasHoje:0,criadoEm:Date.now()
     });
