@@ -407,9 +407,12 @@ function atualizarGanhosDosServicos() {
         ancora.insertAdjacentElement('afterend', painel);
     }
 
-    painel.innerHTML = servicos.map(([, nome, campo]) =>
-        `<div>${nome}: ${Number(perfil[campo] || 0).toLocaleString('pt-BR')} 🪙</div>`
-    ).join('');
+    painel.innerHTML = servicos.map(([id, nome, campo]) => {
+        const ganhos = id === 'caminhao_bombeiro'
+            ? Number(perfil[campo] ?? perfil.ganhosBombeiroTotal ?? 0)
+            : Number(perfil[campo] || 0);
+        return `<div>${nome}: ${ganhos.toLocaleString('pt-BR')} 🪙</div>`;
+    }).join('');
 }
 
 function sincronizarSituacaoVisualDoCarro() {
