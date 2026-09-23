@@ -216,6 +216,35 @@ function atualizarRadiosNoRanking() {
     });
 }
 
+function limparCorridaCorrompida() {
+    const meuNome = nomeDoOuvinteAtual();
+    const entrada = Object.entries(perfis).find(([id, perfil]) => {
+        const corrida = perfil?.corridaAtual;
+        return corrida &&
+            !String(corrida.id || '').trim() &&
+            normalizar(perfil?.nome) === meuNome &&
+            id;
+    });
+
+    if (!entrada) return;
+
+    const [usuarioId] = entrada;
+
+    // Uma corrida sem identificador não possui registro ativo, valor ou rota
+    // para finalizar. Limpa somente esse registro inválido, preservando todo
+    // saldo, contadores, histórico e qualquer corrida real.
+    update(ref(db, `ludigins_usuarios/${usuarioId}`), {
+        corridaAtual: null,
+        atualizadoEm: Date.now()
+    }).then(() => {
+        update(ref(db, `ludigins_jogo/jogadores/${usuarioId}`), {
+            movimento: null,
+            status: 'online',
+            atualizadoEm: Date.now()
+        }).catch(() => {});
+    }).catch(() => {});
+}
+
 function atualizarAtalhoFinalizarNoMac(botao, passageirosEntregues) {
     const idAtalho = 'btnFinalizarMac';
     const existente = document.getElementById(idAtalho);
@@ -279,26 +308,6 @@ function garantirFinalizacaoDaCorrida() {
     }
 
     atualizarAtalhoFinalizarNoMac(botao, true);
-
-    // No Safari/macOS, uma atualização antiga pode voltar a desativar
-    // o botão após a própria tela confirmar a entrega. Registra somente
-    // essa corrida atual como chegada ao destino, mantendo o fluxo normal.
-    if (!chegadaAoDestinoConfirmada) {
-        const usuarioId = String(
-            localStorage.getItem('usuarioKey') ||
-            localStorage.getItem('userId') || ''
-        ).trim();
-
-        if (usuarioId) {
-            chegadaAoDestinoConfirmada = true;
-            update(ref(db, `ludigins_usuarios/${usuarioId}/corridaAtual`), {
-                fase: 'chegou_destino',
-                chegouDestinoEm: Date.now()
-            }).catch(() => {
-                chegadaAoDestinoConfirmada = false;
-            });
-        }
-    }
 
     if (botao.dataset.finalizacaoEmAndamento !== '1') {
         botao.disabled = false;
@@ -445,6 +454,7 @@ onValue(ref(db, 'ludigins_jogo/radios_atuais'), snapshot => {
 
 onValue(ref(db, 'ludigins_usuarios'), snapshot => {
     perfis = snapshot.exists() ? (snapshot.val() || {}) : {};
+    limparCorridaCorrompida();
     sincronizarSituacaoVisualDoCarro();
     atualizarCoresDosCarros();
 });
@@ -452,6 +462,7 @@ onValue(ref(db, 'ludigins_usuarios'), snapshot => {
 // Reaplica depois de qualquer redesenho do jogo, inclusive no Safari/iPhone.
 setInterval(() => {
     sincronizarRadioDoPainelPrincipal();
+    limparCorridaCorrompida();
     sincronizarSituacaoVisualDoCarro();
     atualizarRadiosNoPainel();
     atualizarRadiosNoRanking();
