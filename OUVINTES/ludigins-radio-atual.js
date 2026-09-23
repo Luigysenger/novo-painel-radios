@@ -61,6 +61,7 @@ let radiosAtuais = {};
 let eventos = [];
 let ultimaRadioEnviada = '';
 let ultimaSituacaoVisualEnviada = '';
+let chegadaAoDestinoConfirmada = false;
 
 const normalizar = valor =>
     String(valor || '').trim().toLocaleLowerCase('pt-BR');
@@ -225,12 +226,30 @@ function garantirFinalizacaoDaCorrida() {
 
     if (!passageirosEntregues) {
         delete botao.dataset.finalizacaoEmAndamento;
+        chegadaAoDestinoConfirmada = false;
         return;
     }
 
-    // Safari/macOS pode redesenhar o cartão depois da chegada e recolocar
-    // o botão como desativado. A mensagem de entrega é a confirmação oficial
-    // da própria corrida, então libera somente essa finalização.
+    // No Safari/macOS, uma atualização antiga pode voltar a desativar
+    // o botão após a própria tela confirmar a entrega. Registra somente
+    // essa corrida atual como chegada ao destino, mantendo o fluxo normal.
+    if (!chegadaAoDestinoConfirmada) {
+        const usuarioId = String(
+            localStorage.getItem('usuarioKey') ||
+            localStorage.getItem('userId') || ''
+        ).trim();
+
+        if (usuarioId) {
+            chegadaAoDestinoConfirmada = true;
+            update(ref(db, `ludigins_usuarios/${usuarioId}/corridaAtual`), {
+                fase: 'chegou_destino',
+                chegouDestinoEm: Date.now()
+            }).catch(() => {
+                chegadaAoDestinoConfirmada = false;
+            });
+        }
+    }
+
     if (botao.dataset.finalizacaoEmAndamento !== '1') {
         botao.disabled = false;
     }
