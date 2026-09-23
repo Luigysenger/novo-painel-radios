@@ -7,7 +7,37 @@ const mapa = document.getElementById('mapa');
 const estilo = document.createElement('style');
 estilo.textContent = `
     #rankingDiario .ranking-nome {
-        font-size: 10px !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 4px !important;
+        min-width: 0 !important;
+        overflow: hidden !important;
+        white-space: nowrap !important;
+        font-size: 9px !important;
+    }
+    #rankingDiario .ranking-radio-status {
+        flex: 0 0 auto;
+        color: #86efac;
+        font-size: 8px;
+        font-weight: 800;
+    }
+    #rankingDiario .ranking-radio-nome {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: #c4b5fd;
+        font-weight: 900;
+    }
+    #rankingDiario .ranking-radio-ponto {
+        width: 7px;
+        height: 7px;
+        flex: 0 0 7px;
+        border-radius: 50%;
+        background: #22c55e;
+        box-shadow: 0 0 7px rgba(34,197,94,.95);
+        animation: ranking-radio-piscar 1s ease-in-out infinite;
+    }
+    @keyframes ranking-radio-piscar {
+        50% { opacity: .3; transform: scale(.72); }
     }
     .carro-jogador.alerta-combustivel .carro-visual {
         --car-color: #ef4444 !important;
@@ -139,7 +169,29 @@ function atualizarRadiosNoRanking() {
         nome.dataset.nomeOriginal = nomeOriginal;
 
         const radio = radioDoNome(nomeOriginal);
-        nome.textContent = radio ? `${nomeOriginal} | ${radio}` : nomeOriginal;
+        if (!radio) {
+            nome.textContent = nomeOriginal;
+            return;
+        }
+
+        nome.replaceChildren();
+
+        const nomeTexto = document.createElement('span');
+        nomeTexto.textContent = `${nomeOriginal} |`;
+
+        const ponto = document.createElement('span');
+        ponto.className = 'ranking-radio-ponto';
+        ponto.setAttribute('aria-label', 'Ouvindo agora');
+
+        const status = document.createElement('span');
+        status.className = 'ranking-radio-status';
+        status.textContent = 'Ouvindo agora';
+
+        const radioTexto = document.createElement('span');
+        radioTexto.className = 'ranking-radio-nome';
+        radioTexto.textContent = radio;
+
+        nome.append(nomeTexto, ponto, status, radioTexto);
     });
 }
 
