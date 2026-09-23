@@ -6,13 +6,8 @@ const mapa = document.getElementById('mapa');
 
 const estilo = document.createElement('style');
 estilo.textContent = `
-    .feed-radio-atual {
-        display: block !important;
-        margin-top: 4px !important;
-        color: #c4b5fd !important;
+    #rankingDiario .ranking-nome {
         font-size: 10px !important;
-        font-weight: 900 !important;
-        line-height: 1.25 !important;
     }
     .carro-jogador.alerta-combustivel .carro-visual {
         --car-color: #ef4444 !important;
@@ -109,28 +104,42 @@ function radioDoItem(item) {
 }
 
 function atualizarRadiosNoPainel() {
-    if (!feed) return;
-    const ultimos = [...eventos]
-        .sort((a, b) => Number(b.timestamp || 0) - Number(a.timestamp || 0))
-        .slice(0, 12);
+    // Remove a informação da rádio do feed “Acontecendo agora”.
+    feed?.querySelectorAll('.feed-radio-atual').forEach(linha => linha.remove());
+}
 
-    [...feed.querySelectorAll('.feed-item')].forEach((cartao, indice) => {
-        // O feed pode ser redesenhado antes do histórico terminar de carregar.
-        // Neste caso, usa o nome visível no próprio cartão.
-        const nomeVisivel = String(
-            cartao.querySelector('strong')?.textContent || ''
+function radioDoNome(nome) {
+    const nomeNormalizado = normalizar(nome);
+    const encontrado = Object.entries(jogadores).find(([, jogador]) =>
+        normalizar(jogador?.nome) === nomeNormalizado
+    );
+    const id = encontrado?.[0] || '';
+    const jogador = encontrado?.[1] || {};
+    const radioPublica = String(radiosAtuais[id]?.nome || '').trim();
+    const radioDoMapa = String(jogador.radioAtual || '').trim();
+
+    if (radioPublica) return radioPublica;
+    if (radioDoMapa) return radioDoMapa;
+    return nomeNormalizado && nomeNormalizado === nomeDoOuvinteAtual()
+        ? radioDoPainelPrincipal()
+        : '';
+}
+
+function atualizarRadiosNoRanking() {
+    const rankingDiario = document.getElementById('rankingDiario');
+    if (!rankingDiario) return;
+
+    rankingDiario.querySelectorAll('.ranking-item').forEach(item => {
+        const nome = item.querySelector('.ranking-nome');
+        if (!nome) return;
+
+        const nomeOriginal = String(
+            nome.dataset.nomeOriginal || nome.textContent.split(' | ')[0]
         ).trim();
-        const item = ultimos[indice] || { usuarioNome: nomeVisivel };
+        nome.dataset.nomeOriginal = nomeOriginal;
 
-        let linha = cartao.querySelector('.feed-radio-atual');
-        if (!linha) {
-            linha = document.createElement('span');
-            linha.className = 'feed-radio-atual';
-            cartao.appendChild(linha);
-        }
-        linha.textContent = '📻 ' + (
-            radioDoItem(item) || 'Nenhuma rádio selecionada'
-        );
+        const radio = radioDoNome(nomeOriginal);
+        nome.textContent = radio ? `${nomeOriginal} | ${radio}` : nomeOriginal;
     });
 }
 
@@ -188,11 +197,13 @@ onValue(ref(db, 'ludigins_eventos'), snapshot => {
     eventos = [];
     snapshot.forEach(child => eventos.push({ id: child.key, ...(child.val() || {}) }));
     atualizarRadiosNoPainel();
+    atualizarRadiosNoRanking();
 });
 
 onValue(ref(db, 'ludigins_jogo/jogadores'), snapshot => {
     jogadores = snapshot.exists() ? (snapshot.val() || {}) : {};
     atualizarRadiosNoPainel();
+    atualizarRadiosNoRanking();
     atualizarCoresDosCarros();
 });
 
@@ -210,5 +221,6 @@ onValue(ref(db, 'ludigins_usuarios'), snapshot => {
 setInterval(() => {
     sincronizarRadioDoPainelPrincipal();
     atualizarRadiosNoPainel();
+    atualizarRadiosNoRanking();
     atualizarCoresDosCarros();
 }, 500);
