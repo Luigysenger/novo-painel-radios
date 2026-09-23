@@ -553,6 +553,8 @@ estilo.textContent += `
     .carreta-combustivel-mapa .r1 { left:4px; } .carreta-combustivel-mapa .r2 { right:3px; }
     .caminhao-bombeiro-mapa { transform:translate(-50%,-50%) rotate(0deg)!important; }
     #pedidoLancheJogo { margin:9px 0; padding:11px; border:2px solid #f59e0b; border-radius:14px; background:rgba(120,53,15,.24); color:#fef3c7; font-weight:800; }
+    .logistica-rota { display:flex; align-items:center; gap:0; margin:12px 5px; } .logistica-rota i { width:20px; height:20px; border-radius:50%; border:4px solid #94a3b8; background:#172554; } .logistica-rota b { height:4px; flex:1; background:#94a3b8; } .logistica-rota i:first-child { border-color:#4ade80; box-shadow:0 0 9px #4ade80; }
+    .carreta-f-painel { display:inline-block; margin-right:8px; padding:3px 7px; border-radius:9px; background:linear-gradient(135deg,#a855f7,#6d28d9); color:#fff; border:2px solid #ede9fe; font-size:18px; }
 `;
 
 function meuIdLogistica() {
@@ -617,8 +619,9 @@ function renderizarLogistica() {
     const ultimaFatia = fatiasPosto() === 1;
     if (souDonoDoNegocio(postoNegocio)) {
         partes.push(
-            '<section class="logistica-card"><h3>⛽ Gestão do estoque do posto</h3>' +
-            '<p>Estoque: <strong>' + fatiasPosto() + ' de 10 fatias</strong></p>' +
+            '<section class="logistica-card"><h3>⛽ Gestão do Posto de Combustível</h3>' +
+            '<p>Proprietário do posto: <strong>' + (postoNegocio.donoNome || 'Luigy') + '</strong></p>' +
+            '<p>Estoque do posto: <strong>' + fatiasPosto() + ' de 10 fatias</strong></p>' +
             htmlFatias(fatiasPosto()) +
             '<p>Uma fatia atende 10 abastecimentos.</p>' +
             (ultimaFatia ? '<div class="logistica-alerta">Última fatia: ' + Math.max(0, 5 - usos) + ' abastecimento(s) restantes antes da compra obrigatória.</div>' : '') +
@@ -631,21 +634,24 @@ function renderizarLogistica() {
     }
     if (souDonoDoNegocio(carreta)) {
         partes.push(
-            '<section class="logistica-card"><h3>🚛 Gestão da Carreta de Combustível</h3>' +
-            '<p>Modelo: <strong>caminhão-tanque roxo</strong></p>' +
-            '<p>Pedidos entregues hoje: <strong>' + inteiro(carreta.entregasHoje, 0, 999999) + '</strong></p>' +
+            '<section class="logistica-card"><h3><span class="carreta-f-painel">🚛</span>Gestão da Carreta de Combustível</h3>' +
+            '<p>Proprietário da carreta: <strong>' + (carreta.donoNome || 'Luigy') + '</strong></p>' +
+            '<p>Modelo: <strong>caminhão-tanque F roxo</strong></p>' +
+            '<p>Pedidos de postos hoje: <strong>' + inteiro(carreta.entregasHoje, 0, 999999) + '</strong></p>' +
             '<p>Ganhos da carreta hoje: <strong>' + inteiro(carreta.ganhosHoje, 0, 999999).toLocaleString('pt-BR') + ' 🪙</strong></p>' +
-            '<p>Você recebe 120 🪙 por carga entregue ao posto.</p>' +
-            '<div class="logistica-ok">● ' + (logistica.carretaMapa?.fase === 'em_entrega' ? 'Carreta a caminho do posto.' : 'Carreta disponível para entrega.') + '</div></section>'
+            '<p>Você recebe 120 🪙 por carga entregue.</p>' +
+            '<p style="text-align:center;font-weight:900;margin-top:13px">Rota da carreta</p><div class="logistica-rota"><i></i><b></b><i></i><b></b><i></i><b></b><i></i></div>' +
+            '<div class="logistica-ok">✓ ' + (logistica.carretaMapa?.fase === 'em_entrega' ? 'Carreta a caminho do posto.' : 'Carreta disponível para entrega.') + '</div><button class="btn-logistica" data-logistica-acao="ver-entregas">Ver entregas da carreta</button></section>'
         );
     }
     if (souDonoDoNegocio(bombeiro)) {
         const combustivel = inteiro(bombeiro.combustivel, 0, 100);
         partes.push(
-            '<section class="logistica-card"><h3>🚒 Combustível do caminhão de bombeiro</h3>' +
-            '<p>Tanque: <strong>' + combustivel + '%</strong></p><div class="logistica-barra"><b style="width:' + combustivel + '%"></b></div>' +
-            '<p>Caixa do caminhão: <strong>' + inteiro(bombeiro.caixa, 0, 999999) + ' 🪙</strong></p>' +
-            '<button class="btn-logistica" data-logistica-acao="abastecer-bombeiro">⛽ Abastecer caminhão — 12 🪙</button></section>'
+            '<section class="logistica-card"><h3>🚒 Gestão do Caminhão de Bombeiro</h3>' +
+            '<p>Proprietário: <strong>' + (bombeiro.donoNome || 'Luigy') + '</strong></p>' +
+            '<p>Combustível do caminhão: <strong style="color:#ff6666">' + combustivel + '%</strong></p><div class="logistica-barra lanche"><b style="width:' + combustivel + '%"></b></div>' +
+            '<p>Caixa do caminhão: <strong>' + inteiro(bombeiro.caixa, 0, 999999) + ' 🪙</strong></p><p>Reserva para combustível: <strong>12 🪙</strong></p><p>Custo para encher o tanque: <strong>12 🪙</strong></p>' +
+            '<button class="btn-logistica" data-logistica-acao="abastecer-bombeiro">⛽ Abastecer caminhão — 12 🪙</button><div class="logistica-ok">✓ Atendimento automático ligado<br><small>Cada resfriamento custa 4 Ludigins: 2 🪙 para a caixa e 2 🪙 para o proprietário.</small></div>' + (combustivel <= 0 ? '<div class="logistica-alerta">Sem combustível, o caminhão não atende.</div>' : '') + '</section>'
         );
     }
     if (souDonoDoNegocio(moto)) {
