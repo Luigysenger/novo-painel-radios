@@ -148,9 +148,16 @@ function sincronizarRadioDoPainelPrincipal() {
     if (!usuarioId || !radioAtual || radioAtual === ultimaRadioEnviada) return;
     ultimaRadioEnviada = radioAtual;
 
+    const atualizadoEm = Date.now();
+
     update(ref(db, `ludigins_jogo/jogadores/${usuarioId}`), {
         radioAtual,
-        radioAtualizadoEm: Date.now()
+        radioAtualizadoEm: atualizadoEm
+    }).catch(() => {});
+
+    update(ref(db, `ludigins_jogo/radios_atuais/${usuarioId}`), {
+        nome: radioAtual,
+        atualizadoEm
     }).catch(() => {});
 }
 
