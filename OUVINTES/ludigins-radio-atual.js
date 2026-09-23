@@ -3,34 +3,31 @@ import { ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/
 
 const feed = document.getElementById('feed');
 const mapa = document.getElementById('mapa');
-if (!feed || !mapa) throw new Error('Painel Ludigins não encontrado.');
 
 const estilo = document.createElement('style');
 estilo.textContent = `
     .feed-radio-atual {
-        display: block;
-        margin-top: 3px;
-        color: #c4b5fd;
-        font-size: 10px;
-        font-weight: 800;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        display: block !important;
+        margin-top: 4px !important;
+        color: #c4b5fd !important;
+        font-size: 10px !important;
+        font-weight: 900 !important;
+        line-height: 1.25 !important;
     }
-
     .carro-jogador.alerta-combustivel .carro-visual {
         --car-color: #ef4444 !important;
-        box-shadow: 0 8px 16px rgba(0,0,0,.36), 0 0 24px rgba(239,68,68,.88) !important;
+        border-color: #ef4444 !important;
+        box-shadow: 0 0 26px rgba(239,68,68,.95) !important;
     }
-
     .carro-jogador.alerta-aquecimento .carro-visual {
         --car-color: #f97316 !important;
-        box-shadow: 0 8px 16px rgba(0,0,0,.36), 0 0 24px rgba(249,115,22,.88) !important;
+        border-color: #f97316 !important;
+        box-shadow: 0 0 26px rgba(249,115,22,.95) !important;
     }
-
     .carro-jogador.ouvindo-radio .carro-visual {
         --car-color: #a855f7 !important;
-        box-shadow: 0 8px 16px rgba(0,0,0,.36), 0 0 24px rgba(168,85,247,.88) !important;
+        border-color: #a855f7 !important;
+        box-shadow: 0 0 26px rgba(168,85,247,.95) !important;
     }
 `;
 document.head.appendChild(estilo);
@@ -40,8 +37,17 @@ let perfis = {};
 let eventos = [];
 let ultimaRadioEnviada = '';
 
-function normalizar(valor) {
-    return String(valor || '').trim().toLocaleLowerCase('pt-BR');
+const normalizar = valor =>
+    String(valor || '').trim().toLocaleLowerCase('pt-BR');
+
+function radioDoPainelPrincipal() {
+    try {
+        const titulo = window.parent.document.getElementById('playerNameDisplay');
+        const radio = String(titulo?.textContent || '').trim();
+        return radio && radio !== 'Nenhuma rádio selecionada' ? radio : '';
+    } catch (_) {
+        return '';
+    }
 }
 
 function jogadorDoItem(item) {
@@ -56,77 +62,85 @@ function jogadorDoItem(item) {
 
 function perfilDoJogador(id, jogador) {
     if (perfis[id]) return perfis[id];
-
     const nome = normalizar(jogador?.nome);
     return Object.values(perfis).find(perfil =>
         normalizar(perfil?.nome) === nome
     ) || {};
 }
 
+function radioDoItem(item) {
+    const jogador = jogadorDoItem(item);
+    const radioDoFirebase = String(jogador.radioAtual || '').trim();
+    if (radioDoFirebase) return radioDoFirebase;
+
+    const nomeAtual = normalizar(
+        localStorage.getItem('usuarioNome') || localStorage.getItem('usuarioLogado')
+    );
+    if (nomeAtual && normalizar(item?.usuarioNome) === nomeAtual) {
+        return radioDoPainelPrincipal();
+    }
+    return '';
+}
+
 function atualizarRadiosNoPainel() {
+    if (!feed) return;
     const ultimos = [...eventos]
         .sort((a, b) => Number(b.timestamp || 0) - Number(a.timestamp || 0))
         .slice(0, 12);
 
     [...feed.querySelectorAll('.feed-item')].forEach((cartao, indice) => {
-        cartao.querySelector('.feed-radio-atual')?.remove();
-
         const item = ultimos[indice];
         if (!item) return;
 
-        const jogador = jogadorDoItem(item);
-        const linhaRadio = document.createElement('span');
-        linhaRadio.className = 'feed-radio-atual';
-        linhaRadio.textContent = '📻 ' + (
-            String(jogador.radioAtual || '').trim() ||
-            'Nenhuma rádio selecionada'
+        let linha = cartao.querySelector('.feed-radio-atual');
+        if (!linha) {
+            linha = document.createElement('span');
+            linha.className = 'feed-radio-atual';
+            cartao.appendChild(linha);
+        }
+        linha.textContent = '📻 ' + (
+            radioDoItem(item) || 'Nenhuma rádio selecionada'
         );
-        cartao.appendChild(linhaRadio);
     });
 }
 
 function atualizarCoresDosCarros() {
+    if (!mapa) return;
+
     mapa.querySelectorAll('.carro-jogador').forEach(carro => {
         const id = String(carro.dataset.jogadorId || '');
         const jogador = jogadores[id] || {};
         const perfil = perfilDoJogador(id, jogador);
         const combustivel = Number(perfil.combustivel);
         const aquecimento = Number(perfil.aquecimentoCorridas || 0);
-        const ouvindoRadio = Boolean(String(jogador.radioAtual || '').trim());
-
-        carro.classList.remove(
-            'alerta-combustivel',
-            'alerta-aquecimento',
-            'ouvindo-radio'
+        const temRadio = Boolean(
+            String(jogador.radioAtual || '').trim() ||
+            (normalizar(jogador.nome) === normalizar(localStorage.getItem('usuarioNome')) &&
+                radioDoPainelPrincipal())
         );
 
-        // A ordem mantém alertas importantes sempre visíveis.
-        if (Number.isFinite(combustivel) && combustivel <= 15) {
+        carro.classList.remove('alerta-combustivel', 'alerta-aquecimento', 'ouvindo-radio');
+
+        if (Number.isFinite(combustivel) && combustivel <= 20) {
             carro.classList.add('alerta-combustivel');
         } else if (aquecimento >= 11) {
             carro.classList.add('alerta-aquecimento');
-        } else if (ouvindoRadio) {
+        } else if (temRadio) {
             carro.classList.add('ouvindo-radio');
         }
     });
 }
 
 function sincronizarRadioDoPainelPrincipal() {
-    const titulo = window.parent?.document?.getElementById('playerNameDisplay');
-    const radioAtual = String(titulo?.textContent || '').trim();
+    const radioAtual = radioDoPainelPrincipal();
     const usuarioId = String(
         localStorage.getItem('usuarioKey') ||
         localStorage.getItem('userId') || ''
     ).trim();
 
-    if (
-        !usuarioId ||
-        !radioAtual ||
-        radioAtual === 'Nenhuma rádio selecionada' ||
-        radioAtual === ultimaRadioEnviada
-    ) return;
-
+    if (!usuarioId || !radioAtual || radioAtual === ultimaRadioEnviada) return;
     ultimaRadioEnviada = radioAtual;
+
     update(ref(db, `ludigins_jogo/jogadores/${usuarioId}`), {
         radioAtual,
         radioAtualizadoEm: Date.now()
@@ -135,10 +149,7 @@ function sincronizarRadioDoPainelPrincipal() {
 
 onValue(ref(db, 'ludigins_eventos'), snapshot => {
     eventos = [];
-    snapshot.forEach(child => eventos.push({
-        id: child.key,
-        ...(child.val() || {})
-    }));
+    snapshot.forEach(child => eventos.push({ id: child.key, ...(child.val() || {}) }));
     atualizarRadiosNoPainel();
 });
 
@@ -153,10 +164,9 @@ onValue(ref(db, 'ludigins_usuarios'), snapshot => {
     atualizarCoresDosCarros();
 });
 
-new MutationObserver(() => {
+// Reaplica depois de qualquer redesenho do jogo, inclusive no Safari/iPhone.
+setInterval(() => {
+    sincronizarRadioDoPainelPrincipal();
     atualizarRadiosNoPainel();
     atualizarCoresDosCarros();
-}).observe(feed, { childList: true });
-
-setInterval(sincronizarRadioDoPainelPrincipal, 900);
-sincronizarRadioDoPainelPrincipal();
+}, 500);
