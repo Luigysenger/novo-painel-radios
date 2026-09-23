@@ -43,12 +43,33 @@ const normalizar = valor =>
 
 function radioDoPainelPrincipal() {
     try {
-        const titulo = window.parent.document.getElementById('playerNameDisplay');
-        const radio = String(titulo?.textContent || '').trim();
-        return radio && radio !== 'Nenhuma rádio selecionada' ? radio : '';
+        const painel = window.parent.document;
+        const titulo = String(
+            painel.getElementById('playerNameDisplay')?.textContent || ''
+        ).trim();
+        if (titulo && titulo !== 'Nenhuma rádio selecionada') return titulo;
+
+        const status = String(
+            painel.getElementById('playerStatusText')?.textContent || ''
+        ).trim();
+        const encontrada = status.match(/^Ouvindo Rádio:\s*(.+)$/i);
+        if (encontrada?.[1]) return encontrada[1].trim();
+
+        const retro = String(
+            painel.getElementById('retroTitleDisplay')?.textContent || ''
+        ).trim();
+        return retro && retro !== 'Selecione uma Rádio' ? retro : '';
     } catch (_) {
         return '';
     }
+}
+
+function nomeDoOuvinteAtual() {
+    return normalizar(
+        document.getElementById('nomeOuvinte')?.textContent ||
+        localStorage.getItem('usuarioNome') ||
+        localStorage.getItem('usuarioLogado')
+    );
 }
 
 function jogadorDoItem(item) {
@@ -80,9 +101,7 @@ function radioDoItem(item) {
     const radioDoMapa = String(jogador.radioAtual || '').trim();
     if (radioDoMapa) return radioDoMapa;
 
-    const nomeAtual = normalizar(
-        localStorage.getItem('usuarioNome') || localStorage.getItem('usuarioLogado')
-    );
+    const nomeAtual = nomeDoOuvinteAtual();
     if (nomeAtual && normalizar(item?.usuarioNome) === nomeAtual) {
         return radioDoPainelPrincipal();
     }
@@ -122,7 +141,7 @@ function atualizarCoresDosCarros() {
         const aquecimento = Number(perfil.aquecimentoCorridas || 0);
         const temRadio = Boolean(
             String(jogador.radioAtual || '').trim() ||
-            (normalizar(jogador.nome) === normalizar(localStorage.getItem('usuarioNome')) &&
+            (normalizar(jogador.nome) === nomeDoOuvinteAtual() &&
                 radioDoPainelPrincipal())
         );
 
