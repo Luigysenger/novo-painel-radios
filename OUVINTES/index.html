@@ -3436,6 +3436,21 @@
             atualizarTelaRetrô();
         }
 
+        // Ponte para o Ranking do dia: toca a mesma rádio de outro ouvinte.
+        window.tocarRadioDoLudigins = function(nomeRadio) {
+            const nomeProcurado = String(nomeRadio || '')
+                .trim()
+                .toLocaleLowerCase('pt-BR');
+
+            const radio = todasRadiosGlobal.find(item =>
+                String(item?.nome || '').trim().toLocaleLowerCase('pt-BR') === nomeProcurado
+            );
+
+            if (!radio) return false;
+            tocarRadioPorObjeto(radio);
+            return true;
+        };
+
         document.getElementById('btnProximo').addEventListener('click', () => {
             proximaRadio();
         });
