@@ -546,11 +546,8 @@ estilo.textContent += `
     .btn-logistica:disabled { opacity:.55; cursor:not-allowed; }
     .logistica-alerta { margin-top:10px; padding:9px 11px; border:1px solid #ef4444; border-radius:12px; color:#fecaca; background:rgba(127,29,29,.25); font-weight:800; }
     .logistica-ok { margin-top:10px; padding:9px 11px; border:1px solid #22c55e; border-radius:12px; color:#bbf7d0; background:rgba(20,83,45,.24); font-weight:800; }
-    .carreta-combustivel-mapa { position:absolute; z-index:15; width:46px; height:29px; pointer-events:none; transform:translate(-50%,-50%) rotate(0deg)!important; filter:drop-shadow(0 3px 4px rgba(0,0,0,.75)); transition:left 2.4s linear,top 2.4s linear; }
-    .carreta-combustivel-mapa .cabine { position:absolute; left:0; bottom:0; width:18px; height:19px; border-radius:7px 4px 3px 3px; background:linear-gradient(135deg,#a855f7,#6d28d9); border:2px solid #ede9fe; }
-    .carreta-combustivel-mapa .tanque { position:absolute; left:15px; top:3px; width:29px; height:19px; border-radius:10px; background:linear-gradient(135deg,#f8fafc,#cbd5e1); border:2px solid #7c3aed; }
-    .carreta-combustivel-mapa .roda { position:absolute; bottom:-2px; width:9px; height:9px; border-radius:50%; background:#111827; border:2px solid #cbd5e1; }
-    .carreta-combustivel-mapa .r1 { left:4px; } .carreta-combustivel-mapa .r2 { right:3px; }
+    .carreta-combustivel-mapa { position:absolute; z-index:15; width:76px; height:52px; pointer-events:none; transform:translate(-50%,-50%) rotate(0deg)!important; background:url('./assets/carreta-tanque-f.png') center/contain no-repeat; filter:drop-shadow(0 4px 4px rgba(0,0,0,.72)); transition:left 2.4s linear,top 2.4s linear; }
+    .carreta-f-imagem { width:54px; height:38px; object-fit:contain; vertical-align:middle; margin-right:8px; filter:drop-shadow(0 2px 2px rgba(0,0,0,.45)); }
     .caminhao-bombeiro-mapa { transform:translate(-50%,-50%) rotate(0deg)!important; }
     #pedidoLancheJogo { margin:9px 0; padding:11px; border:2px solid #f59e0b; border-radius:14px; background:rgba(120,53,15,.24); color:#fef3c7; font-weight:800; }
     .logistica-rota { display:flex; align-items:center; gap:0; margin:12px 5px; } .logistica-rota i { width:20px; height:20px; border-radius:50%; border:4px solid #94a3b8; background:#172554; } .logistica-rota b { height:4px; flex:1; background:#94a3b8; } .logistica-rota i:first-child { border-color:#4ade80; box-shadow:0 0 9px #4ade80; }
@@ -564,13 +561,17 @@ function meuPerfilLogistica() {
     const id = meuIdLogistica();
     return perfis[id] || Object.values(perfis).find(item => normalizar(item?.nome) === nomeDoOuvinteAtual()) || {};
 }
+function souMestreLogistica() {
+    const email = normalizar(localStorage.getItem('usuarioEmail') || localStorage.getItem('emailUsuario') || localStorage.getItem('email') || '');
+    return email === 'luigyestilofm@hotmail.com' || nomeDoOuvinteAtual() === 'luigy';
+}
 function souDonoDoNegocio(negocio) {
     if (!negocio) return false;
     const meuId = meuIdLogistica();
     const meuNome = nomeDoOuvinteAtual();
     return String(negocio.donoId || '') === meuId ||
         normalizar(negocio.donoNome) === meuNome ||
-        (String(negocio.donoId || '') === 'proprietario_luigy' && meuNome === 'luigy');
+        (String(negocio.donoId || '') === 'proprietario_luigy' && souMestreLogistica());
 }
 function inteiro(valor, minimo, maximo) {
     return Math.max(minimo, Math.min(maximo, Math.round(Number(valor) || 0)));
@@ -634,7 +635,7 @@ function renderizarLogistica() {
     }
     if (souDonoDoNegocio(carreta)) {
         partes.push(
-            '<section class="logistica-card"><h3><span class="carreta-f-painel">🚛</span>Gestão da Carreta de Combustível</h3>' +
+            '<section class="logistica-card"><h3><img class="carreta-f-imagem" src="./assets/carreta-tanque-f.png" alt="Carreta tanque F">Gestão da Carreta de Combustível</h3>' +
             '<p>Proprietário da carreta: <strong>' + (carreta.donoNome || 'Luigy') + '</strong></p>' +
             '<p>Modelo: <strong>caminhão-tanque F roxo</strong></p>' +
             '<p>Pedidos de postos hoje: <strong>' + inteiro(carreta.entregasHoje, 0, 999999) + '</strong></p>' +
@@ -735,11 +736,10 @@ function renderizarCarretaNoMapa() {
     if (!estado.fase) return;
     const el = document.createElement('div');
     el.className = 'carreta-combustivel-mapa';
-    el.innerHTML = '<span class="cabine"></span><span class="tanque"></span><span class="roda r1"></span><span class="roda r2"></span>';
-    el.style.left = estado.fase === 'em_entrega' ? '34%' : '50%';
-    el.style.top = estado.fase === 'em_entrega' ? '71%' : '58%';
+    el.style.left = '32%';
+    el.style.top = '13%';
     mapa.appendChild(el);
-    if (estado.fase === 'em_entrega') requestAnimationFrame(() => { el.style.left = '50%'; el.style.top = '58%'; });
+    if (estado.fase === 'em_entrega') requestAnimationFrame(() => { el.style.left = '57%'; el.style.top = '47%'; });
 }
 function estadoDoPostoPermiteAbastecer() {
     const estoque = logistica.posto || {};
@@ -865,13 +865,15 @@ async function devolverPostoPorFaltaDeCaixa() {
 }
 function adicionarOfertaCarreta() {
     const loja = document.getElementById('lojaNegocios');
-    if (!loja || loja.querySelector('[data-negocio-logistica="carreta_combustivel"]')) return;
+    if (!loja) return;
+    const existente = loja.querySelector('[data-negocio-logistica="carreta_combustivel"]');
     const carreta = negocios.carreta_combustivel || {};
-    if (souDonoDoNegocio(carreta)) return;
+    if (souDonoDoNegocio(carreta)) { existente?.remove(); return; }
+    if (existente) return;
     const item = document.createElement('div');
     item.className = 'negocio-item';
     item.dataset.negocioLogistica = 'carreta_combustivel';
-    item.innerHTML = '<strong>🚛 Carreta de combustível</strong><em>Entrega a carga que repõe o estoque dos postos.</em><button class="btn-comprar-negocio btn-proposta-logistica" type="button">Fazer proposta</button>';
+    item.innerHTML = '<strong><img class="carreta-f-imagem" src="./assets/carreta-tanque-f.png" alt="Carreta F">Carreta de combustível</strong><em>Entrega a carga que repõe o estoque dos postos.</em><button class="btn-comprar-negocio btn-proposta-logistica" type="button">Fazer proposta</button>';
     loja.appendChild(item);
 }
 document.addEventListener('click', evento => {
@@ -891,3 +893,36 @@ setInterval(() => {
     guardarHistoricoDoPosto().catch(() => {});
     adicionarOfertaCarreta();
 }, 1400);
+
+
+function ajustarBotoesDePropriedade() {
+    const nomes = {
+        posto_combustivel: 'Ver gestão do posto',
+        caminhao_bombeiro: 'Ver gestão do caminhão',
+        ambulancia: 'Ver gestão da ambulância',
+        entregador_lanche: 'Ver gestão da moto'
+    };
+    document.querySelectorAll('#lojaNegocios .btn-proposta[data-negocio]').forEach(botao => {
+        const negocio = botao.dataset.negocio;
+        if (!nomes[negocio]) return;
+        const dono = negocios[negocio] || {};
+        if (souDonoDoNegocio(dono)) {
+            botao.textContent = nomes[negocio];
+            botao.dataset.gestaoDono = '1';
+        } else {
+            botao.textContent = 'Fazer proposta';
+            delete botao.dataset.gestaoDono;
+        }
+    });
+}
+document.addEventListener('click', evento => {
+    const botao = evento.target?.closest?.('#lojaNegocios .btn-proposta[data-gestao-dono="1"]');
+    if (!botao) return;
+    const negocio = botao.dataset.negocio;
+    if (negocio === 'posto_combustivel' || negocio === 'caminhao_bombeiro') return;
+    evento.preventDefault();
+    evento.stopImmediatePropagation();
+    const destino = negocio === 'entregador_lanche' ? document.getElementById('painelLogisticaReal') : document.getElementById('painelNegocios');
+    destino?.scrollIntoView({behavior:'smooth',block:'start'});
+}, true);
+setInterval(ajustarBotoesDePropriedade, 900);
