@@ -20,6 +20,10 @@ estilo.textContent = `
         text-overflow: ellipsis;
         color: #c4b5fd;
         font-weight: 900;
+        cursor: pointer;
+        text-decoration: underline;
+        text-decoration-color: rgba(196,181,253,.45);
+        text-underline-offset: 2px;
     }
     #rankingDiario .ranking-radio-ponto {
         width: 7px;
@@ -150,6 +154,28 @@ function radioDoNome(nome) {
         : '';
 }
 
+function tocarRadioDoRanking(nomeRadio) {
+    try {
+        const tocar = window.parent?.tocarRadioDoLudigins;
+        return typeof tocar === 'function' && tocar(nomeRadio);
+    } catch (_) {
+        return false;
+    }
+}
+
+document.addEventListener('click', evento => {
+    const radio = evento.target?.closest?.('.ranking-radio-nome[data-radio-nome]');
+    if (radio) tocarRadioDoRanking(radio.dataset.radioNome);
+});
+
+document.addEventListener('keydown', evento => {
+    if (evento.key !== 'Enter' && evento.key !== ' ') return;
+    const radio = evento.target?.closest?.('.ranking-radio-nome[data-radio-nome]');
+    if (!radio) return;
+    evento.preventDefault();
+    tocarRadioDoRanking(radio.dataset.radioNome);
+});
+
 function atualizarRadiosNoRanking() {
     const rankingDiario = document.getElementById('rankingDiario');
     if (!rankingDiario) return;
@@ -180,7 +206,10 @@ function atualizarRadiosNoRanking() {
         const radioTexto = document.createElement('span');
         radioTexto.className = 'ranking-radio-nome';
         radioTexto.textContent = radio;
-        radioTexto.title = radio;
+        radioTexto.dataset.radioNome = radio;
+        radioTexto.title = `Clique para ouvir ${radio}`;
+        radioTexto.tabIndex = 0;
+        radioTexto.setAttribute('role', 'button');
 
         nome.append(nomeTexto, ponto, radioTexto);
     });
