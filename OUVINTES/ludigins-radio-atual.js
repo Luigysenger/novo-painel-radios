@@ -15,12 +15,6 @@ estilo.textContent = `
         white-space: nowrap !important;
         font-size: 9px !important;
     }
-    #rankingDiario .ranking-radio-status {
-        flex: 0 0 auto;
-        color: #86efac;
-        font-size: 8px;
-        font-weight: 800;
-    }
     #rankingDiario .ranking-radio-nome {
         overflow: hidden;
         text-overflow: ellipsis;
@@ -181,17 +175,13 @@ function atualizarRadiosNoRanking() {
 
         const ponto = document.createElement('span');
         ponto.className = 'ranking-radio-ponto';
-        ponto.setAttribute('aria-label', 'Ouvindo agora');
-
-        const status = document.createElement('span');
-        status.className = 'ranking-radio-status';
-        status.textContent = 'Ouvindo agora';
 
         const radioTexto = document.createElement('span');
         radioTexto.className = 'ranking-radio-nome';
         radioTexto.textContent = radio;
+        radioTexto.title = radio;
 
-        nome.append(nomeTexto, ponto, status, radioTexto);
+        nome.append(nomeTexto, ponto, radioTexto);
     });
 }
 
