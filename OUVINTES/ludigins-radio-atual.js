@@ -59,6 +59,7 @@ let jogadores = {};
 let perfis = {};
 let radiosAtuais = {};
 let eventos = [];
+let negocios = {};
 let ultimaRadioEnviada = '';
 let ultimaSituacaoVisualEnviada = '';
 let chegadaAoDestinoConfirmada = false;
@@ -376,6 +377,41 @@ function atualizarCoresDosCarros() {
     });
 }
 
+function atualizarGanhosDosServicos() {
+    const ancora = document.getElementById('ganhosPosto');
+    if (!ancora) return;
+
+    const meuId = String(localStorage.getItem('usuarioKey') ||
+        localStorage.getItem('userId') || '').trim();
+    const perfil = perfis[meuId] || Object.values(perfis).find(item =>
+        normalizar(item?.nome) === nomeDoOuvinteAtual()
+    ) || {};
+
+    const servicos = [
+        ['posto_combustivel', '⛽ Posto', 'ganhosPostoHoje'],
+        ['caminhao_bombeiro', '🚒 Bombeiro', 'ganhosBombeiroHoje'],
+        ['ambulancia', '🚑 Ambulância', 'ganhosAmbulanciaHoje'],
+        ['entregador_lanche', '🛵 Entregador', 'ganhosEntregadorLancheHoje']
+    ].filter(([id]) => negocios[id]?.donoId === meuId);
+
+    let painel = document.getElementById('ganhosTodosServicos');
+    if (!servicos.length) {
+        painel?.remove();
+        return;
+    }
+
+    if (!painel) {
+        painel = document.createElement('div');
+        painel.id = 'ganhosTodosServicos';
+        painel.className = 'negocio-ganhos';
+        ancora.insertAdjacentElement('afterend', painel);
+    }
+
+    painel.innerHTML = servicos.map(([, nome, campo]) =>
+        `<div>${nome}: ${Number(perfil[campo] || 0).toLocaleString('pt-BR')} 🪙</div>`
+    ).join('');
+}
+
 function sincronizarSituacaoVisualDoCarro() {
     const usuarioId = String(
         localStorage.getItem('usuarioKey') ||
@@ -457,6 +493,12 @@ onValue(ref(db, 'ludigins_usuarios'), snapshot => {
     limparCorridaCorrompida();
     sincronizarSituacaoVisualDoCarro();
     atualizarCoresDosCarros();
+    atualizarGanhosDosServicos();
+});
+
+onValue(ref(db, 'ludigins_jogo/negocios'), snapshot => {
+    negocios = snapshot.exists() ? (snapshot.val() || {}) : {};
+    atualizarGanhosDosServicos();
 });
 
 // Reaplica depois de qualquer redesenho do jogo, inclusive no Safari/iPhone.
@@ -467,5 +509,6 @@ setInterval(() => {
     atualizarRadiosNoPainel();
     atualizarRadiosNoRanking();
     atualizarCoresDosCarros();
+    atualizarGanhosDosServicos();
     garantirFinalizacaoDaCorrida();
 }, 500);
