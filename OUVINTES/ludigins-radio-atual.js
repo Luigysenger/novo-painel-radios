@@ -785,7 +785,7 @@ function renderizarMotoNoMapa() {
         el = document.createElement('div');
         el.id = 'motoLanchesVisivel';
         el.setAttribute('aria-label', 'Moto de lanches');
-        el.style.cssText = 'position:absolute!important;display:flex!important;align-items:center!important;justify-content:center!important;width:42px!important;height:42px!important;z-index:2147483646!important;pointer-events:none!important;font-size:32px!important;line-height:1!important;filter:drop-shadow(0 3px 3px rgba(0,0,0,.65))!important;transform-origin:center center!important;transition:left .30s linear,top .30s linear,transform .15s linear!important;';
+        el.style.cssText = 'position:absolute!important;display:flex!important;align-items:center!important;justify-content:center!important;width:34px!important;height:34px!important;z-index:2147483646!important;pointer-events:none!important;font-size:26px!important;line-height:1!important;filter:drop-shadow(0 3px 3px rgba(0,0,0,.65))!important;transform-origin:center center!important;transition:left .30s linear,top .30s linear,transform .15s linear!important;';
         el.textContent = '🛵';
         document.body.appendChild(el);
     }
@@ -793,10 +793,12 @@ function renderizarMotoNoMapa() {
     const rect = mapa.getBoundingClientRect();
     const perfil = meuPerfilLogistica();
     const pedido = perfil.pedidoLanchePendente;
+    const pedidoCriadoEm = Number(pedido?.criadoEm || 0);
+    const pedidoEmDeslocamento = Boolean(pedido && pedidoCriadoEm && (Date.now() - pedidoCriadoEm) < 8000);
     let x = 0.335, y = 0.205, rot = 90; // rua vertical marcada no print, olhando para baixo
 
-    if (pedido) {
-        const inicio = Number(pedido.criadoEm || Date.now());
+    if (pedidoEmDeslocamento) {
+        const inicio = pedidoCriadoEm;
         const progresso = Math.max(0, Math.min(1, (Date.now() - inicio) / 2600));
         // Sai da rua de espera, desce e segue pela rua horizontal em direção ao motorista.
         if (progresso < 0.55) {
