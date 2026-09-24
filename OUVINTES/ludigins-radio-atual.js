@@ -732,21 +732,28 @@ document.addEventListener('change', evento => {
 function renderizarCarretaNoMapa() {
     if (!mapa) return;
     mapa.querySelectorAll('.carreta-combustivel-mapa').forEach(el => el.remove());
-    // A carreta fica sempre estacionada na rua definida. O estado de entrega
-    // apenas a move temporariamente até o posto.
+
+    // O mapa precisa ser a referência das coordenadas da carreta.
+    // Sem isto, em alguns navegadores (principalmente Safari/iPhone),
+    // o position:absolute pode usar outro ancestral e a carreta fica fora da área visível.
+    if (getComputedStyle(mapa).position === 'static') mapa.style.position = 'relative';
+
     const estado = logistica.carretaMapa || { fase: 'disponivel' };
     const el = document.createElement('div');
     el.className = 'carreta-combustivel-mapa';
-    // Rua vertical no alto do mapa, à esquerda da Escola Municipal.
-    el.style.left = '37%';
-    el.style.top = '6%';
+    el.style.cssText = 'position:absolute;z-index:9999;width:76px;height:52px;pointer-events:none;left:37%;top:6%;transform:translate(-50%,-50%);';
+
     const imagem = document.createElement('img');
-    imagem.src = './assets/carreta-tanque-f.png?v=20260923';
+    imagem.src = new URL('assets/carreta-tanque-f.png', document.baseURI).href + '?v=202609232135';
     imagem.alt = 'Carreta tanque F';
-    imagem.style.cssText = 'display:block;width:100%;height:100%;object-fit:contain';
+    imagem.style.cssText = 'display:block;width:76px;height:52px;object-fit:contain;';
     el.appendChild(imagem);
     mapa.appendChild(el);
-    if (estado.fase === 'em_entrega') requestAnimationFrame(() => { el.style.left = '57%'; el.style.top = '47%'; });
+
+    if (estado.fase === 'em_entrega') requestAnimationFrame(() => {
+        el.style.left = '57%';
+        el.style.top = '47%';
+    });
 }
 function estadoDoPostoPermiteAbastecer() {
     const estoque = logistica.posto || {};
