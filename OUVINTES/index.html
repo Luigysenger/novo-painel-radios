@@ -3681,38 +3681,35 @@
             // “Acontecendo agora”, sem alterar o jogo principal.
             setTimeout(() => {
                 const documentoJogo = ludiginsFrame.contentDocument;
-                if (!documentoJogo || documentoJogo.getElementById('ludiginsRadioAtualScript')) return;
+                if (!documentoJogo) return;
 
-                const script = documentoJogo.createElement('script');
-                script.id = 'ludiginsRadioAtualScript';
-                script.type = 'module';
-                script.src = './ludigins-radio-atual.js?v=' + Date.now();
-                documentoJogo.head.appendChild(script);
+                // O complemento pode já existir após uma reabertura do painel.
+                // Isso não pode impedir a carreta de ser garantida no mapa atual.
+                if (!documentoJogo.getElementById('ludiginsRadioAtualScript')) {
+                    const script = documentoJogo.createElement('script');
+                    script.id = 'ludiginsRadioAtualScript';
+                    script.type = 'module';
+                    script.src = './ludigins-radio-atual.js?v=' + Date.now();
+                    documentoJogo.head.appendChild(script);
+                }
 
-                // Carreta F: é inserida pelo painel pai para não depender do ciclo
-                // interno de redesenho do jogo no Safari/iPhone.
                 const garantirCarretaF = () => {
                     const mapaAtual = documentoJogo.getElementById('mapa');
                     if (!mapaAtual) return;
-                    if (documentoJogo.defaultView.getComputedStyle(mapaAtual).position === 'static') {
-                        mapaAtual.style.position = 'relative';
-                    }
+                    if (documentoJogo.defaultView.getComputedStyle(mapaAtual).position === 'static') mapaAtual.style.position = 'relative';
                     let carreta = mapaAtual.querySelector('.carreta-f-fixa');
                     if (!carreta) {
                         carreta = documentoJogo.createElement('img');
                         carreta.className = 'carreta-f-fixa';
                         carreta.alt = 'Carreta tanque F';
-                        carreta.src = './assets/carreta-tanque-f.png?v=202609232145';
-                        carreta.style.cssText = 'position:absolute;left:37%;top:6%;width:76px;height:52px;object-fit:contain;transform:translate(-50%,-50%);z-index:2147483647;pointer-events:none;';
+                        carreta.src = './assets/carreta-tanque-f.png?v=202609232155';
+                        carreta.style.cssText = 'position:absolute!important;display:block!important;visibility:visible!important;opacity:1!important;left:37%!important;top:6%!important;width:76px!important;height:52px!important;object-fit:contain!important;transform:translate(-50%,-50%)!important;z-index:2147483647!important;pointer-events:none!important;';
                         mapaAtual.appendChild(carreta);
                     }
                 };
                 garantirCarretaF();
                 const timerCarretaF = setInterval(() => {
-                    if (!ludiginsFrame.contentDocument || ludiginsFrame.contentDocument !== documentoJogo) {
-                        clearInterval(timerCarretaF);
-                        return;
-                    }
+                    if (!ludiginsFrame.contentDocument || ludiginsFrame.contentDocument !== documentoJogo) { clearInterval(timerCarretaF); return; }
                     garantirCarretaF();
                 }, 500);
             }, 0);
