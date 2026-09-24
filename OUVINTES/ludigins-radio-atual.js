@@ -741,7 +741,7 @@ function renderizarCarretaNoMapa() {
         el.id = 'carretaTanqueFVisivel';
         el.className = 'carreta-combustivel-mapa';
         el.alt = 'Carreta tanque F';
-        el.src = './assets/carreta-tanque-f.png?v=202609232230';
+        el.src = 'https://raw.githubusercontent.com/Luigysenger/novo-painel-radios/main/OUVINTES/assets/carreta-tanque-f.png?v=202609232200';
         el.style.cssText = 'position:absolute!important;display:block!important;visibility:visible!important;opacity:1!important;width:76px!important;height:52px!important;object-fit:contain!important;z-index:2147483647!important;pointer-events:none!important;transform:translate(-50%,-50%)!important;';
         document.body.appendChild(el);
     }
