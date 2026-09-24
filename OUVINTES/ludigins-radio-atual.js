@@ -550,7 +550,11 @@ estilo.textContent += `
     .carreta-combustivel-mapa { position:absolute; z-index:999; width:76px; height:52px; pointer-events:none; transform:translate(-50%,-50%) rotate(0deg)!important; filter:drop-shadow(0 4px 4px rgba(0,0,0,.72)); transition:left 2.4s linear,top 2.4s linear; }
     .carreta-f-imagem { width:54px; height:38px; object-fit:contain; vertical-align:middle; margin-right:8px; filter:drop-shadow(0 2px 2px rgba(0,0,0,.45)); }
     .caminhao-bombeiro-mapa { transform:translate(-50%,-50%) rotate(0deg)!important; }
-    #pedidoLancheJogo { margin:9px 0; padding:11px; border:2px solid #f59e0b; border-radius:14px; background:rgba(120,53,15,.24); color:#fef3c7; font-weight:800; }
+    #pedidoLancheJogo { margin:12px 0; padding:16px; border:2px solid #6d28d9; border-radius:20px; background:linear-gradient(145deg,#21102a,#130d22); color:#fff; font-weight:800; box-shadow:0 0 18px rgba(168,85,247,.25); }
+    #pedidoLancheJogo .lanche-titulo { display:flex;align-items:center;gap:10px;font-size:20px;font-weight:950;margin-bottom:7px; }
+    #pedidoLancheJogo .lanche-titulo span { font-size:30px; }
+    #pedidoLancheJogo .lanche-texto { color:#e5e7eb;font-size:14px;line-height:1.35;margin-bottom:10px; }
+    #pedidoLancheJogo .btn-logistica { background:linear-gradient(135deg,#fbbf24,#f59e0b);border:3px solid #a855f7;box-shadow:0 0 13px rgba(168,85,247,.75);font-size:17px;padding:13px;color:#251400; }
     .logistica-rota { display:flex; align-items:center; gap:0; margin:12px 5px; } .logistica-rota i { width:20px; height:20px; border-radius:50%; border:4px solid #94a3b8; background:#172554; } .logistica-rota b { height:4px; flex:1; background:#94a3b8; } .logistica-rota i:first-child { border-color:#4ade80; box-shadow:0 0 9px #4ade80; }
     .carreta-f-painel { display:inline-block; margin-right:8px; padding:3px 7px; border-radius:9px; background:linear-gradient(135deg,#a855f7,#6d28d9); color:#fff; border:2px solid #ede9fe; font-size:18px; }
 `;
@@ -748,7 +752,7 @@ function renderizarCarretaNoMapa() {
 
     const rect = mapa.getBoundingClientRect();
     const estado = logistica.carretaMapa || { fase: 'disponivel' };
-    let x = 0.095, y = 0.16, rot = -90; // garagem: cabine voltada para baixo
+    let x = 0.095, y = 0.16, rot = 0; // visão de cima, alinhado verticalmente na rua
 
     if (estado.fase === 'em_entrega') {
         const inicio = Number(estado.inicioEm || Date.now());
@@ -759,7 +763,7 @@ function renderizarCarretaNoMapa() {
             const p = progresso / 0.38;
             x = 0.095;
             y = 0.16 + (0.31 * p);
-            rot = -90;
+            rot = 0;
         } else if (progresso < 0.76) {
             const p = (progresso - 0.38) / 0.38;
             x = 0.095 + (0.675 * p);
@@ -769,7 +773,7 @@ function renderizarCarretaNoMapa() {
             const p = (progresso - 0.76) / 0.24;
             x = 0.77;
             y = 0.47 + (0.10 * p);
-            rot = -90;
+            rot = 0;
         }
     }
 
@@ -817,16 +821,16 @@ function renderizarMotoNoMapa() {
     }
     const rect=mapa.getBoundingClientRect();
     // Mesma orientação do caminhão: cabine/frente voltada para baixo, na rua ao lado.
-    let x=.335,y=.205,rot=-90;
+    let x=.335,y=.205,rot=0;
     const ev=entregaLancheVisual;
     if (ev) {
         const alvo=ev.alvo;
         const t=(Date.now()-ev.inicio)/ev.duracao;
-        if (t<.42) { const p=Math.max(0,t/.42); x=.335; y=.205+(alvo.y-.205)*p; rot=-90; }
+        if (t<.42) { const p=Math.max(0,t/.42); x=.335; y=.205+(alvo.y-.205)*p; rot=0; }
         else if(t<.50){const p=(t-.42)/.08;x=.335+(alvo.x-.335)*p;y=alvo.y;rot=alvo.x>=.335?0:180;}
         else if(t<.62){x=alvo.x;y=alvo.y;rot=alvo.x>=.335?0:180;if(!ev.efeito){ev.efeito=true;chuvaHamburgueres(x,y);}}
         else if(t<.92){const p=(t-.62)/.30;x=alvo.x+(.335-alvo.x)*p;y=alvo.y;rot=alvo.x>=.335?180:0;}
-        else if(t<1){const p=(t-.92)/.08;x=.335;y=alvo.y+(.205-alvo.y)*p;rot=90;}
+        else if(t<1){const p=(t-.92)/.08;x=.335;y=alvo.y+(.205-alvo.y)*p;rot=0;}
         else entregaLancheVisual=null;
     }
     el.style.left=(window.scrollX+rect.left+rect.width*x)+'px';
@@ -887,7 +891,7 @@ function renderizarPedidoLanche() {
     if (!painel) return;
     let box = existente;
     if (!box) { box = document.createElement('div'); box.id = 'pedidoLancheJogo'; painel.prepend(box); }
-    box.innerHTML = '🍔 Após 7 corridas, você precisa pedir um lanche.<button type="button" class="btn-logistica" data-logistica-acao="pedir-lanche">Pedir lanche — ' + preco + ' 🪙</button>';
+    box.innerHTML = '<div class="lanche-titulo"><span>🍔</span>Lanche disponível!</div><div class="lanche-texto">Peça um lanche e a moto vai até o seu carro.</div><button type="button" class="btn-logistica" data-logistica-acao="pedir-lanche">🍔 Pedir Lanche — ' + preco + ' 🪙</button>';
 }
 async function pedirLanche() {
     const id = meuIdLogistica();
