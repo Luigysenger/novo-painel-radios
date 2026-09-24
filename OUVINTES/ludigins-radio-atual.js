@@ -762,14 +762,14 @@ function renderizarCarretaNoMapa() {
         el = document.createElement('div');
         el.id = 'carretaTanqueFVisivel';
         el.setAttribute('aria-label', 'Caminhão tanque');
-        el.style.cssText = 'position:absolute!important;display:flex!important;align-items:center!important;justify-content:center!important;visibility:visible!important;opacity:1!important;width:46px!important;height:46px!important;z-index:2147483647!important;pointer-events:none!important;font-size:35px!important;line-height:1!important;filter:drop-shadow(0 3px 3px rgba(0,0,0,.65))!important;transform-origin:center center!important;transition:left .35s linear,top .35s linear,transform .15s linear!important;';
-        el.textContent = '🚛';
+        el.style.cssText = 'position:absolute!important;display:flex!important;align-items:center!important;justify-content:center!important;visibility:visible!important;opacity:1!important;width:34px!important;height:58px!important;z-index:2147483647!important;pointer-events:none!important;filter:drop-shadow(0 3px 3px rgba(0,0,0,.65))!important;transform-origin:center center!important;transition:left .35s linear,top .35s linear,transform .15s linear!important;';
+        el.innerHTML = '<div style="position:relative;width:30px;height:54px"><div style="position:absolute;left:3px;top:2px;width:24px;height:37px;border-radius:4px;background:#16a34a;border:2px solid #052e16;box-sizing:border-box"><i style="position:absolute;left:5px;top:3px;width:10px;height:27px;border-radius:7px;background:#22c55e;border:2px solid #14532d"></i></div><div style="position:absolute;left:2px;bottom:1px;width:26px;height:18px;border-radius:4px 4px 9px 9px;background:#e5e7eb;border:2px solid #334155;box-sizing:border-box"><i style="position:absolute;left:4px;top:3px;width:14px;height:6px;border-radius:2px;background:#7dd3fc;border:1px solid #0f172a"></i></div><b style="position:absolute;left:-1px;top:8px;width:4px;height:9px;border-radius:2px;background:#111827;box-shadow:28px 0 #111827,0 20px #111827,28px 20px #111827"></b></div>';
         document.body.appendChild(el);
     }
 
     const rect = mapa.getBoundingClientRect();
     const estado = logistica.carretaMapa || { fase: 'disponivel' };
-    let x = 0.095, y = 0.16, rot = -90; // vertical, cabine voltada para baixo
+    let x = 0.095, y = 0.16, rot = 0; // arte vista de cima já aponta para baixo
 
     if (estado.fase === 'em_entrega') {
         const inicio = Number(estado.inicioEm || Date.now());
@@ -833,21 +833,21 @@ function renderizarMotoNoMapa() {
     let el = document.getElementById('motoLanchesVisivel');
     if (!el) {
         el=document.createElement('div'); el.id='motoLanchesVisivel'; el.setAttribute('aria-label','Moto de lanches');
-        el.style.cssText='position:absolute!important;display:flex!important;align-items:center!important;justify-content:center!important;width:34px!important;height:34px!important;z-index:2147483646!important;pointer-events:none!important;font-size:26px!important;line-height:1!important;filter:drop-shadow(0 3px 3px rgba(0,0,0,.65))!important;transform-origin:center center!important;';
-        el.textContent='🛵'; document.body.appendChild(el);
+        el.style.cssText='position:absolute!important;display:flex!important;align-items:center!important;justify-content:center!important;width:25px!important;height:42px!important;z-index:2147483646!important;pointer-events:none!important;filter:drop-shadow(0 3px 3px rgba(0,0,0,.65))!important;transform-origin:center center!important;';
+        el.innerHTML='<div style="position:relative;width:20px;height:40px"><i style="position:absolute;left:7px;top:0;width:6px;height:8px;border-radius:50%;background:#111827"></i><i style="position:absolute;left:7px;bottom:0;width:6px;height:9px;border-radius:50%;background:#111827"></i><b style="position:absolute;left:4px;top:6px;width:12px;height:28px;border-radius:7px;background:#facc15;border:2px solid #854d0e;box-sizing:border-box"></b><span style="position:absolute;left:5px;top:10px;width:10px;height:10px;border-radius:50%;background:#f59e0b;border:2px solid #422006;box-sizing:border-box"></span><em style="position:absolute;left:2px;top:20px;width:16px;height:9px;border-radius:3px;background:#fbbf24;border:2px solid #854d0e;box-sizing:border-box"></em></div>'; document.body.appendChild(el);
     }
     const rect=mapa.getBoundingClientRect();
     // Mesma orientação do caminhão: cabine/frente voltada para baixo, na rua ao lado.
-    let x=.335,y=.205,rot=-90;
+    let x=.335,y=.205,rot=0;
     const ev=entregaLancheVisual;
     if (ev) {
         const alvo=ev.alvo;
         const t=(Date.now()-ev.inicio)/ev.duracao;
-        if (t<.42) { const p=Math.max(0,t/.42); x=.335; y=.205+(alvo.y-.205)*p; rot=-90; }
+        if (t<.42) { const p=Math.max(0,t/.42); x=.335; y=.205+(alvo.y-.205)*p; rot=0; }
         else if(t<.50){const p=(t-.42)/.08;x=.335+(alvo.x-.335)*p;y=alvo.y;rot=alvo.x>=.335?0:180;}
         else if(t<.62){x=alvo.x;y=alvo.y;rot=alvo.x>=.335?0:180;if(!ev.efeito){ev.efeito=true;chuvaHamburgueres(x,y);}}
         else if(t<.92){const p=(t-.62)/.30;x=alvo.x+(.335-alvo.x)*p;y=alvo.y;rot=alvo.x>=.335?180:0;}
-        else if(t<1){const p=(t-.92)/.08;x=.335;y=alvo.y+(.205-alvo.y)*p;rot=90;}
+        else if(t<1){const p=(t-.92)/.08;x=.335;y=alvo.y+(.205-alvo.y)*p;rot=180;}
         else entregaLancheVisual=null;
     }
     el.style.left=(window.scrollX+rect.left+rect.width*x)+'px';
@@ -903,6 +903,17 @@ function atualizarPedidoDeLanche() {
         atualizadoEm:Date.now()
     }).catch(() => {});
 }
+document.addEventListener('click', evento => {
+    const alvo = evento.target?.closest?.('[data-corrida-id], .ride-card, .corrida-card, .btn-aceitar-corrida');
+    if (!alvo) return;
+    const perfil = meuPerfilLogistica();
+    if (!perfil.pedidoLanchePendente) return;
+    evento.preventDefault();
+    evento.stopImmediatePropagation();
+    avisoLogistica('🍔 Peça seu lanche antes de iniciar a próxima corrida.');
+    renderizarPedidoLanche();
+}, true);
+
 function renderizarPedidoLanche() {
     const existente = document.getElementById('pedidoLancheJogo');
     const perfil = meuPerfilLogistica();
@@ -910,7 +921,7 @@ function renderizarPedidoLanche() {
     if (!pedido) { existente?.remove(); return; }
     const moto = negocios.entregador_lanche || {};
     const preco = [2,4,6,8,10,12].includes(Number(moto.precoLanche)) ? Number(moto.precoLanche) : 6;
-    const painel = document.getElementById('painelCorridaAtual') || document.getElementById('painelCorrida');
+    const painel = document.getElementById('painelCorridaAtual') || document.getElementById('painelCorrida') || mapa?.parentElement;
     if (!painel) return;
     let box = existente;
     if (!box) { box = document.createElement('div'); box.id = 'pedidoLancheJogo'; painel.prepend(box); }
