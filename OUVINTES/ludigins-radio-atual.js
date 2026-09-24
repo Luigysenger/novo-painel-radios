@@ -737,8 +737,9 @@ function renderizarCarretaNoMapa() {
     const estado = logistica.carretaMapa || { fase: 'disponivel' };
     const el = document.createElement('div');
     el.className = 'carreta-combustivel-mapa';
-    el.style.left = '32%';
-    el.style.top = '13%';
+    // Rua vertical no alto do mapa, à esquerda da Escola Municipal.
+    el.style.left = '37%';
+    el.style.top = '6%';
     mapa.appendChild(el);
     if (estado.fase === 'em_entrega') requestAnimationFrame(() => { el.style.left = '57%'; el.style.top = '47%'; });
 }
@@ -844,6 +845,8 @@ setInterval(() => {
     atualizarPedidoDeLanche();
     renderizarPedidoLanche();
     renderizarLogistica();
+    // A carreta não depende do painel de gestão para aparecer no mapa.
+    renderizarCarretaNoMapa();
 }, 750);
 
 
