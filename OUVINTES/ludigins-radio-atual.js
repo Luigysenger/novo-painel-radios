@@ -747,7 +747,7 @@ function renderizarCarretaNoMapa() {
 
     const rect = mapa.getBoundingClientRect();
     const estado = logistica.carretaMapa || { fase: 'disponivel' };
-    let x = 0.095, y = 0.16, rot = 90; // garagem: rua vertical marcada, olhando para baixo
+    let x = 0.095, y = 0.16, rot = -90; // garagem: cabine voltada para baixo
 
     if (estado.fase === 'em_entrega') {
         const inicio = Number(estado.inicioEm || Date.now());
@@ -758,7 +758,7 @@ function renderizarCarretaNoMapa() {
             const p = progresso / 0.38;
             x = 0.095;
             y = 0.16 + (0.31 * p);
-            rot = 90;
+            rot = -90;
         } else if (progresso < 0.76) {
             const p = (progresso - 0.38) / 0.38;
             x = 0.095 + (0.675 * p);
@@ -768,7 +768,7 @@ function renderizarCarretaNoMapa() {
             const p = (progresso - 0.76) / 0.24;
             x = 0.77;
             y = 0.47 + (0.10 * p);
-            rot = 90;
+            rot = -90;
         }
     }
 
@@ -776,6 +776,47 @@ function renderizarCarretaNoMapa() {
     el.style.top = (window.scrollY + rect.top + rect.height * y) + 'px';
     el.style.transform = 'translate(-50%,-50%) rotate(' + rot + 'deg)';
 }
+function renderizarMotoNoMapa() {
+    mapa = document.getElementById('mapa');
+    if (!mapa) return;
+
+    let el = document.getElementById('motoLanchesVisivel');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'motoLanchesVisivel';
+        el.setAttribute('aria-label', 'Moto de lanches');
+        el.style.cssText = 'position:absolute!important;display:flex!important;align-items:center!important;justify-content:center!important;width:42px!important;height:42px!important;z-index:2147483646!important;pointer-events:none!important;font-size:32px!important;line-height:1!important;filter:drop-shadow(0 3px 3px rgba(0,0,0,.65))!important;transform-origin:center center!important;transition:left .30s linear,top .30s linear,transform .15s linear!important;';
+        el.textContent = '🛵';
+        document.body.appendChild(el);
+    }
+
+    const rect = mapa.getBoundingClientRect();
+    const perfil = meuPerfilLogistica();
+    const pedido = perfil.pedidoLanchePendente;
+    let x = 0.31, y = 0.16, rot = 90; // rua ao lado: parada olhando para baixo
+
+    if (pedido) {
+        const inicio = Number(pedido.criadoEm || Date.now());
+        const progresso = Math.max(0, Math.min(1, (Date.now() - inicio) / 2600));
+        // Sai da rua de espera, desce e segue pela rua horizontal em direção ao motorista.
+        if (progresso < 0.55) {
+            const p = progresso / 0.55;
+            x = 0.31;
+            y = 0.16 + (0.36 * p);
+            rot = 90;
+        } else {
+            const p = (progresso - 0.55) / 0.45;
+            x = 0.31 + (0.18 * p);
+            y = 0.52;
+            rot = 0;
+        }
+    }
+
+    el.style.left = (window.scrollX + rect.left + rect.width * x) + 'px';
+    el.style.top = (window.scrollY + rect.top + rect.height * y) + 'px';
+    el.style.transform = 'translate(-50%,-50%) rotate(' + rot + 'deg)';
+}
+
 function estadoDoPostoPermiteAbastecer() {
     const estoque = logistica.posto || {};
     const fatias = inteiro(estoque.fatias,1,10);
@@ -876,7 +917,10 @@ setTimeout(() => garantirBaseLogistica().catch(() => {}), 1200);
 // A carreta tem ciclo próprio: nenhum erro em painel, pedido ou logística pode impedir sua exibição.
 renderizarCarretaNoMapa();
 setInterval(renderizarCarretaNoMapa, 400);
+renderizarMotoNoMapa();
+setInterval(renderizarMotoNoMapa, 400);
 window.addEventListener('resize', renderizarCarretaNoMapa);
+window.addEventListener('resize', renderizarMotoNoMapa);
 window.addEventListener('scroll', renderizarCarretaNoMapa, { passive: true });
 
 // Mantém os controles e os pedidos sincronizados depois dos redesenhos do jogo.
