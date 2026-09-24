@@ -546,7 +546,7 @@ estilo.textContent += `
     .btn-logistica:disabled { opacity:.55; cursor:not-allowed; }
     .logistica-alerta { margin-top:10px; padding:9px 11px; border:1px solid #ef4444; border-radius:12px; color:#fecaca; background:rgba(127,29,29,.25); font-weight:800; }
     .logistica-ok { margin-top:10px; padding:9px 11px; border:1px solid #22c55e; border-radius:12px; color:#bbf7d0; background:rgba(20,83,45,.24); font-weight:800; }
-    .carreta-combustivel-mapa { position:absolute; z-index:15; width:76px; height:52px; pointer-events:none; transform:translate(-50%,-50%) rotate(0deg)!important; background:url('./assets/carreta-tanque-f.png') center/contain no-repeat; filter:drop-shadow(0 4px 4px rgba(0,0,0,.72)); transition:left 2.4s linear,top 2.4s linear; }
+    .carreta-combustivel-mapa { position:absolute; z-index:999; width:76px; height:52px; pointer-events:none; transform:translate(-50%,-50%) rotate(0deg)!important; filter:drop-shadow(0 4px 4px rgba(0,0,0,.72)); transition:left 2.4s linear,top 2.4s linear; }
     .carreta-f-imagem { width:54px; height:38px; object-fit:contain; vertical-align:middle; margin-right:8px; filter:drop-shadow(0 2px 2px rgba(0,0,0,.45)); }
     .caminhao-bombeiro-mapa { transform:translate(-50%,-50%) rotate(0deg)!important; }
     #pedidoLancheJogo { margin:9px 0; padding:11px; border:2px solid #f59e0b; border-radius:14px; background:rgba(120,53,15,.24); color:#fef3c7; font-weight:800; }
