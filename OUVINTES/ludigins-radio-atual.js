@@ -740,6 +740,11 @@ function renderizarCarretaNoMapa() {
     // Rua vertical no alto do mapa, à esquerda da Escola Municipal.
     el.style.left = '37%';
     el.style.top = '6%';
+    const imagem = document.createElement('img');
+    imagem.src = './assets/carreta-tanque-f.png?v=20260923';
+    imagem.alt = 'Carreta tanque F';
+    imagem.style.cssText = 'display:block;width:100%;height:100%;object-fit:contain';
+    el.appendChild(imagem);
     mapa.appendChild(el);
     if (estado.fase === 'em_entrega') requestAnimationFrame(() => { el.style.left = '57%'; el.style.top = '47%'; });
 }
