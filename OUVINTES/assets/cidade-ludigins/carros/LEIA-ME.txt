@@ -1,0 +1,15 @@
+PASTA OFICIAL DOS CARROS - CIDADE LUDIGINS
+
+Envie aqui os 10 modelos PNG:
+carro_01_popular.png
+carro_02_conforto.png
+carro_03_esportivo.png
+carro_04_executivo.png
+carro_05_suv.png
+carro_06_premium.png
+carro_07_aventura.png
+carro_08_elite.png
+carro_09_vip.png
+carro_10_luxo.png
+
+Os modelos serão usados pelo sistema de evolução dos veículos da Cidade Ludigins.
