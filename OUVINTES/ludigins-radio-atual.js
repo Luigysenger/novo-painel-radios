@@ -519,6 +519,7 @@ setInterval(() => {
 
 /* Logística dos negócios: posto, carreta, bombeiro e moto. */
 let logistica = {};
+let entregaLancheVisual = null;
 const CUSTO_CARGA_CARRETA = 120;
 const CUSTO_ABASTECER_BOMBEIRO_MANUAL = 12;
 const CUSTO_ABASTECER_MOTO = 3;
@@ -776,49 +777,62 @@ function renderizarCarretaNoMapa() {
     el.style.top = (window.scrollY + rect.top + rect.height * y) + 'px';
     el.style.transform = 'translate(-50%,-50%) rotate(' + rot + 'deg)';
 }
+function posicaoMeuCarroNoMapa() {
+    const meuId = meuIdLogistica();
+    let carro = meuId ? mapa?.querySelector('.carro-jogador[data-jogador-id="' + CSS.escape(meuId) + '"]') : null;
+    if (!carro) {
+        const meuNome = nomeDoOuvinteAtual();
+        carro = [...(mapa?.querySelectorAll('.carro-jogador') || [])].find(item => {
+            const id = String(item.dataset.jogadorId || '');
+            return normalizar(jogadores[id]?.nome) === meuNome;
+        }) || mapa?.querySelector('.carro-jogador');
+    }
+    if (!carro || !mapa) return {x:0.52,y:0.72};
+    const mr = mapa.getBoundingClientRect(), cr = carro.getBoundingClientRect();
+    return {
+        x: Math.max(.03, Math.min(.97, ((cr.left + cr.width/2) - mr.left) / mr.width)),
+        y: Math.max(.03, Math.min(.97, ((cr.top + cr.height/2) - mr.top) / mr.height))
+    };
+}
+function chuvaHamburgueres(x, y) {
+    if (!mapa) return;
+    const mr = mapa.getBoundingClientRect();
+    for (let i=0;i<7;i++) {
+        const h=document.createElement('div');
+        h.textContent='🍔';
+        h.style.cssText='position:absolute!important;z-index:2147483647!important;pointer-events:none!important;font-size:13px!important;left:'+(window.scrollX+mr.left+mr.width*x+(i-3)*5)+'px!important;top:'+(window.scrollY+mr.top+mr.height*y-22-(i%3)*6)+'px!important;transition:top .8s ease-in,opacity .8s ease-in!important;';
+        document.body.appendChild(h);
+        requestAnimationFrame(()=>{h.style.top=(window.scrollY+mr.top+mr.height*y+8)+'px';h.style.opacity='0';});
+        setTimeout(()=>h.remove(),900);
+    }
+}
 function renderizarMotoNoMapa() {
     mapa = document.getElementById('mapa');
     if (!mapa) return;
-
     let el = document.getElementById('motoLanchesVisivel');
     if (!el) {
-        el = document.createElement('div');
-        el.id = 'motoLanchesVisivel';
-        el.setAttribute('aria-label', 'Moto de lanches');
-        el.style.cssText = 'position:absolute!important;display:flex!important;align-items:center!important;justify-content:center!important;width:34px!important;height:34px!important;z-index:2147483646!important;pointer-events:none!important;font-size:26px!important;line-height:1!important;filter:drop-shadow(0 3px 3px rgba(0,0,0,.65))!important;transform-origin:center center!important;transition:left .30s linear,top .30s linear,transform .15s linear!important;';
-        el.textContent = '🛵';
-        document.body.appendChild(el);
+        el=document.createElement('div'); el.id='motoLanchesVisivel'; el.setAttribute('aria-label','Moto de lanches');
+        el.style.cssText='position:absolute!important;display:flex!important;align-items:center!important;justify-content:center!important;width:34px!important;height:34px!important;z-index:2147483646!important;pointer-events:none!important;font-size:26px!important;line-height:1!important;filter:drop-shadow(0 3px 3px rgba(0,0,0,.65))!important;transform-origin:center center!important;';
+        el.textContent='🛵'; document.body.appendChild(el);
     }
-
-    const rect = mapa.getBoundingClientRect();
-    const perfil = meuPerfilLogistica();
-    const pedido = perfil.pedidoLanchePendente;
-    const pedidoCriadoEm = Number(pedido?.criadoEm || 0);
-    const pedidoEmDeslocamento = Boolean(pedido && pedidoCriadoEm && (Date.now() - pedidoCriadoEm) < 8000);
-    let x = 0.335, y = 0.205, rot = 90; // rua vertical marcada no print, olhando para baixo
-
-    if (pedidoEmDeslocamento) {
-        const inicio = pedidoCriadoEm;
-        const progresso = Math.max(0, Math.min(1, (Date.now() - inicio) / 2600));
-        // Sai da rua de espera, desce e segue pela rua horizontal em direção ao motorista.
-        if (progresso < 0.55) {
-            const p = progresso / 0.55;
-            x = 0.335;
-            y = 0.205 + (0.315 * p);
-            rot = 90;
-        } else {
-            const p = (progresso - 0.55) / 0.45;
-            x = 0.335 + (0.155 * p);
-            y = 0.52;
-            rot = 0;
-        }
+    const rect=mapa.getBoundingClientRect();
+    // Mesma orientação do caminhão: cabine/frente voltada para baixo, na rua ao lado.
+    let x=.335,y=.205,rot=-90;
+    const ev=entregaLancheVisual;
+    if (ev) {
+        const alvo=ev.alvo;
+        const t=(Date.now()-ev.inicio)/ev.duracao;
+        if (t<.42) { const p=Math.max(0,t/.42); x=.335; y=.205+(alvo.y-.205)*p; rot=-90; }
+        else if(t<.50){const p=(t-.42)/.08;x=.335+(alvo.x-.335)*p;y=alvo.y;rot=alvo.x>=.335?0:180;}
+        else if(t<.62){x=alvo.x;y=alvo.y;rot=alvo.x>=.335?0:180;if(!ev.efeito){ev.efeito=true;chuvaHamburgueres(x,y);}}
+        else if(t<.92){const p=(t-.62)/.30;x=alvo.x+(.335-alvo.x)*p;y=alvo.y;rot=alvo.x>=.335?180:0;}
+        else if(t<1){const p=(t-.92)/.08;x=.335;y=alvo.y+(.205-alvo.y)*p;rot=90;}
+        else entregaLancheVisual=null;
     }
-
-    el.style.left = (window.scrollX + rect.left + rect.width * x) + 'px';
-    el.style.top = (window.scrollY + rect.top + rect.height * y) + 'px';
-    el.style.transform = 'translate(-50%,-50%) rotate(' + rot + 'deg)';
+    el.style.left=(window.scrollX+rect.left+rect.width*x)+'px';
+    el.style.top=(window.scrollY+rect.top+rect.height*y)+'px';
+    el.style.transform='translate(-50%,-50%) rotate('+rot+'deg)';
 }
-
 function estadoDoPostoPermiteAbastecer() {
     const estoque = logistica.posto || {};
     const fatias = inteiro(estoque.fatias,1,10);
@@ -889,7 +903,9 @@ async function pedirLanche() {
             ganhosHoje:Number(atual.ganhosHoje || 0)+preco,atualizadoEm:Date.now()};
     });
     if (!venda.committed) { avisoLogistica('A moto está sem lanches ou precisa abastecer.'); return; }
-    await update(ref(db, 'ludigins_usuarios/' + id), {saldo:Number(perfil.saldo || 0)-preco,ultimaRefeicaoCorrida:Number(perfil.pedidoLanchePendente.corrida || 0),pedidoLanchePendente:null,atualizadoEm:Date.now()});
+    const corridaDoPedido = Number(perfil.pedidoLanchePendente.corrida || 0);
+    entregaLancheVisual = {inicio:Date.now(),duracao:6500,alvo:posicaoMeuCarroNoMapa(),efeito:false};
+    await update(ref(db, 'ludigins_usuarios/' + id), {saldo:Number(perfil.saldo || 0)-preco,ultimaRefeicaoCorrida:corridaDoPedido,pedidoLanchePendente:null,atualizadoEm:Date.now()});
 }
 document.addEventListener('click', evento => {
     if (evento.target?.closest?.('[data-logistica-acao="pedir-lanche"]')) pedirLanche().catch(() => avisoLogistica('Não foi possível concluir o pedido.'));
