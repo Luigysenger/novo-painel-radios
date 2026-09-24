@@ -734,6 +734,23 @@ document.addEventListener('click', evento => {
 document.addEventListener('change', evento => {
     if (evento.target?.matches?.('[data-logistica-acao="preco-lanche"]')) definirPrecoLanche(evento.target.value).catch(() => {});
 });
+let estadoBombeiroVisual = null;
+onValue(ref(db, 'ludigins_jogo/caminhao_bombeiro_mapa'), snap => {
+    estadoBombeiroVisual = snap.val() || null;
+});
+function orientarBombeiroSemCabecaParaBaixo() {
+    const el = document.querySelector('.caminhao-bombeiro-mapa');
+    const e = estadoBombeiroVisual;
+    if (!el || !e) return;
+    const dx = Number(e.paraX ?? e.x ?? 0) - Number(e.deX ?? e.x ?? 0);
+    const dy = Number(e.paraY ?? e.y ?? 0) - Number(e.deY ?? e.y ?? 0);
+    let extra = '';
+    if (Math.abs(dx) >= Math.abs(dy)) extra = dx < 0 ? ' scaleX(-1)' : '';
+    else extra = dy >= 0 ? ' rotate(90deg)' : ' rotate(-90deg)';
+    el.style.setProperty('transform','translate(-50%,-50%)' + extra,'important');
+}
+setInterval(orientarBombeiroSemCabecaParaBaixo, 120);
+
 function renderizarCarretaNoMapa() {
     // Caminhão estaciona na rua vertical marcada, de frente para a parte de baixo.
     // Na entrega, percorre a malha em trechos ortogonais até o posto, sem ficar de cabeça para baixo.
@@ -752,7 +769,7 @@ function renderizarCarretaNoMapa() {
 
     const rect = mapa.getBoundingClientRect();
     const estado = logistica.carretaMapa || { fase: 'disponivel' };
-    let x = 0.095, y = 0.16, rot = 0; // visão de cima, alinhado verticalmente na rua
+    let x = 0.095, y = 0.16, rot = -90; // vertical, cabine voltada para baixo
 
     if (estado.fase === 'em_entrega') {
         const inicio = Number(estado.inicioEm || Date.now());
@@ -821,16 +838,16 @@ function renderizarMotoNoMapa() {
     }
     const rect=mapa.getBoundingClientRect();
     // Mesma orientação do caminhão: cabine/frente voltada para baixo, na rua ao lado.
-    let x=.335,y=.205,rot=0;
+    let x=.335,y=.205,rot=-90;
     const ev=entregaLancheVisual;
     if (ev) {
         const alvo=ev.alvo;
         const t=(Date.now()-ev.inicio)/ev.duracao;
-        if (t<.42) { const p=Math.max(0,t/.42); x=.335; y=.205+(alvo.y-.205)*p; rot=0; }
+        if (t<.42) { const p=Math.max(0,t/.42); x=.335; y=.205+(alvo.y-.205)*p; rot=-90; }
         else if(t<.50){const p=(t-.42)/.08;x=.335+(alvo.x-.335)*p;y=alvo.y;rot=alvo.x>=.335?0:180;}
         else if(t<.62){x=alvo.x;y=alvo.y;rot=alvo.x>=.335?0:180;if(!ev.efeito){ev.efeito=true;chuvaHamburgueres(x,y);}}
         else if(t<.92){const p=(t-.62)/.30;x=alvo.x+(.335-alvo.x)*p;y=alvo.y;rot=alvo.x>=.335?180:0;}
-        else if(t<1){const p=(t-.92)/.08;x=.335;y=alvo.y+(.205-alvo.y)*p;rot=0;}
+        else if(t<1){const p=(t-.92)/.08;x=.335;y=alvo.y+(.205-alvo.y)*p;rot=90;}
         else entregaLancheVisual=null;
     }
     el.style.left=(window.scrollX+rect.left+rect.width*x)+'px';
@@ -876,9 +893,15 @@ function atualizarPedidoDeLanche() {
     const id = meuIdLogistica();
     const perfil = meuPerfilLogistica();
     const corridas = Number(perfil.corridasHoje || 0);
-    if (!id || !corridas || corridas % 7 !== 0) return;
-    if (Number(perfil.pedidoLanchePendente?.corrida || 0) === corridas || Number(perfil.ultimaRefeicaoCorrida || 0) === corridas) return;
-    update(ref(db, 'ludigins_usuarios/' + id), {pedidoLanchePendente:{corrida:corridas,criadoEm:Date.now()},atualizadoEm:Date.now()}).catch(() => {});
+    const ultimaRefeicao = Number(perfil.ultimaRefeicaoCorrida || 0);
+    if (!id || corridas < 7 || perfil.pedidoLanchePendente) return;
+    // O pedido é obrigatório a cada bloco de 7 corridas concluídas.
+    // Se a atualização exata da 7ª corrida passar entre dois ciclos, continua pendente na 8ª, 9ª etc.
+    if ((corridas - ultimaRefeicao) < 7) return;
+    update(ref(db, 'ludigins_usuarios/' + id), {
+        pedidoLanchePendente:{corrida:corridas,criadoEm:Date.now()},
+        atualizadoEm:Date.now()
+    }).catch(() => {});
 }
 function renderizarPedidoLanche() {
     const existente = document.getElementById('pedidoLancheJogo');
