@@ -55,6 +55,31 @@ estilo.textContent = `
 `;
 document.head.appendChild(estilo);
 
+// No macOS, os desenhos do embarque não dependem da disponibilidade de emojis.
+// Mantém as animações, posições, atrasos e duração definidos pelo jogo.
+if (/Mac/i.test(navigator.platform || '')) {
+    estilo.textContent += `
+        #mapa .embarque-pessoa, #mapa .embarque-mala {
+            font-size: 0;
+            color: transparent;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+        }
+        #mapa .embarque-pessoa {
+            width: 24px;
+            height: 32px;
+            background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2032%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%225%22%20r%3D%224%22%20fill%3D%22%23edbd94%22%2F%3E%3Cpath%20d%3D%22M8%209h8l4%2011-3%201-2-6v8H9v-8l-2%206-3-1z%22%20fill%3D%22%2338bdf8%22%2F%3E%3Cpath%20d%3D%22M9%2022h3v9H8zm3%200h3l1%209h-4z%22%20fill%3D%22%23334155%22%2F%3E%3C%2Fsvg%3E");
+        }
+        #mapa .embarque-mala {
+            width: 24px;
+            height: 28px;
+            background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2028%22%3E%3Cpath%20d%3D%22M8%207V3h8v4%22%20fill%3D%22none%22%20stroke%3D%22%23f8fafc%22%20stroke-width%3D%222%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%227%22%20width%3D%2218%22%20height%3D%2218%22%20rx%3D%223%22%20fill%3D%22%23c084fc%22%20stroke%3D%22%23581c87%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M8%2010v12m8-12v12%22%20stroke%3D%22%237e22ce%22%20stroke-width%3D%222%22%2F%3E%3Ccircle%20cx%3D%227%22%20cy%3D%2226%22%20r%3D%222%22%20fill%3D%22%230f172a%22%2F%3E%3Ccircle%20cx%3D%2217%22%20cy%3D%2226%22%20r%3D%222%22%20fill%3D%22%230f172a%22%2F%3E%3C%2Fsvg%3E");
+        }
+    `;
+}
+
+
 let jogadores = {};
 let perfis = {};
 let radiosAtuais = {};
@@ -769,7 +794,7 @@ function renderizarCarretaNoMapa() {
 
     const rect = mapa.getBoundingClientRect();
     const estado = logistica.carretaMapa || { fase: 'disponivel' };
-    let x = 0.095, y = 0.16, rot = 0; // arte vista de cima já aponta para baixo
+    let x = 0.095, y = 0.075, rot = 0; // recuado na mesma rua, antes do cruzamento
 
     if (estado.fase === 'em_entrega') {
         const inicio = Number(estado.inicioEm || Date.now());
@@ -779,7 +804,7 @@ function renderizarCarretaNoMapa() {
         if (progresso < 0.38) {
             const p = progresso / 0.38;
             x = 0.095;
-            y = 0.16 + (0.31 * p);
+            y = 0.075 + ((0.47 - 0.075) * p);
             rot = 0;
         } else if (progresso < 0.76) {
             const p = (progresso - 0.38) / 0.38;
@@ -838,16 +863,16 @@ function renderizarMotoNoMapa() {
     }
     const rect=mapa.getBoundingClientRect();
     // Mesma orientação do caminhão: cabine/frente voltada para baixo, na rua ao lado.
-    let x=.335,y=.205,rot=0;
+    let x=.335,y=.075,rot=0;
     const ev=entregaLancheVisual;
     if (ev) {
         const alvo=ev.alvo;
         const t=(Date.now()-ev.inicio)/ev.duracao;
-        if (t<.42) { const p=Math.max(0,t/.42); x=.335; y=.205+(alvo.y-.205)*p; rot=0; }
+        if (t<.42) { const p=Math.max(0,t/.42); x=.335; y=.075+(alvo.y-.075)*p; rot=0; }
         else if(t<.50){const p=(t-.42)/.08;x=.335+(alvo.x-.335)*p;y=alvo.y;rot=alvo.x>=.335?0:180;}
         else if(t<.62){x=alvo.x;y=alvo.y;rot=alvo.x>=.335?0:180;if(!ev.efeito){ev.efeito=true;chuvaHamburgueres(x,y);}}
         else if(t<.92){const p=(t-.62)/.30;x=alvo.x+(.335-alvo.x)*p;y=alvo.y;rot=alvo.x>=.335?180:0;}
-        else if(t<1){const p=(t-.92)/.08;x=.335;y=alvo.y+(.205-alvo.y)*p;rot=180;}
+        else if(t<1){const p=(t-.92)/.08;x=.335;y=alvo.y+(.075-alvo.y)*p;rot=180;}
         else entregaLancheVisual=null;
     }
     el.style.left=(window.scrollX+rect.left+rect.width*x)+'px';
