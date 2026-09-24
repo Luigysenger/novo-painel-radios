@@ -665,7 +665,7 @@ function renderizarLogistica() {
     }
     if (souDonoDoNegocio(carreta)) {
         partes.push(
-            '<section class="logistica-card"><h3><img class="carreta-f-imagem" src="./assets/carreta-tanque-f.png" alt="Carreta tanque F">Gestão da Carreta de Combustível</h3>' +
+            '<section class="logistica-card" id="gestaoCarretaCombustivel"><h3><img class="carreta-f-imagem" src="./assets/carreta-tanque-f.png" alt="Carreta tanque F">Gestão da Carreta de Combustível</h3>' +
             '<p>Proprietário da carreta: <strong>' + (carreta.donoNome || 'Luigy') + '</strong></p>' +
             '<p>Modelo: <strong>caminhão-tanque F roxo</strong></p>' +
             '<p>Pedidos de postos hoje: <strong>' + inteiro(carreta.entregasHoje, 0, 999999) + '</strong></p>' +
@@ -1043,14 +1043,25 @@ function adicionarOfertaCarreta() {
     if (!loja) return;
     const existente = loja.querySelector('[data-negocio-logistica="carreta_combustivel"]');
     const carreta = negocios.carreta_combustivel || {};
-    if (souDonoDoNegocio(carreta)) { existente?.remove(); return; }
-    if (existente) return;
-    const item = document.createElement('div');
-    item.className = 'negocio-item';
-    item.dataset.negocioLogistica = 'carreta_combustivel';
-    item.innerHTML = '<strong><img class="carreta-f-imagem" src="./assets/carreta-tanque-f.png" alt="Carreta F">Carreta de combustível</strong><em>Entrega a carga que repõe o estoque dos postos.</em><button class="btn-comprar-negocio btn-proposta-logistica" type="button">Fazer proposta</button>';
-    loja.appendChild(item);
+    const souDono = souDonoDoNegocio(carreta);
+    const item = existente || document.createElement('div');
+    if (!existente) {
+        item.className = 'negocio-item';
+        item.dataset.negocioLogistica = 'carreta_combustivel';
+        item.innerHTML = '<strong><img class="carreta-f-imagem" src="./assets/carreta-tanque-f.png" alt="Caminhão de combustível">Caminhão de combustível</strong><em>Entrega a carga que repõe o estoque dos postos.</em><button class="btn-comprar-negocio" type="button"></button>';
+        loja.appendChild(item);
+    }
+    const botao = item.querySelector('button');
+    botao.classList.toggle('btn-proposta-logistica', !souDono);
+    botao.classList.toggle('btn-gestao-carreta', souDono);
+    botao.textContent = souDono ? 'Ver gestão do caminhão de combustível' : 'Fazer proposta';
 }
+document.addEventListener('click', evento => {
+    const botao = evento.target?.closest?.('.btn-gestao-carreta');
+    if (!botao || !souDonoDoNegocio(negocios.carreta_combustivel || {})) return;
+    renderizarLogistica();
+    document.getElementById('gestaoCarretaCombustivel')?.scrollIntoView({behavior:'smooth',block:'start'});
+});
 document.addEventListener('click', evento => {
     const botao = evento.target?.closest?.('.btn-proposta-logistica');
     if (!botao) return;
