@@ -3688,6 +3688,33 @@
                 script.type = 'module';
                 script.src = './ludigins-radio-atual.js?v=' + Date.now();
                 documentoJogo.head.appendChild(script);
+
+                // Carreta F: é inserida pelo painel pai para não depender do ciclo
+                // interno de redesenho do jogo no Safari/iPhone.
+                const garantirCarretaF = () => {
+                    const mapaAtual = documentoJogo.getElementById('mapa');
+                    if (!mapaAtual) return;
+                    if (documentoJogo.defaultView.getComputedStyle(mapaAtual).position === 'static') {
+                        mapaAtual.style.position = 'relative';
+                    }
+                    let carreta = mapaAtual.querySelector('.carreta-f-fixa');
+                    if (!carreta) {
+                        carreta = documentoJogo.createElement('img');
+                        carreta.className = 'carreta-f-fixa';
+                        carreta.alt = 'Carreta tanque F';
+                        carreta.src = './assets/carreta-tanque-f.png?v=202609232145';
+                        carreta.style.cssText = 'position:absolute;left:37%;top:6%;width:76px;height:52px;object-fit:contain;transform:translate(-50%,-50%);z-index:2147483647;pointer-events:none;';
+                        mapaAtual.appendChild(carreta);
+                    }
+                };
+                garantirCarretaF();
+                const timerCarretaF = setInterval(() => {
+                    if (!ludiginsFrame.contentDocument || ludiginsFrame.contentDocument !== documentoJogo) {
+                        clearInterval(timerCarretaF);
+                        return;
+                    }
+                    garantirCarretaF();
+                }, 500);
             }, 0);
         });
 
