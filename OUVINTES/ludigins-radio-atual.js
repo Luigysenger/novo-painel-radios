@@ -730,29 +730,29 @@ document.addEventListener('change', evento => {
     if (evento.target?.matches?.('[data-logistica-acao="preco-lanche"]')) definirPrecoLanche(evento.target.value).catch(() => {});
 });
 function renderizarCarretaNoMapa() {
-    // O mapa é recriado pelo jogo em alguns redesenhos. Busca sempre a instância atual.
+    // A carreta fica no BODY, sobre as coordenadas reais do mapa.
+    // Assim ela aparece mesmo se o mapa for redesenhado ou não aceitar filhos visuais.
     mapa = document.getElementById('mapa');
     if (!mapa) return;
-    mapa.querySelectorAll('.carreta-combustivel-mapa').forEach(el => el.remove());
 
-    if (getComputedStyle(mapa).position === 'static') mapa.style.position = 'relative';
+    let el = document.getElementById('carretaTanqueFVisivel');
+    if (!el) {
+        el = document.createElement('img');
+        el.id = 'carretaTanqueFVisivel';
+        el.className = 'carreta-combustivel-mapa';
+        el.alt = 'Carreta tanque F';
+        el.src = './assets/carreta-tanque-f.png?v=202609232230';
+        el.style.cssText = 'position:absolute!important;display:block!important;visibility:visible!important;opacity:1!important;width:76px!important;height:52px!important;object-fit:contain!important;z-index:2147483647!important;pointer-events:none!important;transform:translate(-50%,-50%)!important;';
+        document.body.appendChild(el);
+    }
 
+    const rect = mapa.getBoundingClientRect();
     const estado = logistica.carretaMapa || { fase: 'disponivel' };
-    const el = document.createElement('div');
-    el.className = 'carreta-combustivel-mapa';
-    el.style.cssText = 'position:absolute;z-index:9999;width:76px;height:52px;pointer-events:none;left:37%;top:6%;transform:translate(-50%,-50%);';
-
-    const imagem = document.createElement('img');
-    imagem.src = './assets/carreta-tanque-f.png?v=202609232138';
-    imagem.alt = 'Carreta tanque F';
-    imagem.style.cssText = 'display:block;width:76px;height:52px;object-fit:contain;';
-    el.appendChild(imagem);
-    mapa.appendChild(el);
-
-    if (estado.fase === 'em_entrega') requestAnimationFrame(() => {
-        el.style.left = '57%';
-        el.style.top = '47%';
-    });
+    const emEntrega = estado.fase === 'em_entrega';
+    const x = emEntrega ? 0.57 : 0.37;
+    const y = emEntrega ? 0.47 : 0.06;
+    el.style.left = (window.scrollX + rect.left + rect.width * x) + 'px';
+    el.style.top = (window.scrollY + rect.top + rect.height * y) + 'px';
 }
 function estadoDoPostoPermiteAbastecer() {
     const estoque = logistica.posto || {};
@@ -850,6 +850,12 @@ async function garantirBaseLogistica() {
 onValue(ref(db, 'ludigins_jogo/logistica'), snapshot => { logistica = snapshot.val() || {}; renderizarLogistica(); });
 setTimeout(() => garantirBaseLogistica().catch(() => {}), 1200);
 
+
+// A carreta tem ciclo próprio: nenhum erro em painel, pedido ou logística pode impedir sua exibição.
+renderizarCarretaNoMapa();
+setInterval(renderizarCarretaNoMapa, 400);
+window.addEventListener('resize', renderizarCarretaNoMapa);
+window.addEventListener('scroll', renderizarCarretaNoMapa, { passive: true });
 
 // Mantém os controles e os pedidos sincronizados depois dos redesenhos do jogo.
 setInterval(() => {
