@@ -740,7 +740,7 @@ function renderizarCarretaNoMapa() {
         el = document.createElement('div');
         el.id = 'carretaTanqueFVisivel';
         el.setAttribute('aria-label', 'Caminhão tanque');
-        el.style.cssText = 'position:absolute!important;display:flex!important;align-items:center!important;justify-content:center!important;visibility:visible!important;opacity:1!important;width:52px!important;height:52px!important;z-index:2147483647!important;pointer-events:none!important;font-size:40px!important;line-height:1!important;filter:drop-shadow(0 3px 3px rgba(0,0,0,.65))!important;transform-origin:center center!important;transition:left .35s linear,top .35s linear,transform .15s linear!important;';
+        el.style.cssText = 'position:absolute!important;display:flex!important;align-items:center!important;justify-content:center!important;visibility:visible!important;opacity:1!important;width:46px!important;height:46px!important;z-index:2147483647!important;pointer-events:none!important;font-size:35px!important;line-height:1!important;filter:drop-shadow(0 3px 3px rgba(0,0,0,.65))!important;transform-origin:center center!important;transition:left .35s linear,top .35s linear,transform .15s linear!important;';
         el.textContent = '🚛';
         document.body.appendChild(el);
     }
@@ -793,7 +793,7 @@ function renderizarMotoNoMapa() {
     const rect = mapa.getBoundingClientRect();
     const perfil = meuPerfilLogistica();
     const pedido = perfil.pedidoLanchePendente;
-    let x = 0.31, y = 0.16, rot = 90; // rua ao lado: parada olhando para baixo
+    let x = 0.335, y = 0.17, rot = 90; // rua vertical marcada ao lado do caminhão
 
     if (pedido) {
         const inicio = Number(pedido.criadoEm || Date.now());
@@ -801,12 +801,12 @@ function renderizarMotoNoMapa() {
         // Sai da rua de espera, desce e segue pela rua horizontal em direção ao motorista.
         if (progresso < 0.55) {
             const p = progresso / 0.55;
-            x = 0.31;
-            y = 0.16 + (0.36 * p);
+            x = 0.335;
+            y = 0.17 + (0.35 * p);
             rot = 90;
         } else {
             const p = (progresso - 0.55) / 0.45;
-            x = 0.31 + (0.18 * p);
+            x = 0.335 + (0.155 * p);
             y = 0.52;
             rot = 0;
         }
