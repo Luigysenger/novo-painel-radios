@@ -665,7 +665,7 @@ function renderizarLogistica() {
     }
     if (souDonoDoNegocio(carreta)) {
         partes.push(
-            '<section class="logistica-card" id="gestaoCarretaCombustivel"><h3><img class="carreta-f-imagem" src="./assets/carreta-tanque-f.png" alt="Carreta tanque F">Gestão da Carreta de Combustível</h3>' +
+            '<section class="logistica-card" id="gestaoCarretaCombustivel"><h3><span role="img" aria-label="Caminhão de combustível">🚛</span>Gestão da Carreta de Combustível</h3>' +
             '<p>Proprietário da carreta: <strong>' + (carreta.donoNome || 'Luigy') + '</strong></p>' +
             '<p>Modelo: <strong>caminhão-tanque F roxo</strong></p>' +
             '<p>Pedidos de postos hoje: <strong>' + inteiro(carreta.entregasHoje, 0, 999999) + '</strong></p>' +
@@ -1048,7 +1048,7 @@ function adicionarOfertaCarreta() {
     if (!existente) {
         item.className = 'negocio-item';
         item.dataset.negocioLogistica = 'carreta_combustivel';
-        item.innerHTML = '<strong><img class="carreta-f-imagem" src="./assets/carreta-tanque-f.png" alt="Caminhão de combustível">Caminhão de combustível</strong><em>Entrega a carga que repõe o estoque dos postos.</em><button class="btn-comprar-negocio" type="button"></button>';
+        item.innerHTML = '<strong><span role="img" aria-label="Caminhão de combustível">🚛</span>Caminhão de combustível</strong><em>Entrega a carga que repõe o estoque dos postos.</em><button class="btn-comprar-negocio" type="button"></button>';
         loja.appendChild(item);
     }
     const botao = item.querySelector('button');
