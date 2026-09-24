@@ -739,8 +739,8 @@ function renderizarCarretaNoMapa() {
         el = document.createElement('div');
         el.id = 'carretaTanqueFVisivel';
         el.setAttribute('aria-label', 'Caminhão tanque');
-        el.style.cssText = 'position:absolute!important;display:block!important;visibility:visible!important;opacity:1!important;width:78px!important;height:42px!important;z-index:2147483647!important;pointer-events:none!important;transform:translate(-50%,-50%)!important;';
-        el.innerHTML = '<div style="position:absolute;left:0;top:12px;width:27px;height:22px;border-radius:5px 3px 3px 5px;background:#7c3aed;border:2px solid #ddd6fe;box-sizing:border-box"><div style="position:absolute;left:5px;top:4px;width:11px;height:7px;background:#93c5fd;border-radius:2px"></div></div><div style="position:absolute;left:24px;top:8px;width:49px;height:25px;border-radius:13px;background:linear-gradient(#e5e7eb,#9ca3af);border:3px solid #6d28d9;box-sizing:border-box"><div style="position:absolute;left:7px;top:8px;width:29px;height:4px;background:#7c3aed;border-radius:4px"></div></div><div style="position:absolute;left:7px;top:31px;width:12px;height:12px;border-radius:50%;background:#111827;border:3px solid #64748b;box-sizing:border-box"></div><div style="position:absolute;left:53px;top:31px;width:12px;height:12px;border-radius:50%;background:#111827;border:3px solid #64748b;box-sizing:border-box"></div>';
+        el.style.cssText = 'position:absolute!important;display:flex!important;align-items:center!important;justify-content:center!important;visibility:visible!important;opacity:1!important;width:62px!important;height:48px!important;z-index:2147483647!important;pointer-events:none!important;transform:translate(-50%,-50%)!important;font-size:40px!important;line-height:1!important;filter:drop-shadow(0 3px 3px rgba(0,0,0,.65))!important;';
+        el.textContent = '🚛';
         document.body.appendChild(el);
     }
 
