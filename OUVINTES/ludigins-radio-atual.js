@@ -2,7 +2,7 @@ import { db } from '../firebase-config.js';
 import { ref, onValue, update, get, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 const feed = document.getElementById('feed');
-const mapa = document.getElementById('mapa');
+let mapa = document.getElementById('mapa');
 
 const estilo = document.createElement('style');
 estilo.textContent = `
@@ -730,12 +730,11 @@ document.addEventListener('change', evento => {
     if (evento.target?.matches?.('[data-logistica-acao="preco-lanche"]')) definirPrecoLanche(evento.target.value).catch(() => {});
 });
 function renderizarCarretaNoMapa() {
+    // O mapa é recriado pelo jogo em alguns redesenhos. Busca sempre a instância atual.
+    mapa = document.getElementById('mapa');
     if (!mapa) return;
     mapa.querySelectorAll('.carreta-combustivel-mapa').forEach(el => el.remove());
 
-    // O mapa precisa ser a referência das coordenadas da carreta.
-    // Sem isto, em alguns navegadores (principalmente Safari/iPhone),
-    // o position:absolute pode usar outro ancestral e a carreta fica fora da área visível.
     if (getComputedStyle(mapa).position === 'static') mapa.style.position = 'relative';
 
     const estado = logistica.carretaMapa || { fase: 'disponivel' };
@@ -744,7 +743,7 @@ function renderizarCarretaNoMapa() {
     el.style.cssText = 'position:absolute;z-index:9999;width:76px;height:52px;pointer-events:none;left:37%;top:6%;transform:translate(-50%,-50%);';
 
     const imagem = document.createElement('img');
-    imagem.src = new URL('assets/carreta-tanque-f.png', document.baseURI).href + '?v=202609232135';
+    imagem.src = './assets/carreta-tanque-f.png?v=202609232138';
     imagem.alt = 'Carreta tanque F';
     imagem.style.cssText = 'display:block;width:76px;height:52px;object-fit:contain;';
     el.appendChild(imagem);
