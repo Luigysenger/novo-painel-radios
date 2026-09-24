@@ -672,7 +672,7 @@ function renderizarLogistica() {
             '<p>Ganhos da carreta hoje: <strong>' + inteiro(carreta.ganhosHoje, 0, 999999).toLocaleString('pt-BR') + ' 🪙</strong></p>' +
             '<p>Você recebe 120 🪙 por carga entregue.</p>' +
             '<p style="text-align:center;font-weight:900;margin-top:13px">Rota da carreta</p><div class="logistica-rota"><i></i><b></b><i></i><b></b><i></i><b></b><i></i></div>' +
-            '<div class="logistica-ok">✓ ' + (logistica.carretaMapa?.fase === 'em_entrega' ? 'Carreta a caminho do posto.' : 'Carreta disponível para entrega.') + '</div><button class="btn-logistica" data-logistica-acao="ver-entregas">Ver entregas da carreta</button></section>'
+            '<div class="logistica-ok">✓ ' + ({indo:'Carreta a caminho do posto.',descarregando:'Descarregando combustível — 2 minutos.',voltando:'Carreta retornando à base.',disponivel:'Carreta disponível para entrega.'}[posicaoEntregaCarreta(logistica.carretaMapa).fase]) + '</div><button class="btn-logistica" data-logistica-acao="ver-entregas">Ver entregas da carreta</button></section>'
         );
     }
     if (souDonoDoNegocio(bombeiro)) {
@@ -704,23 +704,73 @@ function renderizarLogistica() {
     painel.innerHTML = partes.join('');
     renderizarCarretaNoMapa();
 }
-async function pedirCargaCompleta() {
-    const posto = negocios.posto_combustivel || {};
-    if (!souDonoDoNegocio(posto)) return;
-    const pago = await runTransaction(ref(db, 'ludigins_jogo/negocios/posto_combustivel'), atual => {
-        if (!atual || Number(atual.caixa || 0) < CUSTO_CARGA_CARRETA) return;
-        return { ...atual, caixa:Number(atual.caixa || 0) - CUSTO_CARGA_CARRETA, atualizadoEm:Date.now() };
-    });
-    if (!pago.committed) { avisoLogistica('A caixa do posto precisa ter 120 🪙 para pedir a carga.'); return; }
-    const agora = Date.now();
-    await update(ref(db, 'ludigins_jogo/logistica'), { posto:{fatias:10,usosNaUltimaFatia:0,atualizadoEm:agora}, carretaMapa:{fase:'em_entrega',inicioEm:agora} });
-    await runTransaction(ref(db, 'ludigins_jogo/negocios/carreta_combustivel'), atual => ({
-        ...(atual || {}), caixa:Number(atual?.caixa || 0) + CUSTO_CARGA_CARRETA,
-        ganhosHoje:Number(atual?.ganhosHoje || 0) + CUSTO_CARGA_CARRETA,
-        entregasHoje:Number(atual?.entregasHoje || 0) + 1, atualizadoEm:agora
-    }));
-    setTimeout(() => update(ref(db, 'ludigins_jogo/logistica/carretaMapa'), {fase:'disponivel',atualizadoEm:Date.now()}).catch(() => {}), 2700);
+const ROTA_CARRETA = [
+    {x:.095,y:.075}, {x:.095,y:.809}, {x:.87,y:.809},
+    {x:.87,y:.384}, {x:.76,y:.384}
+];
+const DESCARGA_CARRETA_MS = 120000;
+// Táxi básico: aproximadamente 22 unidades do mapa em cinco segundos.
+const TRECHOS_CARRETA_MS = ROTA_CARRETA.slice(1).map((p,i) =>
+    Math.hypot(p.x-ROTA_CARRETA[i].x,p.y-ROTA_CARRETA[i].y)*100*5000/22);
+const IDA_CARRETA_MS = TRECHOS_CARRETA_MS.reduce((a,b)=>a+b,0);
+
+function posicaoEntregaCarreta(estado, agora = Date.now()) {
+    const base = {...ROTA_CARRETA[0],rot:0,fase:'disponivel'};
+    if (estado?.fase !== 'em_entrega') return base;
+    const t = Math.max(0,agora-Number(estado.inicioEm));
+    if (!Number.isFinite(t) || t >= IDA_CARRETA_MS*2+DESCARGA_CARRETA_MS) return base;
+    if (t >= IDA_CARRETA_MS && t < IDA_CARRETA_MS+DESCARGA_CARRETA_MS)
+        return {...ROTA_CARRETA[4],rot:90,fase:'descarregando'};
+    const volta = t >= IDA_CARRETA_MS+DESCARGA_CARRETA_MS;
+    let restante = volta ? t-IDA_CARRETA_MS-DESCARGA_CARRETA_MS : t;
+    const pontos = volta ? [...ROTA_CARRETA].reverse() : ROTA_CARRETA;
+    const tempos = volta ? [...TRECHOS_CARRETA_MS].reverse() : TRECHOS_CARRETA_MS;
+    for (let i=0;i<tempos.length;i++) {
+        if (restante <= tempos[i] || i===tempos.length-1) {
+            const p=Math.min(1,restante/tempos[i]), a=pontos[i], b=pontos[i+1];
+            const rot=b.x>a.x ? -90 : b.x<a.x ? 90 : b.y<a.y ? 180 : 0;
+            return {x:a.x+(b.x-a.x)*p,y:a.y+(b.y-a.y)*p,rot,fase:volta?'voltando':'indo'};
+        }
+        restante-=tempos[i];
+    }
+    return base;
 }
+async function pedirCargaCompleta() {
+    if (!souDonoDoNegocio(negocios.posto_combustivel || {})) return;
+    const agora=Date.now();
+    const pago=await runTransaction(ref(db,'ludigins_jogo'), atual => {
+        const posto=atual?.negocios?.posto_combustivel;
+        const entrega=atual?.logistica?.carretaMapa;
+        if (!posto || !souDonoDoNegocio(posto) || Number(posto.caixa||0)<CUSTO_CARGA_CARRETA ||
+            posicaoEntregaCarreta(entrega,agora).fase!=='disponivel' ||
+            (entrega?.fase==='em_entrega' && !entrega.estoqueEntregue)) return;
+        const carreta=atual.negocios.carreta_combustivel || {};
+        return {...atual,negocios:{...atual.negocios,
+            posto_combustivel:{...posto,caixa:Number(posto.caixa||0)-CUSTO_CARGA_CARRETA,atualizadoEm:agora},
+            carreta_combustivel:{...carreta,caixa:Number(carreta.caixa||0)+CUSTO_CARGA_CARRETA,
+                ganhosHoje:Number(carreta.ganhosHoje||0)+CUSTO_CARGA_CARRETA,
+                entregasHoje:Number(carreta.entregasHoje||0)+1,atualizadoEm:agora}},
+            logistica:{...atual.logistica,carretaMapa:{fase:'em_entrega',inicioEm:agora,estoqueEntregue:false}}};
+    });
+    if (!pago.committed) avisoLogistica('Aguarde o caminhão retornar à base e confira os 120 🪙 na caixa do posto.');
+}
+let finalizandoDescargaCarreta=false;
+async function concluirDescargaCarreta() {
+    const estado=logistica.carretaMapa;
+    if (finalizandoDescargaCarreta || estado?.fase!=='em_entrega' || estado.estoqueEntregue ||
+        Date.now()<Number(estado.inicioEm)+IDA_CARRETA_MS+DESCARGA_CARRETA_MS) return;
+    finalizandoDescargaCarreta=true;
+    try {
+        await runTransaction(ref(db,'ludigins_jogo/logistica'), atual => {
+            const e=atual?.carretaMapa;
+            if (e?.fase!=='em_entrega' || e.estoqueEntregue ||
+                Date.now()<Number(e.inicioEm)+IDA_CARRETA_MS+DESCARGA_CARRETA_MS) return;
+            return {...atual,posto:{...atual.posto,fatias:10,usosNaUltimaFatia:0,atualizadoEm:Date.now()},
+                carretaMapa:{...e,estoqueEntregue:true}};
+        });
+    } finally { finalizandoDescargaCarreta=false; }
+}
+setInterval(()=>concluirDescargaCarreta().catch(console.warn),1000);
 async function abastecerNegocio(id, custo, campos) {
     const negocio = negocios[id] || {};
     if (!souDonoDoNegocio(negocio)) return;
@@ -794,31 +844,9 @@ function renderizarCarretaNoMapa() {
 
     const rect = mapa.getBoundingClientRect();
     const estado = logistica.carretaMapa || { fase: 'disponivel' };
-    let x = 0.095, y = 0.075, rot = 0; // recuado na mesma rua, antes do cruzamento
-
-    if (estado.fase === 'em_entrega') {
-        const inicio = Number(estado.inicioEm || Date.now());
-        const progresso = Math.max(0, Math.min(1, (Date.now() - inicio) / 2700));
-
-        // Rota pelas ruas: desce -> segue à direita -> desce até o posto.
-        if (progresso < 0.38) {
-            const p = progresso / 0.38;
-            x = 0.095;
-            y = 0.075 + ((0.47 - 0.075) * p);
-            rot = 0;
-        } else if (progresso < 0.76) {
-            const p = (progresso - 0.38) / 0.38;
-            x = 0.095 + (0.675 * p);
-            y = 0.47;
-            rot = 0;
-        } else {
-            const p = (progresso - 0.76) / 0.24;
-            x = 0.77;
-            y = 0.47 + (0.10 * p);
-            rot = 0;
-        }
-    }
-
+    const {x,y,rot,fase} = posicaoEntregaCarreta(estado);
+    el.style.setProperty('opacity', fase === 'descarregando' && Math.floor(Date.now()/500)%2 ? '.3' : '1', 'important');
+    el.setAttribute('aria-label', fase === 'descarregando' ? 'Caminhão descarregando combustível por dois minutos' : 'Caminhão tanque');
     el.style.left = (window.scrollX + rect.left + rect.width * x) + 'px';
     el.style.top = (window.scrollY + rect.top + rect.height * y) + 'px';
     el.style.transform = 'translate(-50%,-50%) rotate(' + rot + 'deg)';
