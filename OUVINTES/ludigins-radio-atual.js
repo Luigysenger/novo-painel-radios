@@ -730,7 +730,8 @@ document.addEventListener('change', evento => {
     if (evento.target?.matches?.('[data-logistica-acao="preco-lanche"]')) definirPrecoLanche(evento.target.value).catch(() => {});
 });
 function renderizarCarretaNoMapa() {
-    // Caminhão-tanque desenhado em HTML/CSS: não depende de PNG ou servidor externo.
+    // Caminhão estaciona na rua vertical marcada, de frente para a parte de baixo.
+    // Na entrega, percorre a malha em trechos ortogonais até o posto, sem ficar de cabeça para baixo.
     mapa = document.getElementById('mapa');
     if (!mapa) return;
 
@@ -739,18 +740,41 @@ function renderizarCarretaNoMapa() {
         el = document.createElement('div');
         el.id = 'carretaTanqueFVisivel';
         el.setAttribute('aria-label', 'Caminhão tanque');
-        el.style.cssText = 'position:absolute!important;display:flex!important;align-items:center!important;justify-content:center!important;visibility:visible!important;opacity:1!important;width:62px!important;height:48px!important;z-index:2147483647!important;pointer-events:none!important;transform:translate(-50%,-50%)!important;font-size:40px!important;line-height:1!important;filter:drop-shadow(0 3px 3px rgba(0,0,0,.65))!important;';
+        el.style.cssText = 'position:absolute!important;display:flex!important;align-items:center!important;justify-content:center!important;visibility:visible!important;opacity:1!important;width:52px!important;height:52px!important;z-index:2147483647!important;pointer-events:none!important;font-size:40px!important;line-height:1!important;filter:drop-shadow(0 3px 3px rgba(0,0,0,.65))!important;transform-origin:center center!important;transition:left .35s linear,top .35s linear,transform .15s linear!important;';
         el.textContent = '🚛';
         document.body.appendChild(el);
     }
 
     const rect = mapa.getBoundingClientRect();
     const estado = logistica.carretaMapa || { fase: 'disponivel' };
-    const emEntrega = estado.fase === 'em_entrega';
-    const x = emEntrega ? 0.57 : 0.37;
-    const y = emEntrega ? 0.47 : 0.06;
+    let x = 0.095, y = 0.16, rot = 90; // garagem: rua vertical marcada, olhando para baixo
+
+    if (estado.fase === 'em_entrega') {
+        const inicio = Number(estado.inicioEm || Date.now());
+        const progresso = Math.max(0, Math.min(1, (Date.now() - inicio) / 2700));
+
+        // Rota pelas ruas: desce -> segue à direita -> desce até o posto.
+        if (progresso < 0.38) {
+            const p = progresso / 0.38;
+            x = 0.095;
+            y = 0.16 + (0.31 * p);
+            rot = 90;
+        } else if (progresso < 0.76) {
+            const p = (progresso - 0.38) / 0.38;
+            x = 0.095 + (0.675 * p);
+            y = 0.47;
+            rot = 0;
+        } else {
+            const p = (progresso - 0.76) / 0.24;
+            x = 0.77;
+            y = 0.47 + (0.10 * p);
+            rot = 90;
+        }
+    }
+
     el.style.left = (window.scrollX + rect.left + rect.width * x) + 'px';
     el.style.top = (window.scrollY + rect.top + rect.height * y) + 'px';
+    el.style.transform = 'translate(-50%,-50%) rotate(' + rot + 'deg)';
 }
 function estadoDoPostoPermiteAbastecer() {
     const estoque = logistica.posto || {};
