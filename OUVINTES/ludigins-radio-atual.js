@@ -730,19 +730,17 @@ document.addEventListener('change', evento => {
     if (evento.target?.matches?.('[data-logistica-acao="preco-lanche"]')) definirPrecoLanche(evento.target.value).catch(() => {});
 });
 function renderizarCarretaNoMapa() {
-    // A carreta fica no BODY, sobre as coordenadas reais do mapa.
-    // Assim ela aparece mesmo se o mapa for redesenhado ou não aceitar filhos visuais.
+    // Caminhão-tanque desenhado em HTML/CSS: não depende de PNG ou servidor externo.
     mapa = document.getElementById('mapa');
     if (!mapa) return;
 
     let el = document.getElementById('carretaTanqueFVisivel');
     if (!el) {
-        el = document.createElement('img');
+        el = document.createElement('div');
         el.id = 'carretaTanqueFVisivel';
-        el.className = 'carreta-combustivel-mapa';
-        el.alt = 'Carreta tanque F';
-        el.src = 'https://raw.githubusercontent.com/Luigysenger/novo-painel-radios/main/OUVINTES/assets/carreta-tanque-f.png?v=202609232200';
-        el.style.cssText = 'position:absolute!important;display:block!important;visibility:visible!important;opacity:1!important;width:76px!important;height:52px!important;object-fit:contain!important;z-index:2147483647!important;pointer-events:none!important;transform:translate(-50%,-50%)!important;';
+        el.setAttribute('aria-label', 'Caminhão tanque');
+        el.style.cssText = 'position:absolute!important;display:block!important;visibility:visible!important;opacity:1!important;width:78px!important;height:42px!important;z-index:2147483647!important;pointer-events:none!important;transform:translate(-50%,-50%)!important;';
+        el.innerHTML = '<div style="position:absolute;left:0;top:12px;width:27px;height:22px;border-radius:5px 3px 3px 5px;background:#7c3aed;border:2px solid #ddd6fe;box-sizing:border-box"><div style="position:absolute;left:5px;top:4px;width:11px;height:7px;background:#93c5fd;border-radius:2px"></div></div><div style="position:absolute;left:24px;top:8px;width:49px;height:25px;border-radius:13px;background:linear-gradient(#e5e7eb,#9ca3af);border:3px solid #6d28d9;box-sizing:border-box"><div style="position:absolute;left:7px;top:8px;width:29px;height:4px;background:#7c3aed;border-radius:4px"></div></div><div style="position:absolute;left:7px;top:31px;width:12px;height:12px;border-radius:50%;background:#111827;border:3px solid #64748b;box-sizing:border-box"></div><div style="position:absolute;left:53px;top:31px;width:12px;height:12px;border-radius:50%;background:#111827;border:3px solid #64748b;box-sizing:border-box"></div>';
         document.body.appendChild(el);
     }
 
