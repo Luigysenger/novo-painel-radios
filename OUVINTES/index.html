@@ -3683,6 +3683,18 @@
                 const documentoJogo = ludiginsFrame.contentDocument;
                 if (!documentoJogo) return;
 
+                // A carreta é criada imediatamente no documento do jogo, sem depender
+                // do carregamento do módulo auxiliar.
+                const mapaImediato = documentoJogo.getElementById('mapa');
+                if (mapaImediato && !mapaImediato.querySelector('#carretaTanqueFForcada')) {
+                    const carretaForcada = documentoJogo.createElement('img');
+                    carretaForcada.id = 'carretaTanqueFForcada';
+                    carretaForcada.src = new URL('./assets/carreta-tanque-f.png?v=202609232200', ludiginsFrame.src).href;
+                    carretaForcada.alt = 'Carreta tanque F';
+                    carretaForcada.style.cssText = 'position:absolute!important;left:37%!important;top:6%!important;width:76px!important;height:52px!important;display:block!important;visibility:visible!important;opacity:1!important;object-fit:contain!important;transform:translate(-50%,-50%)!important;z-index:2147483647!important;pointer-events:none!important;';
+                    mapaImediato.appendChild(carretaForcada);
+                }
+
                 // O complemento pode já existir após uma reabertura do painel.
                 // Isso não pode impedir a carreta de ser garantida no mapa atual.
                 if (!documentoJogo.getElementById('ludiginsRadioAtualScript')) {
