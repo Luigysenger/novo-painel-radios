@@ -793,7 +793,7 @@ function renderizarMotoNoMapa() {
     const rect = mapa.getBoundingClientRect();
     const perfil = meuPerfilLogistica();
     const pedido = perfil.pedidoLanchePendente;
-    let x = 0.335, y = 0.17, rot = 90; // rua vertical marcada ao lado do caminhão
+    let x = 0.335, y = 0.205, rot = 90; // rua vertical marcada no print, olhando para baixo
 
     if (pedido) {
         const inicio = Number(pedido.criadoEm || Date.now());
@@ -802,7 +802,7 @@ function renderizarMotoNoMapa() {
         if (progresso < 0.55) {
             const p = progresso / 0.55;
             x = 0.335;
-            y = 0.17 + (0.35 * p);
+            y = 0.205 + (0.315 * p);
             rot = 90;
         } else {
             const p = (progresso - 0.55) / 0.45;
