@@ -1,36 +1,44 @@
-// Trânsito da Cidade Ludigins — veículos presos à malha viária central do asfalto.
+// Trânsito da Cidade Ludigins — veículos presos ao eixo central das vias de asfalto.
 (function(){
 const shell=document.querySelector('.mapa-shell');if(!shell)return;
 const CARROS=[
 {nivel:1,nome:'Popular',arquivo:'assets/cidade-ludigins/carros/carro_01_popular.png',corridas:0},{nivel:2,nome:'Conforto',arquivo:'assets/cidade-ludigins/carros/carro_02_conforto.png',corridas:200},{nivel:3,nome:'Esportivo',arquivo:'assets/cidade-ludigins/carros/carro_03_esportivo.png',corridas:500},{nivel:4,nome:'Executivo',arquivo:'assets/cidade-ludigins/carros/carro_04_executivo.png',corridas:1000},{nivel:5,nome:'SUV',arquivo:'assets/cidade-ludigins/carros/carro_05_suv.png',corridas:1500},{nivel:6,nome:'Premium',arquivo:'assets/cidade-ludigins/carros/carro_06_premium.png',corridas:2000},{nivel:7,nome:'Aventura',arquivo:'assets/cidade-ludigins/carros/carro_07_aventura.png',corridas:3000},{nivel:8,nome:'Elite',arquivo:'assets/cidade-ludigins/carros/carro_08_elite.png',corridas:4500},{nivel:9,nome:'VIP',arquivo:'assets/cidade-ludigins/carros/carro_09_vip.png',corridas:6500},{nivel:10,nome:'Luxo',arquivo:'assets/cidade-ludigins/carros/carro_10_luxo.png',corridas:9000}];
 const css=document.createElement('style');css.textContent=`.cidade-transito{position:absolute;inset:0;z-index:7;pointer-events:none;overflow:hidden}.cidade-veiculo{position:absolute;left:0;top:0;transform:translate(-50%,-50%);width:clamp(78px,5vw,96px);height:clamp(35px,2.4vw,45px);z-index:8;transform-origin:center center;will-change:left,top,transform}.cidade-veiculo:before{content:'';position:absolute;left:50%;top:50%;width:76px;height:76px;border:4px solid #ffd400;border-radius:50%;transform:translate(-50%,-50%);background:rgba(255,212,0,.06);box-shadow:0 0 8px #ffd400,0 0 18px rgba(255,212,0,.9);z-index:-1}.cidade-veiculo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 3px 5px #000);user-select:none;-webkit-user-drag:none}.cidade-passageiro{position:absolute;transform:translate(-50%,-105%);font-size:20px;z-index:9;pointer-events:auto;cursor:pointer}.cidade-passageiro b{display:block;background:#101827e8;color:#fff;border:2px solid #facc15;border-radius:999px;padding:2px 6px;font:900 9px Arial;white-space:nowrap}.cidade-status{position:absolute;left:50%;top:2%;transform:translateX(-50%);background:#07101def;border:1px solid #475569;border-radius:999px;padding:6px 10px;color:#e2e8f0;font:900 10px Arial;z-index:10;white-space:nowrap}.cidade-status.corrida{background:#3b0764ef;border-color:#c084fc;color:#fff}@media(max-width:650px){.cidade-veiculo{width:70px;height:32px}.cidade-veiculo:before{width:62px;height:62px}}`;document.head.appendChild(css);
 const layer=document.createElement('div');layer.className='cidade-transito';layer.innerHTML='<div class="cidade-status" id="cidadeTransitoStatus">ESCOLHA UMA CORRIDA</div><div class="cidade-veiculo" id="taxiCidade"><img id="taxiCidadeImagem" alt="Táxi do jogador"></div>';shell.appendChild(layer);
-/* MALHA OFICIAL: coordenadas percentuais da própria imagem do mapa. Cada nó fica no eixo central do asfalto, nunca em lote/calçada/prédio. */
-const P={
-A0:[7.0,20.0],A1:[25.7,20.0],A2:[42.7,20.0],A3:[59.0,20.0],A4:[72.7,20.0],A5:[90.5,20.0],
-B0:[7.0,41.7],B1:[25.7,41.7],B2:[42.7,41.7],B3:[59.0,41.7],B4:[72.7,41.7],B5:[90.5,41.7],
-C0:[7.0,61.5],C1:[25.7,61.5],C2:[42.7,61.5],C3:[59.0,61.5],C4:[72.7,61.5],C5:[90.5,61.5],
-D1:[25.7,81.7],D2:[42.7,81.7],D3:[59.0,81.7],D4:[72.7,81.7],D5:[90.5,81.7],
-/* vias verticais centrais reais */
-V10:[25.7,10.0],V11:[25.7,30.8],V12:[25.7,51.6],V13:[25.7,71.6],
-V20:[42.7,10.0],V21:[42.7,30.8],V22:[42.7,51.6],V23:[42.7,71.6],
-V30:[59.0,10.0],V31:[59.0,30.8],V32:[59.0,51.6],V33:[59.0,71.6],
-V40:[72.7,10.0],V41:[72.7,30.8],V42:[72.7,51.6],V43:[72.7,71.6],
-V50:[90.5,10.0],V51:[90.5,30.8],V52:[90.5,51.6],V53:[90.5,71.6]
-};
-const edges=[],add=(a,b)=>edges.push([a,b]);
-/* somente segmentos que coincidem com ruas visíveis */
-[['A0','A1'],['A1','A2'],['A2','A3'],['A3','A4'],['A4','A5'],['B0','B1'],['B1','B2'],['B2','B3'],['B3','B4'],['B4','B5'],['C0','C1'],['C1','C2'],['C2','C3'],['C3','C4'],['C4','C5'],['D1','D2'],['D2','D3'],['D3','D4'],['D4','D5']].forEach(e=>add(...e));
-[['A1','V11'],['V11','B1'],['B1','V12'],['V12','C1'],['C1','V13'],['V13','D1'],['A2','V21'],['V21','B2'],['B2','V22'],['V22','C2'],['C2','V23'],['V23','D2'],['A3','V31'],['V31','B3'],['B3','V32'],['V32','C3'],['C3','V33'],['V33','D3'],['A4','V41'],['V41','B4'],['B4','V42'],['V42','C4'],['C4','V43'],['V43','D4'],['A5','V51'],['V51','B5'],['B5','V52'],['V52','C5'],['C5','V53'],['V53','D5']].forEach(e=>add(...e));
+/*
+ MALHA VIÁRIA V2.
+ Cada rua é uma polilinha própria. As conexões acontecem apenas nas bocas dos cruzamentos.
+ Não existem mais diagonais nem segmentos atravessando quarteirões, prédios ou ilhas centrais.
+ Coordenadas em percentual mantêm o alinhamento ao redimensionar/tela cheia.
+*/
+const P={}; const edges=[];
+const node=(id,x,y)=>{P[id]=[x,y]}; const add=(a,b)=>edges.push([a,b]);
+function ruaH(prefix,y,xs){xs.forEach((x,i)=>node(prefix+i,x,y));for(let i=0;i<xs.length-1;i++)add(prefix+i,prefix+(i+1))}
+function ruaV(prefix,x,ys){ys.forEach((y,i)=>node(prefix+i,x,y));for(let i=0;i<ys.length-1;i++)add(prefix+i,prefix+(i+1))}
+/* eixos centrais reais observados no mapa */
+const XS=[7.0,25.7,42.7,59.0,72.7,90.5];
+const YS=[20.0,41.7,61.5,81.7];
+ruaH('A',YS[0],XS);ruaH('B',YS[1],XS);ruaH('C',YS[2],XS);ruaH('D',YS[3],XS.slice(1));
+/* verticais: cada eixo passa somente pelo centro da pista */
+ruaV('X1',XS[1],[8.0,17.7,22.3,39.4,44.0,59.2,63.8,79.4,84.0]);
+ruaV('X2',XS[2],[8.0,17.7,22.3,39.4,44.0,59.2,63.8,79.4,84.0]);
+ruaV('X3',XS[3],[8.0,17.7,22.3,39.4,44.0,59.2,63.8,79.4,84.0]);
+ruaV('X4',XS[4],[8.0,17.7,22.3,39.4,44.0,59.2,63.8,79.4,84.0]);
+ruaV('X5',XS[5],[8.0,17.7,22.3,39.4,44.0,59.2,63.8,79.4,84.0]);
+/* conecta cada avenida horizontal às verticais por pequenos trechos inteiramente asfaltados */
+function ligaHVertical(h,v){add(h,v)}
+['1','2','3','4','5'].forEach((n,i)=>{const x='X'+n;ligaHVertical('A'+n,x+'1');ligaHVertical(x+'2','A'+n);ligaHVertical('B'+n,x+'3');ligaHVertical(x+'4','B'+n);ligaHVertical('C'+n,x+'5');ligaHVertical(x+'6','C'+n);if(n!=='5'||P['D4']){const d='D'+(i);if(P[d]){ligaHVertical(d,x+'7');ligaHVertical(x+'8',d)}}});
+/* nós de parada usados pelas corridas ficam no asfalto, nunca dentro dos imóveis */
+const STOP={hospital:'A1',bombeiros:'A2',posto:'A4',flores:'B0',supermercado:'B2',prefeitura:'B3',lanchonete:'B5',roupas:'C3',academia:'C4',industria:'C5',lago:'D0',central:'D2',nova:'D3'};
 const adj={};Object.keys(P).forEach(k=>adj[k]=[]);edges.forEach(([a,b])=>{if(P[a]&&P[b]){adj[a].push(b);adj[b].push(a)}});
-const taxi=document.getElementById('taxiCidade'),taxiImg=document.getElementById('taxiCidadeImagem'),status=document.getElementById('cidadeTransitoStatus');let atual='A4',movendo=false,corridaAtiva=false,modeloAtual=CARROS[0];
-function numero(v){const n=Number(v);return Number.isFinite(n)?n:0}function escolherModelo(perfil={}){const explicito=numero(perfil.carroNivel??perfil.nivelCarro??perfil.modeloCarro);if(explicito>=1&&explicito<=10)return CARROS[explicito-1];const total=numero(perfil.corridasTotais??perfil.corridas??perfil.totalCorridas);let escolhido=CARROS[0];for(const c of CARROS)if(total>=c.corridas)escolhido=c;return escolhido}function aplicarModelo(perfil={}){modeloAtual=escolherModelo(perfil);taxiImg.src=modeloAtual.arquivo+'?v=20260925-12';taxiImg.alt='Táxi '+modeloAtual.nome;taxi.dataset.modelo=String(modeloAtual.nivel);taxi.title='Táxi '+modeloAtual.nome;return modeloAtual}
+const taxi=document.getElementById('taxiCidade'),taxiImg=document.getElementById('taxiCidadeImagem'),status=document.getElementById('cidadeTransitoStatus');let atual=STOP.posto,movendo=false,corridaAtiva=false,modeloAtual=CARROS[0];
+function numero(v){const n=Number(v);return Number.isFinite(n)?n:0}function escolherModelo(perfil={}){const explicito=numero(perfil.carroNivel??perfil.nivelCarro??perfil.modeloCarro);if(explicito>=1&&explicito<=10)return CARROS[explicito-1];const total=numero(perfil.corridasTotais??perfil.corridas??perfil.totalCorridas);let escolhido=CARROS[0];for(const c of CARROS)if(total>=c.corridas)escolhido=c;return escolhido}function aplicarModelo(perfil={}){modeloAtual=escolherModelo(perfil);taxiImg.src=modeloAtual.arquivo+'?v=20260925-13';taxiImg.alt='Táxi '+modeloAtual.nome;taxi.dataset.modelo=String(modeloAtual.nivel);taxi.title='Táxi '+modeloAtual.nome;return modeloAtual}
 function posXY(x,y){taxi.style.left=x+'%';taxi.style.top=y+'%'}function pos(no){posXY(P[no][0],P[no][1])}pos(atual);aplicarModelo({});
 function rota(a,b){const q=[a],prev={[a]:null};while(q.length){const n=q.shift();if(n===b)break;for(const x of(adj[n]||[]))if(!(x in prev)){prev[x]=n;q.push(x)}}if(!(b in prev))return[a];const r=[];for(let x=b;x!==null;x=prev[x])r.push(x);return r.reverse()}
 function orientar(de,para){const dx=para[0]-de[0],dy=para[1]-de[1];let sx=1,ang=0;if(Math.abs(dx)>=Math.abs(dy)){sx=dx>=0?1:-1}else{ang=dy>=0?90:-90}taxi.style.transform=`translate(-50%,-50%) rotate(${ang}deg) scaleX(${sx})`}
-function animarTrecho(de,para,cb){orientar(de,para);const dist=Math.hypot(para[0]-de[0],para[1]-de[1]);const dur=Math.max(650,dist*95);taxi.style.transition=`left ${dur}ms linear,top ${dur}ms linear,transform 160ms ease`;requestAnimationFrame(()=>{posXY(para[0],para[1]);setTimeout(cb,dur+25)})}
+function animarTrecho(de,para,cb){orientar(de,para);const dist=Math.hypot(para[0]-de[0],para[1]-de[1]);const dur=Math.max(420,dist*72);taxi.style.transition=`left ${dur}ms linear,top ${dur}ms linear,transform 140ms ease`;requestAnimationFrame(()=>{posXY(para[0],para[1]);setTimeout(cb,dur+20)})}
 function moverAte(dest,cb){if(movendo||!P[dest])return;movendo=true;const r=rota(atual,dest);let i=1;(function passo(){if(i>=r.length){movendo=false;cb&&cb();return}const de=P[r[i-1]],para=P[r[i]];animarTrecho(de,para,()=>{atual=r[i];i++;passo()})})()}
-const corridas=[{o:'A1',d:'C4',v:4,n:'Hospital → Academia'},{o:'A2',d:'D3',v:3,n:'Bombeiros → Bairro Central'},{o:'B0',d:'B5',v:5,n:'Bairro das Flores → Lanchonete'},{o:'B3',d:'C0',v:2,n:'Prefeitura → Bairro das Flores'},{o:'B5',d:'D1',v:6,n:'Lanchonete → Bairro Lago Sul'},{o:'C0',d:'A4',v:5,n:'Bairro das Flores → Posto'},{o:'C3',d:'A1',v:4,n:'Loja de Roupas → Hospital'},{o:'C5',d:'B2',v:6,n:'Indústria → Supermercado'},{o:'D1',d:'B3',v:3,n:'Bairro Lago Sul → Prefeitura'},{o:'D3',d:'B4',v:4,n:'Bairro Central → Restaurante'},{o:'D4',d:'A2',v:5,n:'Nova Esperança → Bombeiros'}];
+const corridas=[{o:STOP.hospital,d:STOP.academia,v:4,n:'Hospital → Academia'},{o:STOP.bombeiros,d:STOP.central,v:3,n:'Bombeiros → Bairro Central'},{o:STOP.flores,d:STOP.lanchonete,v:5,n:'Bairro das Flores → Lanchonete'},{o:STOP.prefeitura,d:STOP.flores,v:2,n:'Prefeitura → Bairro das Flores'},{o:STOP.lanchonete,d:STOP.lago,v:6,n:'Lanchonete → Bairro Lago Sul'},{o:STOP.flores,d:STOP.posto,v:5,n:'Bairro das Flores → Posto'},{o:STOP.roupas,d:STOP.hospital,v:4,n:'Loja de Roupas → Hospital'},{o:STOP.industria,d:STOP.supermercado,v:6,n:'Indústria → Supermercado'},{o:STOP.lago,d:STOP.prefeitura,v:3,n:'Bairro Lago Sul → Prefeitura'},{o:STOP.central,d:STOP.lanchonete,v:4,n:'Bairro Central → Restaurante'},{o:STOP.nova,d:STOP.bombeiros,v:5,n:'Nova Esperança → Bombeiros'}];
 function passageiros(){layer.querySelectorAll('.cidade-passageiro').forEach(x=>x.remove());if(corridaAtiva)return;[...corridas].sort(()=>Math.random()-.5).slice(0,5).forEach(c=>{const el=document.createElement('div');el.className='cidade-passageiro';el.dataset.origem=c.o;el.dataset.destino=c.d;el.dataset.valor=c.v;el.dataset.nome=c.n;el.style.left=P[c.o][0]+'%';el.style.top=P[c.o][1]+'%';el.innerHTML=`<b>+${c.v} LUDIGINS</b><span>●</span>`;layer.appendChild(el);el.addEventListener('click',()=>aceitar(el))})}
 function aceitar(el){if(corridaAtiva||movendo)return;corridaAtiva=true;layer.querySelectorAll('.cidade-passageiro').forEach(p=>{if(p!==el)p.remove()});status.classList.add('corrida');status.textContent='EM CORRIDA • indo buscar passageiro';const origem=el.dataset.origem,destino=el.dataset.destino,nome=el.dataset.nome;moverAte(origem,()=>{el.remove();status.textContent='EM CORRIDA • passageiro a bordo • '+nome;moverAte(destino,()=>{status.textContent='PASSAGEIRO ENTREGUE • corrida em teste';status.classList.remove('corrida');corridaAtiva=false;setTimeout(()=>{status.textContent='ESCOLHA UMA CORRIDA';passageiros()},1000)})})}
 window.addEventListener('message',e=>{const d=e.data||{};if(d.tipo==='cidadeLudiginsPerfil'||d.tipo==='ludiginsPerfil')aplicarModelo(d.perfil||d.dados||{})});passageiros();window.CidadeLudiginsTransito={moverAte,pontos:P,recriarPassageiros:passageiros,aplicarModelo,modelos:CARROS,get modeloAtual(){return modeloAtual}};
