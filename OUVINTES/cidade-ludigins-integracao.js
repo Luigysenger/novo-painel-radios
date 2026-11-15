@@ -1,5 +1,5 @@
 // Integração da Cidade Ludigins com patrimônio real, casas e evolução residencial.
-import {perfilServicos,servicoEmCurso,fome} from './cidade-servicos.js?v=20261115a';
+import {perfilServicos,servicoEmCurso,fome} from './cidade-servicos.js?v=20261115b';
 import { db } from '../firebase-config.js';
 import { ref, get, onValue, runTransaction } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
 let registroAtual=null,lotesAtuais={};
