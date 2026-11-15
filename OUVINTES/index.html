@@ -4238,5 +4238,34 @@
         <iframe id="ludiginsFrame" class="ludigins-frame" src="about:blank"
                 title="Painel Ludigins" allow="autoplay"></iframe>
     </div>
+<script>
+    // Em telas de toque, acompanhe a borda visível quando o Safari move suas barras.
+    (() => {
+        const player = document.getElementById('carPlayerBar');
+        const viewport = window.visualViewport;
+        if (!viewport || !player) return;
+        const touch = matchMedia('(hover: none) and (pointer: coarse)');
+        let frame = 0;
+        function alinhar() {
+            frame = 0;
+            if (!touch.matches) {
+                for (const key of ['position','top','bottom','transform']) player.style.removeProperty(key);
+                return;
+            }
+            player.style.position = 'absolute';
+            player.style.bottom = 'auto';
+            player.style.top = (viewport.pageTop + viewport.height) + 'px';
+            player.style.transform = 'translateY(-100%)';
+        }
+        function atualizar() { if (!frame) frame = requestAnimationFrame(alinhar); }
+        for (const alvo of [window, viewport]) {
+            alvo.addEventListener('scroll', atualizar, {passive:true});
+            alvo.addEventListener('resize', atualizar);
+        }
+        window.addEventListener('pageshow', atualizar);
+        touch.addEventListener?.('change', atualizar);
+        alinhar();
+    })();
+</script>
 </body>
 </html>
