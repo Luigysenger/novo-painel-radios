@@ -1,0 +1,52 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "radios_cadastradas": {
+      ".read": true,
+      ".write": "auth != null && auth.token.email_verified == true && auth.token.email == 'senger.luigy@gmail.com' && auth.token.firebase.sign_in_provider == 'password'"
+    },
+    "chat_ao_vivo": {
+      ".indexOn": [
+        "timestamp"
+      ]
+    },
+    "contas": {
+      ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'senger.luigy@gmail.com' && auth.token.firebase.sign_in_provider == 'password'"
+    },
+    "ouvintes_chat": {
+      ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'senger.luigy@gmail.com' && auth.token.firebase.sign_in_provider == 'password'",
+      ".write": "auth != null && auth.token.email_verified == true && auth.token.email == 'senger.luigy@gmail.com' && auth.token.firebase.sign_in_provider == 'password'"
+    },
+    "configuracoes": {
+      ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'senger.luigy@gmail.com' && auth.token.firebase.sign_in_provider == 'password'",
+      ".write": "auth != null && auth.token.email_verified == true && auth.token.email == 'senger.luigy@gmail.com' && auth.token.firebase.sign_in_provider == 'password'"
+    },
+    "admin_preferencias": {
+      ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'senger.luigy@gmail.com' && auth.token.firebase.sign_in_provider == 'password'",
+      ".write": "auth != null && auth.token.email_verified == true && auth.token.email == 'senger.luigy@gmail.com' && auth.token.firebase.sign_in_provider == 'password'"
+    },
+    "comerciais": {
+      ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'senger.luigy@gmail.com' && auth.token.firebase.sign_in_provider == 'password'",
+      ".write": "auth != null && auth.token.email_verified == true && auth.token.email == 'senger.luigy@gmail.com' && auth.token.firebase.sign_in_provider == 'password'"
+    },
+    "ouvintes": {
+      ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'senger.luigy@gmail.com' && auth.token.firebase.sign_in_provider == 'password'"
+    },
+    "ouvintes_cadastrados": {
+      ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'senger.luigy@gmail.com' && auth.token.firebase.sign_in_provider == 'password'"
+    },
+    "usuarios": {
+      ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'senger.luigy@gmail.com' && auth.token.firebase.sign_in_provider == 'password'"
+    },
+    "usuarios_cadastrados": {
+      ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'senger.luigy@gmail.com' && auth.token.firebase.sign_in_provider == 'password'"
+    },
+    "clientes": {
+      ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'senger.luigy@gmail.com' && auth.token.firebase.sign_in_provider == 'password'"
+    },
+    "ouvintes_preferencias": {
+      ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'senger.luigy@gmail.com' && auth.token.firebase.sign_in_provider == 'password'"
+    }
+  }
+}
