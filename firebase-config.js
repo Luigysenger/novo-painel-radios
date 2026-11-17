@@ -4,13 +4,13 @@ import { getDatabase } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-
 
 // Configuração Oficial do Firebase para o seu Projeto
 const firebaseConfig = {
-  apiKey: "AIzaSyD-ExemploChaveConfiguradaCorretamenteParaSeuProjeto",
+  apiKey: "AIzaSyClKTeBJ2RIwc27RYX7x85QM5P2EQ0d9Vo",
   authDomain: "novo-jeito-de-ouvir-radio.firebaseapp.com",
   databaseURL: "https://novo-jeito-de-ouvir-radio-default-rtdb.firebaseio.com",
   projectId: "novo-jeito-de-ouvir-radio",
   storageBucket: "novo-jeito-de-ouvir-radio.appspot.com",
-  messagingSenderId: "100000000000",
-  appId: "1:100000000000:web:abcdef123456789"
+  messagingSenderId: "938297469903",
+  appId: "1:938297469903:web:9f52d127522363be1100ba"
 };
 
 const app = initializeApp(firebaseConfig);
