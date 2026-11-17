@@ -132,7 +132,9 @@
 
             <button id="btnLogin" class="btn-submit">ACESSAR PAINEL</button>
 
-            <div class="actions-links">
+            <div style="margin:16px 0"><button type="button" id="ouvirAgora" class="btn-submit">📻 Ouvir rádios sem entrar</button>
+<div id="escutaLivre" hidden style="margin-top:12px"><label for="emissoraLivre">Escolha uma rádio</label><select id="emissoraLivre" style="width:100%;padding:10px"></select><audio controls id="audioLivre" style="width:100%;margin-top:8px"></audio><p id="avisoLivre" role="status"></p></div></div>
+<div class="actions-links">
                 <a href="#" id="btnEsqueciSenha">Esqueci a senha</a>
                 <a href="cadastro.html" id="linkCadastro">Não tenho cadastro</a>
             </div>
@@ -233,6 +235,20 @@
             }
         });
 
+        const ouvir=document.getElementById('ouvirAgora'),escolha=document.getElementById('emissoraLivre'),audio=document.getElementById('audioLivre'),aviso=document.getElementById('avisoLivre');
+        ouvir.onclick=async()=>{
+            document.getElementById('escutaLivre').hidden=false;ouvir.disabled=true;
+            aviso.textContent='Buscando emissoras…';
+            try {
+                const snap=await get(ref(db,'radios_cadastradas'));escolha.replaceChildren();
+                for(const r of Object.values(snap.val()||{})){
+                    if(typeof r?.url==='string' && /^https?:\/\//i.test(r.url)) escolha.add(new Option(r.nome||'Rádio',r.url));
+                }
+                if(escolha.length){audio.src=escolha.value;aviso.textContent='Toque em ▶ para ouvir.'}
+                else aviso.textContent='Nenhuma emissora disponível.';
+            }catch{aviso.textContent='O catálogo ainda não está disponível.'}
+            finally{ouvir.disabled=false}
+        };escolha.onchange=()=>{audio.src=escolha.value;audio.play().catch(()=>aviso.textContent='Toque em ▶ para ouvir.')};
         async function realizarLogin() {
             const email = inputEmail.value.trim();
             const senha = inputSenha.value.trim();
@@ -276,7 +292,7 @@
                 }
             } catch (erro) {
                 console.error("Erro ao fazer login:", erro);
-                alert("Erro ao conectar com o banco de dados.");
+                alert("O acesso ao perfil antigo está temporariamente indisponível. Seu cadastro não foi apagado.");
             }
         }
 
