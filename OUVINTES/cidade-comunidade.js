@@ -77,11 +77,11 @@ function listaOnline(){
  const contador=document.getElementById('cidadeOnlineTotal');if(contador)contador.textContent=String(lista.size);
  for(const s of [...lista.values()].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'))){
   const linha=document.createElement('li'),nome=document.createElement('b'),radio=document.createElement('span');
-  linha.className='cidade-ouvinte-linha';nome.textContent='🟢 '+s.nome+(s.id===identidade()?.id?' (você)':'');radio.textContent=s.radio?'📻 '+s.radio:'Sem rádio em reprodução';
+  linha.className='cidade-ouvinte-linha';nome.textContent=s.nome;nome.title=s.nome;radio.className='cidade-ouvinte-radio';radio.textContent=s.radio||'Sem rádio em reprodução';
   if(s.radio){
    const botao=document.createElement('button'),ponto=document.createElement('i'),titulo=document.createElement('span');
    botao.type='button';botao.className='cidade-radio-ouvir';botao.dataset.radio=s.radio;
-   botao.dataset.ouvinteId=s.id;botao.setAttribute('aria-label','Ouvir '+s.radio);
+   botao.title='Ouvir '+s.radio;botao.dataset.ouvinteId=s.id;botao.setAttribute('aria-label','Ouvir '+s.radio);
    ponto.className='cidade-radio-ponto';ponto.setAttribute('aria-hidden','true');
    titulo.textContent=s.radio;botao.append(ponto,titulo);radio.replaceChildren(botao);
   }
