@@ -60,7 +60,33 @@ function atualizarNegocios(n=negociosCidade){negociosCidade=n;const a=document.g
  if(meu){card.type='button';card.style.cursor='pointer';const link=document.createElement('small');link.style.cssText='display:block;margin-top:8px;color:#a7f3d0';link.textContent='Ver propostas';card.append(link);card.onclick=()=>consultarNegocio(id,nome)}fragment.append(card)}a.replaceChildren(fragment)}
 
 function loteCard(l){const casa=l.casa,res=String(l.tipo).toLowerCase()==='residencial';return`<div class="card real"><b>${casa?'🏠':'📍'} ${texto(l.id)}</b><span>${texto(l.endereco)}</span><small style="display:block;margin-top:5px;color:#94a3b8">${casa?texto(casa.nome)+' • nível '+numero(casa.nivel)+' • patrimônio permanente':'Terreno '+texto(l.tipo)+' • '+numero(l.preco).toLocaleString('pt-BR')+' Ludigins'}</small>${res?`<button class="btn" style="margin-top:8px" onclick="abrirCatalogoCasasCidadeLudigins('${l.id}')">${casa?'Melhorar / Trocar casa':'Escolher casa'}</button>`:''}${casa&&Array.isArray(l.historicoCasas)&&l.historicoCasas.length?`<small style="display:block;margin-top:7px;color:#cbd5e1">Histórico: ${l.historicoCasas.length} residência(s) anterior(es)</small>`:''}</div>`}
-function atualizarLotes(lotes={}){lotesAtuais=lotes||{};const a=document.getElementById('meusTerrenosLista'),meus=registroAtual?Object.values(lotesAtuais).filter(l=>String(l?.donoId||'')===String(registroAtual.id)):[];if(a)a.innerHTML=meus.length?meus.map(loteCard).join(''):'<div class="card"><b>📍 Meu patrimônio</b><span>Nenhum terreno comprado nesta cidade.</span></div>';document.querySelectorAll('[data-lote]').forEach(el=>{const[id]=el.dataset.lote.split('|'),l=lotesAtuais[id];if(l?.donoId){el.dataset.vendido='1';el.setAttribute('aria-label',(l.casa?'Casa de ':'Terreno de ')+texto(l.donoNome,'proprietário'));el.style.border='2px solid '+(l.casa?'#f59e0b':'#22c55e');el.style.background=l.casa?'#92400e55':'#16653444';const et=el.querySelector('.etiqueta');if(et)et.textContent=l.casa?'CASA • '+texto(l.donoNome,'MORADOR'):'✓ '+texto(l.donoNome,'VENDIDO')}else{delete el.dataset.vendido;el.style.border='';el.style.background='';const et=el.querySelector('.etiqueta');if(et)et.textContent=String((LOTES_OFICIAIS[id]||{}).tipo||'').toLowerCase()==='comercial'?'COMERCIAL':'TERRENO'}})}
+function atualizarLotes(lotes={}){
+ lotesAtuais=lotes||{};
+ const a=document.getElementById('meusTerrenosLista'),meus=registroAtual?Object.values(lotesAtuais).filter(l=>String(l?.donoId||'')===String(registroAtual.id)):[];
+ if(a)a.innerHTML=meus.length?meus.map(loteCard).join(''):'<div class="card"><b>📍 Meu patrimônio</b><span>Nenhum terreno comprado nesta cidade.</span></div>';
+ document.querySelectorAll('[data-lote]').forEach(el=>{
+  const [id]=el.dataset.lote.split('|'),l=lotesAtuais[id],vendido=!!l?.donoId;
+  const meu=vendido&&registroAtual&&String(l.donoId)===String(registroAtual.id);
+  const modelo=vendido&&l.casa?CASAS.find(c=>c.id===l.casa.modeloId):null;
+  let imagem=el.querySelector('.casa-construida');
+  if(modelo){
+   if(!imagem){imagem=document.createElement('img');imagem.className='casa-construida';imagem.draggable=false;imagem.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none';el.appendChild(imagem)}
+   if(imagem.getAttribute('src')!==modelo.arquivo)imagem.setAttribute('src',modelo.arquivo);
+   imagem.alt=modelo.nome;
+  }else imagem?.remove();
+  const et=el.querySelector('.etiqueta');
+  if(vendido){
+   el.dataset.vendido='1';
+   el.setAttribute('aria-label',(l.casa?texto(l.casa.nome,'Casa')+' de ':'Terreno de ')+texto(l.donoNome,'proprietário'));
+   el.style.setProperty('border','2px dashed '+(meu?'#22c55e':'#fde047'),'important');
+   el.style.setProperty('background',l.casa?'transparent':(meu?'#16653444':'#fde04716'),'important');
+   if(et)et.textContent=l.casa?'CASA • '+texto(l.donoNome,'MORADOR'):'✓ '+texto(l.donoNome,'VENDIDO');
+  }else{
+   delete el.dataset.vendido;el.style.removeProperty('border');el.style.removeProperty('background');
+   if(et)et.textContent=String((LOTES_OFICIAIS[id]||{}).tipo||'').toLowerCase()==='comercial'?'COMERCIAL':'TERRENO';
+  }
+ });
+}
 async function debitar(preco){const pr=ref(db,registroAtual.raiz+'/'+registroAtual.id),campo=campoSaldo(registroAtual.perfil);const r=await runTransaction(pr,a=>{if(!a||saldoDoPerfil(a)<preco)return;return{...a,[campo]:saldoDoPerfil(a)-preco,atualizadoEm:Date.now()}});if(r.committed){registroAtual.perfil=r.snapshot.val()||registroAtual.perfil;atualizarTela(registroAtual)}return r.committed}// Use the exact catalog displayed by the 37 map buttons, including their prices.
 for(const el of document.querySelectorAll('.hotspot.lote')){
  const [id,endereco,tipo,preco]=el.dataset.lote.split('|');
