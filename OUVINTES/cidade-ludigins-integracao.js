@@ -70,7 +70,7 @@ function atualizarLotes(lotes={}){
   const modelo=vendido&&l.casa?CASAS.find(c=>c.id===l.casa.modeloId):null;
   let imagem=el.querySelector('.casa-construida');
   if(modelo){
-   if(!imagem){imagem=document.createElement('img');imagem.className='casa-construida';imagem.draggable=false;imagem.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none';el.appendChild(imagem)}
+   if(!imagem){imagem=document.createElement('img');imagem.className='casa-construida';imagem.draggable=false;imagem.style.cssText='position:absolute;inset:0;width:100%;height:100%;max-width:none;max-height:none;object-fit:fill;pointer-events:none;user-select:none';el.appendChild(imagem)}
    if(imagem.getAttribute('src')!==modelo.arquivo)imagem.setAttribute('src',modelo.arquivo);
    imagem.alt=modelo.nome;
   }else imagem?.remove();
