@@ -72,15 +72,44 @@ function rankings(){
 function listaOnline(){
  if(!online)return;
  const lista=recentes({...ouvintes,...sessoes},presenca.agora());
+ const foco=online.contains(document.activeElement)?document.activeElement?.dataset?.ouvinteId:null;
  online.replaceChildren();
  const contador=document.getElementById('cidadeOnlineTotal');if(contador)contador.textContent=String(lista.size);
  for(const s of [...lista.values()].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'))){
   const linha=document.createElement('li'),nome=document.createElement('b'),radio=document.createElement('span');
   linha.className='cidade-ouvinte-linha';nome.textContent='🟢 '+s.nome+(s.id===identidade()?.id?' (você)':'');radio.textContent=s.radio?'📻 '+s.radio:'Sem rádio em reprodução';
+  if(s.radio){
+   const botao=document.createElement('button'),ponto=document.createElement('i'),titulo=document.createElement('span');
+   botao.type='button';botao.className='cidade-radio-ouvir';botao.dataset.radio=s.radio;
+   botao.dataset.ouvinteId=s.id;botao.setAttribute('aria-label','Ouvir '+s.radio);
+   ponto.className='cidade-radio-ponto';ponto.setAttribute('aria-hidden','true');
+   titulo.textContent=s.radio;botao.append(ponto,titulo);radio.replaceChildren(botao);
+  }
   linha.append(nome,radio);online.append(linha);
  }
+ if(foco)for(const b of online.querySelectorAll('button[data-ouvinte-id]'))if(b.dataset.ouvinteId===foco){b.focus({preventScroll:true});break}
  if(!lista.size){const li=document.createElement('li');li.textContent='Nenhum ouvinte online no momento.';online.append(li)}
 }
+
+function ouvirRadioDaCidade(nome){
+ const aviso=document.getElementById('cidadeRadioAviso');
+ try{
+  const painel=window.parent;
+  if(typeof painel?.tocarRadioDoLudigins!=='function'){
+   if(aviso)aviso.textContent='Abra a cidade pelo painel de rádios para ouvir esta estação.';
+   return;
+  }
+  const encontrada=painel.tocarRadioDoLudigins(nome);
+  if(aviso)aviso.textContent=encontrada?'Rádio selecionada: '+nome+'. Confira a reprodução no player.':'Esta rádio não está disponível no painel agora.';
+ }catch{
+  if(aviso)aviso.textContent='Não foi possível selecionar a rádio. Tente pelo player do painel.';
+ }
+}
+online?.addEventListener('click',evento=>{
+ const botao=evento.target.closest?.('button.cidade-radio-ouvir');
+ if(botao&&online.contains(botao))ouvirRadioDaCidade(botao.dataset.radio);
+});
+
 function ouvir(caminho,receber,erro){
  onValue(ref(db,caminho),s=>{receber(s.val()||{})},()=>{if(nota)nota.textContent=erro});
 }
