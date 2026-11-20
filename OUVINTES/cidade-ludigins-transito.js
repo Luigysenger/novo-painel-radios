@@ -48,14 +48,14 @@ function estadoPico(agora=new Date()){
  const falta=Math.min(...HORAS_PICO.map(h=>(h*60-minutos+1440)%1440));
  return {ativo,contagem:!ativo&&falta>0&&falta<=10?falta:0};
 }
-function valorCorrida(base){return estadoPico().ativo?Math.max(31,base*2):base}
+function valorCorrida(base){return estadoPico().ativo?base*5:base}
 function atualizarValorPassageiro(el){
  const valor=valorCorrida(Number(el.dataset.base));el.dataset.valor=String(valor);
  el.querySelector('b').textContent='+'+valor;el.setAttribute('aria-label',el.dataset.nome+' • '+valor+' Ludigins');
 }
 let ultimoPico=null;
 function atualizarPico(){
- const pico=estadoPico(),texto=pico.ativo?'HORÁRIO DE PICO • Corridas a partir de 31 Ludigins':pico.contagem?'Em '+pico.contagem+' min HORÁRIO DE PICO':'';
+ const pico=estadoPico(),texto=pico.ativo?'HORÁRIO DE PICO • Corridas valendo 5 vezes o valor normal':pico.contagem?'Em '+pico.contagem+' min HORÁRIO DE PICO':'';
  const aviso=document.getElementById('cidadePicoAviso');
  if(aviso){aviso.textContent=texto;aviso.hidden=!texto}
  const relogio=document.querySelector('.cp-clock');
