@@ -71,6 +71,11 @@ function atualizarLotes(lotes={}){
   let imagem=el.querySelector('.casa-construida');
   if(modelo){
    if(!imagem){imagem=document.createElement('img');imagem.className='casa-construida';imagem.draggable=false;imagem.style.cssText='position:absolute;inset:0;width:100%;height:100%;max-width:none;max-height:none;object-fit:fill;pointer-events:none;user-select:none';el.appendChild(imagem)}
+   // Crescimento visual por nível, sempre dentro do lote e centralizado.
+   const tamanho=[80,83,86,89,92,95,98,100][Math.max(0,Math.min(7,Number(modelo.nivel)-1))];
+   imagem.style.width=tamanho+'%';
+   imagem.style.height=tamanho+'%';
+   imagem.style.inset=((100-tamanho)/2)+'%';
    if(imagem.getAttribute('src')!==modelo.arquivo)imagem.setAttribute('src',modelo.arquivo);
    imagem.alt=modelo.nome;
   }else imagem?.remove();
