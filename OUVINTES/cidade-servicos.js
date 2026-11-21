@@ -36,6 +36,30 @@ function visualizar(k,j){
  function tick(){const t=agora();fx.hidden=true;if(t<j.chegada)mover(el,a,t-j.inicio);else if(t<j.saida){posicionar(el,T.pontos[j.alvo]);posicionar(fx,T.pontos[j.alvo]);fx.hidden=false}else if(t<j.fim)mover(el,v,t-j.saida);else{if(fogo)estacionar();else{posicionar(el,T.pontos[cfg[k][1]]);timer=setTimeout(cancel,Math.max(0,j.fim+120000-t))}return}frame=requestAnimationFrame(tick)}tick()}
 visualizar('bombeiro',null);
 const tx=async(path,fn)=>{const r=ref(db,path);await get(r);return (await runTransaction(r,fn,{applyLocally:false})).snapshot.val()};
+
+const filaPath='ludigins_cidade/filaPosto';
+let fichaFila=null,bombaAtual=null;
+async function entrarFila(){
+ const chave=uid+'_'+crypto.randomUUID();fichaFila=chave;
+ await tx(filaPath,a=>{a=a||{};const itens=Object.fromEntries(Object.entries(a.itens||{}).filter(([,v])=>v.ate>agora()));const ordem=num(a.ordem)+1;return{ordem,itens:{...itens,[chave]:{uid,ordem,ate:agora()+30000}}}});
+ while(fichaFila===chave){
+  const fila=await tx(filaPath,a=>{if(!a?.itens?.[chave])return;const itens=Object.fromEntries(Object.entries(a.itens).filter(([k,v])=>k===chave||v.ate>agora()));itens[chave]={...itens[chave],ate:agora()+30000};return {...a,itens}});
+  const ordem=Object.entries(fila?.itens||{}).sort((a,b)=>a[1].ordem-b[1].ordem),pos=ordem.findIndex(([k])=>k===chave);
+  if(pos<0)throw Error('Sua conexão com a fila expirou. Solicite novamente.');
+  T.estacionarFila?.(pos);nota(pos?'Fila do posto • '+(pos+1)+'º na ordem de chegada':'Táxi em frente ao posto.');
+  if(pos===0){await espera(Math.max(0,num(lojas.posto?.despachoCidade?.fim)-agora()));return}
+  await espera(1200);
+ }
+}
+async function sairFila(){
+ const chave=fichaFila;fichaFila=null;if(!chave)return;
+ await tx(filaPath,a=>{if(!a?.itens?.[chave])return;const itens={...a.itens};delete itens[chave];return {...a,itens}});
+}
+function bomba(ativa){
+ bombaAtual?.remove();bombaAtual=null;if(!ativa)return;
+ const e=document.createElement('div');e.className='svc-efeito';e.textContent='⛽';e.setAttribute('aria-label','Abastecendo');posicionar(e,[T.pontos.A4[0],T.pontos.A4[1]-4]);document.querySelector('.cidade-transito').append(e);bombaAtual=e;
+}
+
 async function processar(p){
  const {tipo:k,id,alvo,valor}=p,pr='ludigins_usuarios/'+uid,biz=loja(k);
  async function cancelar(msg){await tx(pr,a=>a?.servicoCidade?.id===id?{...a,servicoCidade:null,saldo:num(a.saldo)+valor}:undefined);throw Error(msg)}
@@ -49,24 +73,26 @@ async function processar(p){
  return {...a,...extra,despachoCidade:job,servicosRecibos:{...a.servicosRecibos,[id]:job}};
  });const j=b?.servicosRecibos?.[id];if(!j)return cancelar('Atendimento indisponível ou ocupado. Seus Ludigins foram devolvidos.');
  if(k==='posto'){const stock=await tx('ludigins_jogo/logistica/posto',s=>{s=s||{fatias:10,usosNaUltimaFatia:0};if(s.recibosCidade?.[id])return;let f=s.fatias??10,u=num(s.usosNaUltimaFatia);const ok=f>1||(f===1&&u<5);if(ok&&++u>=10&&f>1){f--;u=0}return {...s,fatias:f,usosNaUltimaFatia:u,recibosCidade:{...s.recibosCidade,[id]:ok?'ok':'vazio'}}});if(stock.recibosCidade[id]!=='ok')return cancelar('O posto está sem estoque. Seus Ludigins foram devolvidos.');
- await new Promise(resolve=>T.moverAte('A4',resolve));nota('Táxi no posto • abastecendo…');await espera(3200)}
+ await new Promise(resolve=>T.moverAte('A4',resolve));nota('Táxi no posto • abastecendo…');bomba(true);try{await espera(3200)}finally{bomba(false)}}
  else{nota(k==='lanche'?'A moto está levando seu lanche.':'O bombeiro está a caminho do táxi.');await espera(j.saida-agora())}
  // Settle each ledger once, even if the page closed midway.
  await tx(biz,a=>{if(!a||a.servicosRecibos?.[id]?.liquidado)return;const parte=k==='lanche'?valor:valor/2;return {...a,caixa:num(a.caixa)+parte,...(k==='lanche'?{ganhosHoje:num(a.ganhosHoje)+valor}:k==='bombeiro'?{atendimentos:num(a.atendimentos)+1}:{abastecimentos:num(a.abastecimentos)+1}),servicosRecibos:{...a.servicosRecibos,[id]:{...j,liquidado:true}}}});
  if(k!=='lanche'&&j.dono){await tx('ludigins_usuarios/'+j.dono,a=>{if(!a||a.receitasServicoCidade?.[id])return;const c=k==='posto'?'ganhosPostoTotal':'ganhosBombeiroTotal';return {...a,saldo:num(a.saldo)+valor/2,[c]:num(a[c])+valor/2,...(k==='posto'?{ganhosPostoHoje:(a.dataCorridas===dia()?num(a.ganhosPostoHoje):0)+valor/2}:{}),receitasServicoCidade:{...a.receitasServicoCidade,[id]:true}}})}
  await tx(pr,a=>a?.servicoCidade?.id===id?{...a,servicoCidade:null,...(k==='posto'?{combustivel:100}:k==='bombeiro'?{aquecimentoCorridas:0}:{pedidoLanchePendente:null,ultimaRefeicaoCorrida:num(a.corridasHoje),dataUltimaRefeicao:dia()})}:undefined);
+ if(k==='posto'){nota('Tanque cheio • liberando a bomba…');await new Promise(resolve=>T.moverAte('X42',resolve))}
  nota(k==='posto'?'Tanque cheio.':k==='lanche'?'Lanche entregue.':'Táxi resfriado.');
 }
 async function atender(k,pendente){if(ocupado||!uid)return;ocupado=true;render();try{
  if(!pendente){if(T.ocupado||!lojas[k])throw Error('Aguarde o fim da corrida ou a conexão do serviço.');
  const b=lojas[k],valor=preco(k,b);
  if(k==='bombeiro'&&b.modoAtendimento!=='automatico'){const d=b.donoId&&(await get(ref(db,'ludigins_jogo/jogadores/'+b.donoId))).val();if(!d||d.status==='offline'||agora()-num(d.atualizadoEm)>60000)throw Error('O dono do bombeiro está offline.')}
- if(k==='posto'){nota('Táxi a caminho do posto…');await new Promise(resolve=>T.moverAte('A4',resolve))}
+ if(k==='posto'){nota('Táxi a caminho do posto…');await new Promise(resolve=>T.moverAte('A4',resolve));await entrarFila()}
  const id=crypto.randomUUID(),alvo=T.atual;
  const a=await tx('ludigins_usuarios/'+uid,p=>p&&!p.corridaAtual&&!p.servicoCidade&&precisa(k,p)&&num(p.saldo)>=valor?{...p,saldo:num(p.saldo)-valor,servicoCidade:{id,tipo:k,alvo,valor}}:undefined);
  if(a?.servicoCidade?.id!==id)throw Error('Confira o saldo, a necessidade do táxi e se há outro atendimento.');pendente=a.servicoCidade;}
+ if(k==='posto'&&!fichaFila){await new Promise(resolve=>T.moverAte('A4',resolve));await entrarFila()}
  await processar(pendente);
- }catch(e){nota(e.message||'Falha de conexão.');}finally{ocupado=false;render();$('svcRetomar').hidden=!perfil?.servicoCidade}}
+ }catch(e){nota(e.message||'Falha de conexão.');}finally{bomba(false);try{await sairFila()}catch{nota('Conexão da fila interrompida; sua vaga será liberada automaticamente.')}ocupado=false;render();$('svcRetomar').hidden=!perfil?.servicoCidade}}
 export function perfilServicos(r){uid=r?.id;perfil=r?.perfil;render();$('svcRetomar').hidden=!perfil?.servicoCidade||ocupado}
 export function servicoEmCurso(){return ocupado||!!perfil?.servicoCidade}
 onValue(ref(db,'.info/serverTimeOffset'),s=>offset=num(s.val()));
