@@ -3489,6 +3489,11 @@
             radioAnterior();
         });
 
+        window.controlarRadioCidade = function(acao) {
+            if(acao==='anterior')return radioAnterior();
+            if(acao==='proxima')return proximaRadio();
+            if((acao==='play'&&audioElement.paused)||(acao==='stop'&&!audioElement.paused))btnPlayPause.click();
+        };
         function proximaRadio() {
             const radiosAtivasNoCentro = radiosFavoritasIds.map(id => todasRadiosGlobal.find(r => r.id === id)).filter(Boolean);
             if (radiosAtivasNoCentro.length === 0) return;
