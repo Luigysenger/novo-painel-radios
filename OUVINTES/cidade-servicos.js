@@ -35,24 +35,25 @@ function visualizar(k,j){
  const a=trajeto(cfg[k][1],j.alvo),v=trajeto(j.alvo,cfg[k][1]);
  function tick(){const t=agora();fx.hidden=true;if(t<j.chegada)mover(el,a,t-j.inicio);else if(t<j.saida){posicionar(el,T.pontos[j.alvo]);posicionar(fx,T.pontos[j.alvo]);fx.hidden=false}else if(t<j.fim)mover(el,v,t-j.saida);else{if(fogo)estacionar();else{posicionar(el,T.pontos[cfg[k][1]]);timer=setTimeout(cancel,Math.max(0,j.fim+120000-t))}return}frame=requestAnimationFrame(tick)}tick()}
 visualizar('bombeiro',null);
-const tx=async(path,fn)=>{const r=ref(db,path);await get(r);return (await runTransaction(r,fn,{applyLocally:false})).snapshot.val()};
+const tx=async(path,fn)=>{const r=ref(db,path);await get(r);const result=await runTransaction(r,fn,{applyLocally:false});return result.committed?result.snapshot.val():(await get(r)).val()};
 
 const filaPath='ludigins_cidade/filaPosto';
-let fichaFila=null,bombaAtual=null;
+let fichaFila=null,bombaAtual=null,renovarFila=null;
+const retomados=new Set();
 async function entrarFila(){
  const chave=uid+'_'+crypto.randomUUID();fichaFila=chave;
  await tx(filaPath,a=>{a=a||{};const itens=Object.fromEntries(Object.entries(a.itens||{}).filter(([,v])=>v.ate>agora()));const ordem=num(a.ordem)+1;return{ordem,itens:{...itens,[chave]:{uid,ordem,ate:agora()+30000}}}});
  while(fichaFila===chave){
-  const fila=await tx(filaPath,a=>{if(!a?.itens?.[chave])return;const itens=Object.fromEntries(Object.entries(a.itens).filter(([k,v])=>k===chave||v.ate>agora()));itens[chave]={...itens[chave],ate:agora()+30000};return {...a,itens}});
+  const fila=await tx(filaPath,a=>{a=a||{};const itens=Object.fromEntries(Object.entries(a.itens||{}).filter(([k,v])=>k===chave||v.ate>agora()));const ordem=itens[chave]?.ordem||num(a.ordem)+1;itens[chave]={uid,ordem,ate:agora()+60000};return {...a,ordem:Math.max(num(a.ordem),ordem),itens}});
   const ordem=Object.entries(fila?.itens||{}).sort((a,b)=>a[1].ordem-b[1].ordem),pos=ordem.findIndex(([k])=>k===chave);
-  if(pos<0)throw Error('Sua conexão com a fila expirou. Solicite novamente.');
+  if(pos<0){nota('Reconectando à fila do posto…');await espera(1200);continue}
   T.estacionarFila?.(pos);nota(pos?'Fila do posto • '+(pos+1)+'º na ordem de chegada':'Táxi em frente ao posto.');
-  if(pos===0){await espera(Math.max(0,num(lojas.posto?.despachoCidade?.fim)-agora()));return}
+  if(pos===0){renovarFila=setInterval(()=>tx(filaPath,a=>{if(!a?.itens?.[chave])return;return {...a,itens:{...a.itens,[chave]:{...a.itens[chave],ate:agora()+60000}}}}).catch(()=>{}),10000);await espera(Math.max(0,num(lojas.posto?.despachoCidade?.fim)-agora()));return}
   await espera(1200);
  }
 }
 async function sairFila(){
- const chave=fichaFila;fichaFila=null;if(!chave)return;
+ clearInterval(renovarFila);renovarFila=null;const chave=fichaFila;fichaFila=null;if(!chave)return;
  await tx(filaPath,a=>{if(!a?.itens?.[chave])return;const itens={...a.itens};delete itens[chave];return {...a,itens}});
 }
 function bomba(ativa){
@@ -93,7 +94,7 @@ async function atender(k,pendente){if(ocupado||!uid)return;ocupado=true;render()
  if(k==='posto'&&!fichaFila){await new Promise(resolve=>T.moverAte('A4',resolve));await entrarFila()}
  await processar(pendente);
  }catch(e){nota(e.message||'Falha de conexão.');}finally{bomba(false);try{await sairFila()}catch{nota('Conexão da fila interrompida; sua vaga será liberada automaticamente.')}ocupado=false;render();$('svcRetomar').hidden=!perfil?.servicoCidade}}
-export function perfilServicos(r){uid=r?.id;perfil=r?.perfil;render();$('svcRetomar').hidden=!perfil?.servicoCidade||ocupado}
+export function perfilServicos(r){uid=r?.id;perfil=r?.perfil;render();$('svcRetomar').hidden=!perfil?.servicoCidade||ocupado;const p=perfil?.servicoCidade;if(p?.tipo==='posto'&&!ocupado&&!retomados.has(p.id)){retomados.add(p.id);setTimeout(()=>{if(!ocupado&&perfil?.servicoCidade?.id===p.id)atender('posto',p)},0)}}
 export function servicoEmCurso(){return ocupado||!!perfil?.servicoCidade}
 onValue(ref(db,'.info/serverTimeOffset'),s=>offset=num(s.val()));
 for(const k in cfg){$('svc-'+k).onclick=()=>atender(k);onValue(ref(db,loja(k)),s=>{lojas[k]=s.val();visualizar(k,lojas[k]?.despachoCidade);render()})}
