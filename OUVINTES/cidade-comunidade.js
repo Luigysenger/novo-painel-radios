@@ -1,5 +1,5 @@
 import { db } from '../firebase-config.js';
-import { ref, onValue } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+import { ref, onValue, runTransaction, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
 import { identidade, manterPresenca, radioEmReproducao } from './cidade-presenca.js?v=20261120a';
 const transito=window.CidadeLudiginsTransito;
 const camada=document.querySelector('.cidade-transito');
@@ -31,7 +31,7 @@ window.addEventListener('cidade-taxi-movimento',()=>presenca.publicar(true));
 window.addEventListener('cidade-presenca-erro',()=>{if(nota)nota.textContent='Conexão interrompida. Reconectando os jogadores…'});
 function desenharCarros(){
  if(!camada)return;
- const lista=recentes(sessoes,presenca.agora()),meu=identidade()?.id,vistos=new Set();
+ const lista=recentes(ouvintes,presenca.agora()),meu=identidade()?.id,vistos=new Set();for(const [id,s] of recentes(sessoes,presenca.agora()))lista.set(id,s);
  for(const [id,s] of lista){
   if(id===meu||!posicao(s.taxi,presenca.agora()))continue;
   vistos.add(id);
@@ -39,9 +39,9 @@ function desenharCarros(){
   if(!el){
    el=document.createElement('div');el.className='cidade-veiculo cidade-outro-jogador';
    const desenho=document.createElement('span'),nome=document.createElement('b');
-   desenho.textContent='🚕';nome.className='cidade-nome-jogador';el.append(desenho,nome);camada.append(el);carros.set(id,el);
+   desenho.textContent='🚕';nome.className='cidade-nome-jogador';el.append(desenho,nome);camada.append(el);carros.set(id,el);el.style.pointerEvents='auto';el.style.cursor='pointer';el.tabIndex=0;el.setAttribute('role','button');el.onclick=()=>menuReacao(id,s.nome);el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();menuReacao(id,s.nome)}};
   }
-  el.querySelector('b').textContent=s.nome;
+  el.querySelector('b').textContent=primeiroNome(s.nome);
   el.title=s.nome+(s.radio?' • '+s.radio:'');
   const nivel=Math.max(1,Math.min(10,Math.floor(num(s.taxi.nivel)||1)));
   el.querySelector('span').style.setProperty('--taxi-filtro',filtros[nivel-1]);
@@ -114,7 +114,49 @@ function ouvir(caminho,receber,erro){
  onValue(ref(db,caminho),s=>{receber(s.val()||{})},()=>{if(nota)nota.textContent=erro});
 }
 ouvir('ludigins_cidade/sessoes',s=>{sessoes=s;desenharCarros();listaOnline();if(nota)nota.textContent='Atualização em tempo real';},'Não foi possível carregar os jogadores da cidade.');
-ouvir('ludigins_publico/ouvintes',s=>{ouvintes=s;listaOnline()},'Não foi possível carregar os ouvintes online.');
+ouvir('ludigins_publico/ouvintes',s=>{ouvintes=s;desenharCarros();listaOnline()},'Não foi possível carregar os ouvintes online.');
 ouvir('ludigins_usuarios',s=>{perfis=s;rankings()},'Não foi possível carregar a classificação.');
 setInterval(()=>{desenharCarros();listaOnline();rankings()},5000);
 animar();
+
+function primeiroNome(nome){return String(nome||'Ouvinte').trim().split(/\s+/)[0]}
+const nomeProprio=document.createElement('b');nomeProprio.className='cidade-nome-jogador';
+nomeProprio.textContent=primeiroNome(identidade()?.nome);document.getElementById('taxiCidade')?.append(nomeProprio);
+const estiloReacoes=document.createElement('style');estiloReacoes.textContent=`
+.cidade-reacoes-menu{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;background:#0008}
+.cidade-reacoes-box{max-width:90vw;background:#101b2d;color:white;border:1px solid #a78bfa;border-radius:16px;padding:18px;text-align:center}
+.cidade-reacoes-box button{min-width:48px;min-height:48px;margin:5px;border-radius:10px;border:1px solid #64748b;background:#25344b;color:#fff;font-size:24px;cursor:pointer}
+.cidade-reacao-chuva{position:fixed;inset:0;z-index:10001;pointer-events:none;overflow:hidden}
+.cidade-reacao-chuva i{position:absolute;top:-60px;font-style:normal;font-size:32px;animation:cidadeChuva 2.8s linear forwards}
+@keyframes cidadeChuva{to{transform:translateY(110vh) rotate(240deg)}}
+@media(prefers-reduced-motion:reduce){.cidade-reacao-chuva i{animation:none;top:40%}}
+`;document.head.append(estiloReacoes);
+function menuReacao(id,nome){
+ if(document.querySelector('.cidade-reacoes-menu'))return;
+ const meu=identidade()?.id;if(!meu||meu===id)return;
+ const fundo=document.createElement('div'),box=document.createElement('div'),titulo=document.createElement('p');
+ fundo.className='cidade-reacoes-menu';box.className='cidade-reacoes-box';box.setAttribute('role','dialog');box.setAttribute('aria-modal','true');box.setAttribute('aria-label','Enviar reação');
+ titulo.textContent='Reagir ao táxi de '+primeiroNome(nome);box.append(titulo);
+ const fechar=()=>fundo.remove();fundo.onclick=e=>{if(e.target===fundo)fechar()};fundo.onkeydown=e=>{if(e.key==='Escape')fechar()};
+ for(const [icone,label] of [['👏','Palmas'],['👍','Positivo'],['🎉','Confetes']]){
+  const b=document.createElement('button');b.textContent=icone;b.setAttribute('aria-label',label);box.append(b);
+  b.onclick=async()=>{box.querySelectorAll('button').forEach(x=>x.disabled=true);
+   try{const result=await runTransaction(ref(db,'ludigins_cidade/reacoes/'+id+'/'+meu),a=>a?undefined:{icone,em:serverTimestamp(),nome:primeiroNome(identidade()?.nome)},{applyLocally:false});
+   titulo.textContent=result.committed?'Reação enviada!':'Você já enviou uma reação para este táxi.';
+   }catch{titulo.textContent='Não foi possível enviar. Tente novamente.'}
+   fecharBotao.disabled=false;
+  };
+ }
+ const fecharBotao=document.createElement('button');fecharBotao.textContent='Fechar';fecharBotao.style.fontSize='14px';fecharBotao.onclick=fechar;box.append(fecharBotao);fundo.append(box);document.body.append(fundo);box.querySelector('button').focus();
+}
+const inicioReacoes=Date.now(),vistas=new Set();
+const meuId=identidade()?.id;
+if(meuId)onValue(ref(db,'ludigins_cidade/reacoes/'+meuId),snap=>{
+ for(const [id,r] of Object.entries(snap.val()||{})){
+  if(vistas.has(id)||!['👏','👍','🎉'].includes(r?.icone)||!Number.isFinite(r.em))continue;
+  vistas.add(id);if(r.em<inicioReacoes-5000)continue;
+  const chuva=document.createElement('div');chuva.className='cidade-reacao-chuva';chuva.setAttribute('aria-label',primeiroNome(r.nome)+' enviou uma reação');chuva.setAttribute('role','status');
+  for(let n=0;n<24;n++){const p=document.createElement('i');p.textContent=r.icone;p.style.left=(Math.random()*94)+'%';p.style.animationDelay=(Math.random()*1.2)+'s';chuva.append(p)}
+  document.body.append(chuva);setTimeout(()=>chuva.remove(),4500);
+ }
+});
