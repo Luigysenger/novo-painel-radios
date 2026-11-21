@@ -12,7 +12,24 @@ async function localizarPerfil(){
  return snap.exists()?{id,raiz,perfil:snap.val()}:null;
 }
 function totalPerfil(p){return numero(p.corridasTotal??p.corridasTotais??p.totalCorridas??p.corridas??p.corridasHoje)}
-function diaSP(){return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}
+
+function dataCorridaSP(timestamp=Date.now()){
+ const partes=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date(timestamp));
+ return ['year','month','day'].map(k=>partes.find(p=>p.type===k).value).join('-');
+}
+function normalizarDataCorrida(d){d=String(d||'');if(/^\d{4}-\d{2}-\d{2}$/.test(d))return d;const m=d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);return m?m[3]+'-'+m[1].padStart(2,'0')+'-'+m[2].padStart(2,'0'):d}
+function contagensCorridas(p,dia,sem){
+ const dias={...p.corridasPorDia},recibos={};
+ for(const t of Object.values(p.recibosCidade||{})){if(!Number.isFinite(Number(t))||Number(t)<=0)continue;const d=dataCorridaSP(Number(t));recibos[d]=(recibos[d]||0)+1}
+ for(const [d,n] of Object.entries(recibos))dias[d]=Math.max(Number(dias[d])||0,n);
+ const anterior=normalizarDataCorrida(p.dataCorridas);
+ if(/^\d{4}-\d{2}-\d{2}$/.test(anterior))dias[anterior]=Math.max(Number(dias[anterior])||0,Number(p.corridasHoje)||0);
+ const hoje=Number(dias[dia])||0;
+ const totalSemana=Object.entries(dias).reduce((n,[d,v])=>n+(d>=sem&&d<=dia?(Number(v)||0):0),0);
+ return {hoje,semana:Math.max(totalSemana,normalizarDataCorrida(p.semanaCorridas)===sem?Number(p.corridasSemana)||0:0),dias};
+}
+
+function diaSP(){return dataCorridaSP()}
 function semana(d){const dt=new Date(d+'T12:00:00Z');dt.setUTCDate(dt.getUTCDate()-(dt.getUTCDay()+6)%7);return dt.toISOString().slice(0,10)}
 function bloqueio(p){
  if(!p)return 'Entre pelo painel para fazer corridas.';
@@ -30,13 +47,13 @@ window.finalizarCorridaCidade=async function(id,valor){
  const dia=diaSP(),sem=semana(dia),agora=Date.now();
  const tx=await runTransaction(ref(db,r.raiz+'/'+r.id),p=>{
   if(!p||p.recibosCidade?.[id]||bloqueio(p))return;
-  const hoje=(p.dataCorridas===dia?numero(p.corridasHoje):0)+1,bonus=hoje===100?50:0;
-  return {...p,corridasTotal:totalPerfil(p)+1,corridasHoje:hoje,...(p.dataCorridas!==dia?{ultimaRefeicaoCorrida:0,dataUltimaRefeicao:dia}:{}),dataCorridas:dia,corridasSemana:(p.semanaCorridas===sem?numero(p.corridasSemana):0)+1,semanaCorridas:sem,saldo:saldoDoPerfil(p)+valor+bonus,ganhosHoje:(p.dataCorridas===dia?numero(p.ganhosHoje):0)+valor+bonus,bonusAposMetaAte:bonus?agora+300000:numero(p.bonusAposMetaAte),combustivel:Math.max(0,numero(p.combustivel??100)-15),aquecimentoCorridas:numero(p.aquecimentoCorridas)+1,recibosCidade:{...p.recibosCidade,[id]:agora},atualizadoEm:agora};
+  const contagem=contagensCorridas(p,dia,sem),hoje=contagem.hoje+1,bonus=hoje===100?50:0;
+  return {...p,corridasTotal:totalPerfil(p)+1,corridasHoje:hoje,...(p.dataCorridas!==dia?{ultimaRefeicaoCorrida:0,dataUltimaRefeicao:dia}:{}),dataCorridas:dia,corridasPorDia:{...contagem.dias,[dia]:hoje},corridasSemana:contagem.semana+1,semanaCorridas:sem,saldo:saldoDoPerfil(p)+valor+bonus,ganhosHoje:(p.dataCorridas===dia?numero(p.ganhosHoje):0)+valor+bonus,bonusAposMetaAte:bonus?agora+300000:numero(p.bonusAposMetaAte),combustivel:Math.max(0,numero(p.combustivel??100)-15),aquecimentoCorridas:numero(p.aquecimentoCorridas)+1,recibosCidade:{...p.recibosCidade,[id]:agora},atualizadoEm:agora};
  },{applyLocally:false});
  if(!tx.committed&&!tx.snapshot.val()?.recibosCidade?.[id])throw Error(bloqueio(tx.snapshot.val())||'Corrida não registrada.');
 };
 function numero(v){const n=Number(v);return Number.isFinite(n)?n:0}function texto(v,p='—'){return v===undefined||v===null||v===''?p:String(v)}function saldoDoPerfil(p){return numero(p?.saldo??p?.ludigins??p?.moedas)}function campoSaldo(p){if(Object.prototype.hasOwnProperty.call(p||{},'saldo'))return'saldo';if(Object.prototype.hasOwnProperty.call(p||{},'ludigins'))return'ludigins';if(Object.prototype.hasOwnProperty.call(p||{},'moedas'))return'moedas';return'saldo'}
-function atualizarTela(r){registroAtual=r;atualizarNegocios();perfilServicos(r);const s=document.getElementById('perfilRealStatus');if(!r){if(s)s.textContent='Entre pelo painel normal do ouvinte para usar a Prefeitura.';return}const p=r.perfil,c={perfilRealStatus:'✅ Cidadão reconhecido. Prefeitura conectada ao seu patrimônio real.',cidadaoNome:texto(p.nome??p.displayName??p.apelido,'Ouvinte'),cidadaoSaldo:saldoDoPerfil(p).toLocaleString('pt-BR')+' Ludigins',cidadaoCorridasHoje:(p.dataCorridas&&p.dataCorridas!==diaSP()?0:numero(p.corridasHoje??p.corridas_hoje)).toLocaleString('pt-BR'),cidadaoCorridasTotal:totalPerfil(p).toLocaleString('pt-BR'),cidadaoCarro:texto(p.carroAtual??p.corCarro??p.patente,'carro atual preservado')};for(const[id,v]of Object.entries(c)){const e=document.getElementById(id);if(e)e.textContent=v}}
+function atualizarTela(r){registroAtual=r;atualizarNegocios();perfilServicos(r);const s=document.getElementById('perfilRealStatus');if(!r){if(s)s.textContent='Entre pelo painel normal do ouvinte para usar a Prefeitura.';return}const p=r.perfil,c={perfilRealStatus:'✅ Cidadão reconhecido. Prefeitura conectada ao seu patrimônio real.',cidadaoNome:texto(p.nome??p.displayName??p.apelido,'Ouvinte'),cidadaoSaldo:saldoDoPerfil(p).toLocaleString('pt-BR')+' Ludigins',cidadaoCorridasHoje:contagensCorridas(p,diaSP(),semana(diaSP())).hoje.toLocaleString('pt-BR'),cidadaoCorridasTotal:totalPerfil(p).toLocaleString('pt-BR'),cidadaoCarro:texto(p.carroAtual??p.corCarro??p.patente,'carro atual preservado')};for(const[id,v]of Object.entries(c)){const e=document.getElementById(id);if(e)e.textContent=v}}
 function dono(n){return texto(n?.donoNome??n?.proprietarioNome??n?.dono,'Sem proprietário')}function caixa(n){return numero(n?.caixa).toLocaleString('pt-BR')+' Ludigins'}const tiposNegocio=[['posto_combustivel','⛽','Posto'],['carreta_combustivel','🚛','Carreta de combustível'],['entregador_lanche','🍔','Entrega de lanches'],['caminhao_bombeiro','🚒','Caminhão do bombeiro']];
 let negociosCidade={},consulta=null;
 function proprietario(n){if(!registroAtual||!n?.donoId)return false;
@@ -129,3 +146,5 @@ async function construirCasa(id,modeloId){const modelo=CASAS.find(c=>c.id===mode
 function abrirPrefeitura(){const p=document.getElementById('centralCidadao'),f=document.getElementById('fecharCentral');if(matchMedia('(min-width:651px)').matches){p.classList.add('aberta');f.hidden=false;f.onclick=()=>{p.classList.remove('aberta');f.hidden=true}}else p.scrollIntoView({behavior:'smooth',block:'start'})}window.comprarLoteCidadeLudigins=comprarLote;window.abrirCatalogoCasasCidadeLudigins=abrirCatalogo;window.construirCasaCidadeLudigins=construirCasa;window.abrirPrefeituraCidadeLudigins=abrirPrefeitura;
 const prefeituraHotspot=document.getElementById('prefeitura');if(prefeituraHotspot)prefeituraHotspot.addEventListener('click',()=>{const modal=document.getElementById('modalLocal'),titulo=document.getElementById('localTitulo'),badge=document.getElementById('localBadge'),textoEl=document.getElementById('localTexto'),acao=document.getElementById('localAcao');if(titulo)titulo.textContent='🏛️ Prefeitura';if(badge)badge.textContent='Central do Cidadão';if(textoEl)textoEl.textContent='Aqui você consulta seu patrimônio, compra terrenos e administra ou melhora sua residência.';if(acao){acao.textContent='Abrir Central do Cidadão';acao.onclick=()=>{modal?.classList.remove('ativo');abrirPrefeitura()}}modal?.classList.add('ativo')});
 localizarPerfil().then(r=>{if(!r)return atualizarTela(null);onValue(ref(db,r.raiz+'/'+r.id),snap=>{if(!snap.exists())return atualizarTela(null);atualizarTela({...r,perfil:snap.val()});atualizarLotes(lotesAtuais);window.CidadeLudiginsTransito?.aplicarModelo({...snap.val(),corridasTotais:totalPerfil(snap.val())})},()=>atualizarTela(null))}).catch(()=>atualizarTela(null));onValue(ref(db,'ludigins_jogo/negocios'),s=>atualizarNegocios(s.exists()?(s.val()||{}):{}));onValue(ref(db,'ludigins_cidade/lotes'),s=>atualizarLotes(s.exists()?(s.val()||{}):{}));
+
+let dataTelaCorridas=diaSP();setInterval(()=>{const hoje=diaSP();if(hoje!==dataTelaCorridas){dataTelaCorridas=hoje;if(registroAtual)atualizarTela(registroAtual)}},1000);
