@@ -1,3 +1,19 @@
+
+function dataCorridaSP(timestamp=Date.now()){
+ const partes=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date(timestamp));
+ return ['year','month','day'].map(k=>partes.find(p=>p.type===k).value).join('-');
+}
+function normalizarDataCorrida(d){d=String(d||'');if(/^\d{4}-\d{2}-\d{2}$/.test(d))return d;const m=d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);return m?m[3]+'-'+m[1].padStart(2,'0')+'-'+m[2].padStart(2,'0'):d}
+function contagensCorridas(p,dia,sem){
+ const dias={...p.corridasPorDia},recibos={};
+ for(const t of Object.values(p.recibosCidade||{})){if(!Number.isFinite(Number(t))||Number(t)<=0)continue;const d=dataCorridaSP(Number(t));recibos[d]=(recibos[d]||0)+1}
+ for(const [d,n] of Object.entries(recibos))dias[d]=Math.max(Number(dias[d])||0,n);
+ const anterior=normalizarDataCorrida(p.dataCorridas);
+ if(/^\d{4}-\d{2}-\d{2}$/.test(anterior))dias[anterior]=Math.max(Number(dias[anterior])||0,Number(p.corridasHoje)||0);
+ const hoje=Number(dias[dia])||0;
+ const totalSemana=Object.entries(dias).reduce((n,[d,v])=>n+(d>=sem&&d<=dia?(Number(v)||0):0),0);
+ return {hoje,semana:Math.max(totalSemana,normalizarDataCorrida(p.semanaCorridas)===sem?Number(p.corridasSemana)||0:0),dias};
+}
 import { db } from '../firebase-config.js';
 import { ref, onValue, runTransaction, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
 import { identidade, manterPresenca, radioEmReproducao } from './cidade-presenca.js?v=20261120a';
@@ -57,13 +73,13 @@ function animar(){
  for(const el of carros.values()){const p=posicao(el.estado,agora);if(p){el.style.left=p[0]+'%';el.style.top=p[1]+'%'}}
  requestAnimationFrame(animar);
 }
-function dataSP(){return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(presenca.agora()))}
+function dataSP(){return dataCorridaSP(presenca.agora())}
 function chaveSemana(dia){const d=new Date(dia+'T12:00:00Z');d.setUTCDate(d.getUTCDate()-(d.getUTCDay()+6)%7);return d.toISOString().slice(0,10)}
 function rankings(){
  const dia=dataSP(),semana=chaveSemana(dia);
  for(const [alvo,campo,data,chave] of [[rankingDia,'corridasHoje','dataCorridas',dia],[rankingSemana,'corridasSemana','semanaCorridas',semana]]){
   if(!alvo)continue;
-  const lista=Object.entries(perfis).filter(([,p])=>p&&p[data]===chave&&num(p[campo])>0).sort((a,b)=>num(b[1][campo])-num(a[1][campo])||String(a[1].nome||'').localeCompare(String(b[1].nome||''),'pt-BR')).slice(0,5);
+  const lista=Object.entries(perfis).filter(([,p])=>p).map(([id,p])=>{const t=contagensCorridas(p,dia,semana);return [id,{...p,corridasHoje:t.hoje,corridasSemana:t.semana}]}).filter(([,p])=>num(p[campo])>0).sort((a,b)=>num(b[1][campo])-num(a[1][campo])||String(a[1].nome||'').localeCompare(String(b[1].nome||''),'pt-BR')).slice(0,5);
   alvo.replaceChildren();
   if(!lista.length){const li=document.createElement('li');li.textContent='Aguardando as primeiras corridas.';alvo.append(li)}
   lista.forEach(([id,p],i)=>{const li=document.createElement('li'),pos=document.createElement('b'),nome=document.createElement('span'),total=document.createElement('strong');li.className='cidade-ranking-linha';if(id===identidade()?.id)li.classList.add('cidade-eu');pos.textContent=(i+1)+'º';nome.textContent=p.nome||p.displayName||p.apelido||'Ouvinte';total.textContent=num(p[campo]).toLocaleString('pt-BR')+' corridas';li.append(pos,nome,total);alvo.append(li)});
@@ -85,7 +101,14 @@ function listaOnline(){
    ponto.className='cidade-radio-ponto';ponto.setAttribute('aria-hidden','true');
    titulo.textContent=s.radio;botao.append(ponto,titulo);radio.replaceChildren(botao);
   }
-  linha.append(nome,radio);online.append(linha);
+  linha.append(nome,radio);
+ if(s.id===identidade()?.id){
+  const controles=document.createElement('div');controles.className='cidade-radio-controles';
+  for(const [acao,icone,label] of [['anterior','⏮','Rádio anterior'],['play','▶','Tocar rádio'],['stop','■','Parar rádio'],['proxima','⏭','Próxima rádio']]){
+   const b=document.createElement('button');b.type='button';b.textContent=icone;b.title=label;b.setAttribute('aria-label',label);b.onclick=()=>{try{window.parent.controlarRadioCidade?.(acao)}catch{}};controles.append(b);
+  }linha.append(controles);
+ }
+ online.append(linha);
  }
  if(foco)for(const b of online.querySelectorAll('button[data-ouvinte-id]'))if(b.dataset.ouvinteId===foco){b.focus({preventScroll:true});break}
  if(!lista.size){const li=document.createElement('li');li.textContent='Nenhum ouvinte online no momento.';online.append(li)}
