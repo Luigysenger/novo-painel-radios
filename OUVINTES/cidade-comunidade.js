@@ -151,7 +151,7 @@ function menuReacao(id,nome){
 }
 const inicioReacoes=Date.now(),vistas=new Set();
 const meuId=identidade()?.id;
-if(meuId)onValue(ref(db,'ludigins_cidade/reacoes/'+meuId),snap=>{
+if(meuId&&window.parent===window)onValue(ref(db,'ludigins_cidade/reacoes/'+meuId),snap=>{
  for(const [id,r] of Object.entries(snap.val()||{})){
   if(vistas.has(id)||!['👏','👍','🎉'].includes(r?.icone)||!Number.isFinite(r.em))continue;
   vistas.add(id);if(r.em<inicioReacoes-5000)continue;
